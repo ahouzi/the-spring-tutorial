@@ -2,6 +2,7 @@ package org.springsource.examples.spring31.services;
 
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,24 @@ public class User {
 
     private String email;
     private String password;
+    private boolean enabled;
+    private Date signupDate;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Date getSignupDate() {
+        return signupDate;
+    }
+
+    public void setSignupDate(Date signupDate) {
+        this.signupDate = signupDate;
+    }
 
     public String getEmail() {
         return email;
