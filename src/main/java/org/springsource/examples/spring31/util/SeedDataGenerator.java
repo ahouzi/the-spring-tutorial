@@ -2,6 +2,9 @@ package org.springsource.examples.spring31.util;
 
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import java.io.StringWriter;
@@ -51,7 +54,8 @@ public class SeedDataGenerator implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        assert StringUtils.hasText(this.names) : "the names property should have a comma delimited list of first and last name pairs, like this 'Josh Long, Mark Fisher, ...'";
+        assert StringUtils.hasText(this.names) : "the names property should have a comma delimited list of first and last name pairs, " +
+                "like this 'Josh Long, Mark Fisher, ...' Simply call #addName(String fn, String ln) on this object to populate that data.";
         String[] nameArr = names.split(",");
         assert nameArr.length > 0 : "you must specify values for the names";
         for (String noms : nameArr) {
@@ -63,8 +67,15 @@ public class SeedDataGenerator implements InitializingBean {
     }
 
     public static void main(String[] args) throws Exception {
-        SeedDataGenerator seedDataGenerator = new SeedDataGenerator();
-        seedDataGenerator.afterPropertiesSet();
-        seedDataGenerator.generate();
+        @Configuration
+        class SeedDataGeneratorConfiguration {
+            @Bean
+            public SeedDataGenerator seedDataGenerator() {
+                return new SeedDataGenerator();
+            }
+        }
+
+        AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(SeedDataGeneratorConfiguration.class);
+        annotationConfigApplicationContext.getBean(SeedDataGenerator.class).generate();
     }
 }

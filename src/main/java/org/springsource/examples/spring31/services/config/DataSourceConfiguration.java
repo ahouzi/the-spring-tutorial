@@ -10,6 +10,8 @@ import java.util.Map;
  * properties used to configure a Hibernate 4 {@link org.hibernate.SessionFactory session factory} and
  * a {@link DataSource datasource} - into a separate hierarchy so that implementations may be
  * <em>activated</em> based on which profile is active.
+ *
+ * @author Josh Long
  */
 public interface DataSourceConfiguration {
     CacheManager cacheManager() throws Exception;

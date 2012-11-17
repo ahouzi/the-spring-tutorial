@@ -11,10 +11,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-//
-//@RequestMapping(
-//        //consumes = MediaType.APPLICATION_JSON_VALUE,
-//        produces = MediaType.APPLICATION_JSON_VALUE)
+/**
+ * A {@link Controller controller} implementation that exposes a RESTful API to clients
+ * of the system.
+ *
+ * This API is to be secured using Spring Security OAuth as it supports full mutation of all
+ * {@link Customer business data}.
+ *
+ * @author Josh Long
+ */
 @Controller
 public class CustomerApiController {
 

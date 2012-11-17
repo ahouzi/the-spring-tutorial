@@ -1,7 +1,6 @@
 package org.springsource.examples.spring31.services.config;
 
 import org.hibernate.ejb.HibernatePersistence;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,6 +13,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springsource.examples.spring31.services.Customer;
 import org.springsource.examples.spring31.services.CustomerService;
 
+import javax.inject.Inject;
+
 
 @Configuration
 @PropertySource("/config.properties")
@@ -22,16 +23,21 @@ import org.springsource.examples.spring31.services.CustomerService;
 @ComponentScan(basePackageClasses = {CustomerService.class})
 public class ServicesConfiguration {
 
-    @Autowired private DataSourceConfiguration dataSourceConfiguration;
+    private DataSourceConfiguration dataSourceConfiguration;
+
+    @Inject
+    public ServicesConfiguration(DataSourceConfiguration dataSourceConfiguration) {
+        this.dataSourceConfiguration = dataSourceConfiguration;
+    }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean() throws Exception {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSourceConfiguration.dataSource());
-        em.setPackagesToScan(Customer.class.getPackage().getName());
-        em.setPersistenceProvider(new HibernatePersistence());
-        em.setJpaPropertyMap(dataSourceConfiguration.contributeJpaEntityManagerProperties());
-        return em;
+        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactoryBean.setDataSource(dataSourceConfiguration.dataSource());
+        entityManagerFactoryBean.setPackagesToScan(Customer.class.getPackage().getName());
+        entityManagerFactoryBean.setPersistenceProvider(new HibernatePersistence());
+        entityManagerFactoryBean.setJpaPropertyMap(dataSourceConfiguration.contributeJpaEntityManagerProperties());
+        return entityManagerFactoryBean;
     }
 
     @Bean

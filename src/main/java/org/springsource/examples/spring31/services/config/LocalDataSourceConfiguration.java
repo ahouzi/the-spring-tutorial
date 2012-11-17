@@ -1,8 +1,8 @@
 package org.springsource.examples.spring31.services.config;
 
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.H2Dialect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -11,45 +11,61 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
+import java.sql.Driver;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link Configuration class } that builds up local resources, consulting a properteis assumed to be
+ * in the {@link org.springframework.core.env.PropertySource property sources chain}:
+ * <p/>
+ * <OL>
+ * <LI>
+ * <code>ds.driverClass</code> the driver class for the RDBMS database.
+ * </LI>
+ * <LI>
+ * <code>ds.url</code> the JDBC connection URL for the RDBMS database
+ * </LI>
+ * <LI>
+ * <code>ds.password</code> the password for the RDBMS database
+ * </LI>
+ * <LI>
+ * <code>ds.user</code> the user name for the RDBMS database
+ * </LI>
+ * </OL>
+ *
+ * @author Josh Long
+ */
 @Configuration
 @Profile("default")
 public class LocalDataSourceConfiguration implements DataSourceConfiguration {
 
-    @Autowired
     private Environment environment;
+
+    @Inject
+    public LocalDataSourceConfiguration(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean
     public DataSource dataSource() throws Exception {
 
-        return new EmbeddedDatabaseBuilder()
-                .setName("crm")
-                .setType(EmbeddedDatabaseType.H2)
-                .build();
-
-        /*
         String user = environment.getProperty("ds.user"),
                 pw = environment.getProperty("ds.password"),
                 url = environment.getProperty("ds.url");
-        Class<Driver> driverClass = environment.getPropertyAsClass( "ds.driverClass", Driver.class );
-
+        Class<Driver> driverClass = environment.getPropertyAsClass("ds.driverClass", Driver.class);
         BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setDriverClassName( driverClass.getName() );
-        basicDataSource.setPassword( pw );
-        basicDataSource.setUrl( url );
-        basicDataSource.setUsername( user );
-        basicDataSource.setInitialSize( 5 );
-        basicDataSource.setMaxActive( 10 );
+        basicDataSource.setDriverClassName(driverClass.getName());
+        basicDataSource.setPassword(pw);
+        basicDataSource.setUrl(url);
+        basicDataSource.setUsername(user);
+        basicDataSource.setInitialSize(5);
+        basicDataSource.setMaxActive(10);
         return basicDataSource;
-        */
-
     }
 
     @Bean
