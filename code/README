@@ -1,4 +1,25 @@
-This is a simple application that demonstrates how to use Spring 3.1 on Cloud Foundry. 
+=======================================================================================================================
+TODO
+ - clean up the UI (maybe a watermark of the S2 logo in the background of the page that doesnt move even when you scroll?
+ - setup a Spring Integration flow that takes the uploaded image, resizes it, forwards the image to an http WS
+   that in turn emails the image as an attachment for someone to review in an email client and then type 'approve'
+   or 'disapprove' to make sure the images aren't lude. if they type 'approve' the image is 'enabled'
+
+   so there are two flows:
+    a) resize image and respond w/ resized image.
+    b) send image for moderation in a way that demonstrates hybrid cloud integration: CF propagates oauth creds
+       to a WS from the original AMQP context, and then uses that to securely send an email to the administrator asking
+       for approval. if the reply comes back 'yes' then the image is enabled. otherwise, a timeout happens and some sort
+       of escalation, maybe? iono. Either way, this would be a nice example of using Si to work with inbound
+       http (basic auth), amqp, smtp, spring security, etc.
+
+ - make it possible to signup/register with Spring Social
+ - use MongoDB and Redis somehow (gridfs, caching? what about gemfire?)
+
+=======================================================================================================================
+
+
+This is a simple application that demonstrates how to use Spring 3.1 on Cloud Foundry.
 This application builds a transactional service that talks to an RDBMS and is fronted by
 an Spring MVC controller which handles RESTful API calls. 
 
