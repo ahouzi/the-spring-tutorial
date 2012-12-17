@@ -45,11 +45,11 @@ module.run(function () {
         return;
 
     var resources = {};
-  //  window.alert(window.location.href +':'+ crmSession.getUserId());
+    //  window.alert(window.location.href +':'+ crmSession.getUserId());
     resources[oauthResource] = {
         client_id:crmSession.getUserId() + '',
         isDefault:true,
-        redirect_uri:window.location.href +'',
+        redirect_uri:window.location.href + '',
         authorization:baseUrl + '/oauth/authorize',
         scopes:['read', 'write'],
         callback:function () {
@@ -57,7 +57,7 @@ module.run(function () {
 
     jso_configure(resources);
 
-  //  resources[oauthResource] = resources[oauthResource].scopes;
+    //  resources[oauthResource] = resources[oauthResource].scopes;
     //jso_ensureTokens(resources);
 
 
