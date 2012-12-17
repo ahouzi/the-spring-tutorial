@@ -81,6 +81,13 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
+    public User updateUser(long userId, String email, String pw) {
+        User user = getUserById(userId);
+        user.setEmail(email);
+        user.setPassword(pw);
+        entityManager.merge(user);
+        return getUserById(userId);
+    }
     public User createOrGet(String user, String pw) {
         User usr;
         if ((usr = login(user, pw)) == null) {

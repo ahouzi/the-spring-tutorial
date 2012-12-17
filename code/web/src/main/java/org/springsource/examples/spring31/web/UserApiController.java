@@ -31,8 +31,14 @@ public class UserApiController {
 
     @RequestMapping(value = "/api/users/{userId}", method = RequestMethod.GET)
     @ResponseBody
-    public User userById(@PathVariable("userId") Long userId) {
+    public User getUserById(@PathVariable("userId") Long userId) {
         return this.userService.getUserById(userId);
+    }
+
+    @RequestMapping(value = "/api/users/{userId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public User updateUserById(@PathVariable("userId") Long userId, @RequestBody User user) {
+        return this.userService.updateUser(userId, user.getEmail(), user.getPassword());
     }
 
 
