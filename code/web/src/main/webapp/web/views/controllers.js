@@ -13,14 +13,34 @@ $.ajaxSetup({
 
 var appName = 'crm';
 var module = angular.module(appName, ['ngResource']);
-var oauthResource = appName;
 
+
+// idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separte object
 module.factory('ajaxUtils', function () {
+    var contentType = 'application/json; charset=utf-8' ,
+        dataType = 'json',
+        oauthResource = appName,
+        errorCallback = function (e) {
+            alert('error trying to connect to ');
+        };
 
-    // construct the base url based on a script from http://stackoverflow.com/questions/1368264/get-root-url-in-javascript
+    if (crmSession.isLoggedIn()) {
+
+        var resources = {};
+        resources[oauthResource] = {
+            client_id:crmSession.getUserId() + '',
+            isDefault:true,
+            redirect_uri:window.location.href + '',
+            authorization:'/oauth/authorize',
+            scopes:['read', 'write'],
+            callback:function () {
+            }
+        };
+        jso_configure(resources);
+    }
+
     var baseUrl = (function () {
         var defaultPorts = {"http:":80, "https:":443};
-
         return window.location.protocol + "//" + window.location.hostname
             + (((window.location.port)
             && (window.location.port != defaultPorts[window.location.protocol]))
@@ -28,6 +48,7 @@ module.factory('ajaxUtils', function () {
     })();
 
     console.debug('the base URL is ' + baseUrl);
+
 
     return {
         url:function (u) {
@@ -39,47 +60,102 @@ module.factory('ajaxUtils', function () {
             a['jso_scopes'] = ["read", 'write'];
             a['jso_allowia'] = true;
             return a;
+        },
+        oauthPut:function (url, data, cb) {
+
+
+            data['_method'] = 'PUT';
+
+            $.oajax(this.enrichRequestArguments({
+                type:'POST',
+                url:url,
+                headers:{'_method':'PUT'},
+                data:data, // the object to send
+                cache:false,
+                dataType:dataType,
+                contentType:contentType,
+                success:cb,
+                error:errorCallback
+            }));
+        },
+        oauthGet:function (url, data, cb) {
+            $.oajax(this.enrichRequestArguments({
+                type:'GET',
+                url:url,
+                cache:false,
+                dataType:dataType,
+                contentType:contentType,
+                success:cb,
+                error:errorCallback
+            }));
+        },
+        get:function (url, data, cb) {
+            $.ajax({
+                type:'GET',
+                url:url,
+                cache:false,
+                dataType:dataType,
+                contentType:contentType,
+                success:cb,
+                error:errorCallback
+            });
         }
+
+
     };
 });
 
-/**
- * injects a reference to ajaxUtils object, which is provided above.
- */
 module.factory('userService', function (ajaxUtils) {
     return {
-        userById:function (userId, callback) {
-            $.oajax(ajaxUtils.enrichRequestArguments({
-                url:ajaxUtils.url('/api/users/' + userId),
-                dataType:'json',
-                success:function (data) {
-                    console.log("Response: " + data);
-                    callback(data);
-                }
+
+        updateUserById:function (userId, email, pw, callback) {
+            // call the update method
+            // call as a method of type PUT
+            var updateUrl = ajaxUtils.url('/api/user/' + userId)
+
+            var user = {id:413, email:'josh@joshlong.com', password:'password01' ,_method:'PUT' };
+
+
+            var contentType = 'application/json; charset=utf-8' ,
+                dataType = 'json',
+                oauthResource = appName,
+                errorCallback = function (e) {
+                    alert('error trying to connect to ');
+                };
+
+
+            function enrichRequestArguments(args) {
+                var a = args || {};
+                a['jso_provider'] = oauthResource;
+                a['jso_scopes'] = ["read", 'write'];
+                a['jso_allowia'] = true;
+                return a;
+            }
+
+            // data['_method'] = 'PUT';
+
+            $.oajax(enrichRequestArguments({
+                type:'POST',
+                url:updateUrl,
+                headers:{'_method':'PUT'},
+                data:{email:email, password:pw, _method:'PUT' ,id: userId }, // the object to send
+                cache:false,
+                dataType:dataType,
+               // contentType:contentType,
+                success:callback,
+                error:errorCallback
             }));
 
+
+            //ajaxUtils.oauthPut(updateUrl, user, callback)
+
+        },
+        getUserById:function (userId, callback) {
+            ajaxUtils.oauthGet(ajaxUtils.url('/api/users/' + userId), {}, callback);
         }
     };
 });
 
-module.run(function () {
-    // setup jso.js and tell it about our OAuth service
-
-    if (!crmSession.isLoggedIn())
-        return;
-
-    var resources = {};
-    resources[oauthResource] = {
-        client_id:crmSession.getUserId() + '',
-        isDefault:true,
-        redirect_uri:window.location.href + '',
-        authorization:'/oauth/authorize',
-        scopes:['read', 'write'],
-        callback:function () {
-        }};
-    jso_configure(resources);
-
-});
 
 /***
  * used for editing the profile and handling the uploaded photo.
@@ -90,13 +166,15 @@ function ProfileController($scope, userService) {
 
     console.log('inside ProfileController.');
 
-    if (crmSession.isLoggedIn()) {
-        userService.userById(crmSession.getUserId(), function (usr) {
-            $scope.$apply(function () {
-                $scope.user = usr;
-            })
-        });
-    }
+    userService.getUserById(crmSession.getUserId(), function (usr) {
+        $scope.$apply(function () {
+            $scope.user = usr;
+        })
+    });
+
+    userService.updateUserById(413, 'josh@joshlong.com', 'password12132', function (updatedUsr) {
+        window.alert(JSON.stringify(updatedUsr))
+    });
 
 }
 

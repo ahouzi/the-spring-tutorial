@@ -35,10 +35,12 @@ public class UserApiController {
         return this.userService.getUserById(userId);
     }
 
-    @RequestMapping(value = "/api/users/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/user/{userId}", method = RequestMethod.PUT)
     @ResponseBody
-    public User updateUserById(@PathVariable("userId") Long userId, @RequestBody User user) {
-        return this.userService.updateUser(userId, user.getEmail(), user.getPassword());
+    public User updateUserById(@PathVariable("userId") Long userId,  @RequestParam String email, @RequestParam String password) {
+        User usr = this.userService.updateUser(userId, email, password);
+
+        return usr;
     }
 
 
