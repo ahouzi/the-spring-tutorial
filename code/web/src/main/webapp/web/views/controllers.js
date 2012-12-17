@@ -37,6 +37,8 @@ module.factory('ajaxUtils', function () {
             }
         };
         jso_configure(resources);
+
+
     }
 
     var baseUrl = (function () {
@@ -49,6 +51,25 @@ module.factory('ajaxUtils', function () {
 
     console.debug('the base URL is ' + baseUrl);
 
+    var sendDataFunction = function (ajaxFunction, argsProcessor, url, _method, data, cb) {
+        var d = data || {};
+        var argFunc = argsProcessor || function (a) {
+            return a;
+        };
+        var isPost = (_method || '').toLowerCase() == 'post'; // dont specify the '_method' attribute if the request's a POST. Redundant
+        if (!isPost) d['_method'] = _method;
+        ajaxFunction(argFunc({
+            type:'POST',
+            url:url,
+            headers:(isPost ? {} : {'_method':_method}),
+            data:d,
+            cache:false,
+            dataType:dataType,
+            success:cb,
+            error:errorCallback
+        })
+        );
+    };
 
     return {
         url:function (u) {
@@ -61,22 +82,12 @@ module.factory('ajaxUtils', function () {
             a['jso_allowia'] = true;
             return a;
         },
+        put:function (url, data, cb) {
+            sendDataFunction($.ajax, function () {
+            }, url, 'PUT', data, cb);
+        },
         oauthPut:function (url, data, cb) {
-
-
-            data['_method'] = 'PUT';
-
-            $.oajax(this.enrichRequestArguments({
-                type:'POST',
-                url:url,
-                headers:{'_method':'PUT'},
-                data:data, // the object to send
-                cache:false,
-                dataType:dataType,
-                contentType:contentType,
-                success:cb,
-                error:errorCallback
-            }));
+            sendDataFunction($.oajax, this.enrichRequestArguments, url, 'PUT', data, cb);
         },
         oauthGet:function (url, data, cb) {
             $.oajax(this.enrichRequestArguments({
@@ -109,46 +120,9 @@ module.factory('userService', function (ajaxUtils) {
     return {
 
         updateUserById:function (userId, email, pw, callback) {
-            // call the update method
-            // call as a method of type PUT
-            var updateUrl = ajaxUtils.url('/api/user/' + userId)
-
-            var user = {id:413, email:'josh@joshlong.com', password:'password01' ,_method:'PUT' };
-
-
-            var contentType = 'application/json; charset=utf-8' ,
-                dataType = 'json',
-                oauthResource = appName,
-                errorCallback = function (e) {
-                    alert('error trying to connect to ');
-                };
-
-
-            function enrichRequestArguments(args) {
-                var a = args || {};
-                a['jso_provider'] = oauthResource;
-                a['jso_scopes'] = ["read", 'write'];
-                a['jso_allowia'] = true;
-                return a;
-            }
-
-            // data['_method'] = 'PUT';
-
-            $.oajax(enrichRequestArguments({
-                type:'POST',
-                url:updateUrl,
-                headers:{'_method':'PUT'},
-                data:{email:email, password:pw, _method:'PUT' ,id: userId }, // the object to send
-                cache:false,
-                dataType:dataType,
-               // contentType:contentType,
-                success:callback,
-                error:errorCallback
-            }));
-
-
-            //ajaxUtils.oauthPut(updateUrl, user, callback)
-
+            var updateUrl = ajaxUtils.url('/api/user/' + userId);
+            var user = {email:email, password:pw, id:userId };
+            ajaxUtils.oauthPut(updateUrl, user, callback);
         },
         getUserById:function (userId, callback) {
             ajaxUtils.oauthGet(ajaxUtils.url('/api/users/' + userId), {}, callback);

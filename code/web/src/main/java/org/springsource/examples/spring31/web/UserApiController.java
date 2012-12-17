@@ -37,10 +37,8 @@ public class UserApiController {
 
     @RequestMapping(value = "/api/user/{userId}", method = RequestMethod.PUT)
     @ResponseBody
-    public User updateUserById(@PathVariable("userId") Long userId,  @RequestParam String email, @RequestParam String password) {
-        User usr = this.userService.updateUser(userId, email, password);
-
-        return usr;
+    public User updateUserById(@PathVariable("userId") Long userId, @RequestParam("email") String email, @RequestParam("password") String password) {
+        return this.userService.updateUser(userId, email, password);
     }
 
 
