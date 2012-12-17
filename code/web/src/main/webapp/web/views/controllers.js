@@ -11,7 +11,6 @@ $.ajaxSetup({
     cache:false
 });
 
-
 var appName = 'crm';
 var module = angular.module(appName, ['ngResource']);
 var oauthResource = appName;
@@ -27,6 +26,7 @@ module.factory('ajaxUtils', function () {
             && (window.location.port != defaultPorts[window.location.protocol]))
             ? (":" + window.location.port) : "");
     })();
+
     console.debug('the base URL is ' + baseUrl);
 
     return {

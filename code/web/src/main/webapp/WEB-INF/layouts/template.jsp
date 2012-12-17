@@ -6,6 +6,11 @@
 <!doctype html>
 <html ng-app="crm">
 <head>
+    <%-- Hack for IE. bleargh. --%>
+    <!--[if IE]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery.js"></script>
     <script type="text/javascript">
 
@@ -23,9 +28,6 @@
             }
         };
 
-        $(function () {
-      //      Ajax.setup('${pageContext.request.contextPath}', '${fullUrl}');
-        });
     </script>
 
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-ui.js"></script>
