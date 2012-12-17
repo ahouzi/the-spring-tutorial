@@ -16,24 +16,18 @@ var appName = 'crm';
 var module = angular.module(appName, ['ngResource']);
 var oauthResource = appName;
 
-
 module.factory('ajaxUtils', function () {
 
-
-    function getRootUrl() {
-        var defaultPorts = {"http:":80,"https:":443};
+    // construct the base url based on a script from http://stackoverflow.com/questions/1368264/get-root-url-in-javascript
+    var baseUrl = (function () {
+        var defaultPorts = {"http:":80, "https:":443};
 
         return window.location.protocol + "//" + window.location.hostname
             + (((window.location.port)
             && (window.location.port != defaultPorts[window.location.protocol]))
-            ? (":"+window.location.port) : "");
-    }
-    var baseUrl = getRootUrl() ;
-    console.debug('the base URL is '+ baseUrl)
-//    function getRootUrl(url) {
-//        return url.toString().replace(/^(.*\/\/[^\/?#]*).*$/,"$1");
-//    }
-//
+            ? (":" + window.location.port) : "");
+    })();
+    console.debug('the base URL is ' + baseUrl);
 
     return {
         url:function (u) {
@@ -79,7 +73,7 @@ module.run(function () {
         client_id:crmSession.getUserId() + '',
         isDefault:true,
         redirect_uri:window.location.href + '',
-        authorization:  '/oauth/authorize',
+        authorization:'/oauth/authorize',
         scopes:['read', 'write'],
         callback:function () {
         }};
