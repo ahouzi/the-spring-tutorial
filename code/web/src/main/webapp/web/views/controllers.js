@@ -15,24 +15,54 @@ $.ajaxSetup({
 var appName = 'crm';
 var module = angular.module(appName, ['ngResource']);
 var oauthResource = appName;
-var baseUrl = 'http://localhost:8080'; // todo factor this out so that it's provided by the server somehow
 
 
-module.factory('userService', function () {
+module.factory('ajaxUtils', function () {
+
+
+    function getRootUrl() {
+        var defaultPorts = {"http:":80,"https:":443};
+
+        return window.location.protocol + "//" + window.location.hostname
+            + (((window.location.port)
+            && (window.location.port != defaultPorts[window.location.protocol]))
+            ? (":"+window.location.port) : "");
+    }
+    var baseUrl = getRootUrl() ;
+    console.debug('the base URL is '+ baseUrl)
+//    function getRootUrl(url) {
+//        return url.toString().replace(/^(.*\/\/[^\/?#]*).*$/,"$1");
+//    }
+//
+
+    return {
+        url:function (u) {
+            return baseUrl + u;
+        },
+        enrichRequestArguments:function (args) {
+            var a = args || {};
+            a['jso_provider'] = oauthResource;
+            a['jso_scopes'] = ["read", 'write'];
+            a['jso_allowia'] = true;
+            return a;
+        }
+    };
+});
+
+/**
+ * injects a reference to ajaxUtils object, which is provided above.
+ */
+module.factory('userService', function (ajaxUtils) {
     return {
         userById:function (userId, callback) {
-            $.oajax({
-                url:baseUrl + '/api/users/' + userId,
-                jso_provider:appName,
-                jso_scopes:["read", 'write'],
-                jso_allowia:true,
+            $.oajax(ajaxUtils.enrichRequestArguments({
+                url:ajaxUtils.url('/api/users/' + userId),
                 dataType:'json',
                 success:function (data) {
-                    console.log("Response:");
-                    console.log(data);
+                    console.log("Response: " + data);
                     callback(data);
                 }
-            });
+            }));
 
         }
     };
@@ -45,21 +75,15 @@ module.run(function () {
         return;
 
     var resources = {};
-    //  window.alert(window.location.href +':'+ crmSession.getUserId());
     resources[oauthResource] = {
         client_id:crmSession.getUserId() + '',
         isDefault:true,
         redirect_uri:window.location.href + '',
-        authorization:baseUrl + '/oauth/authorize',
+        authorization:  '/oauth/authorize',
         scopes:['read', 'write'],
         callback:function () {
         }};
-
     jso_configure(resources);
-
-    //  resources[oauthResource] = resources[oauthResource].scopes;
-    //jso_ensureTokens(resources);
-
 
 });
 
