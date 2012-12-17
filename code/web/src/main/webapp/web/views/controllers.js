@@ -22,8 +22,8 @@ module.factory('userService', function () {
     return {
         userById:function (userId, callback) {
             $.oajax({
-                url: baseUrl + '/api/users/' + userId,
-                jso_provider: appName,
+                url:baseUrl + '/api/users/' + userId,
+                jso_provider:appName,
                 jso_scopes:["read", 'write'],
                 jso_allowia:true,
                 dataType:'json',
@@ -41,20 +41,24 @@ module.factory('userService', function () {
 module.run(function () {
     // setup jso.js and tell it about our OAuth service
 
+    if (!crmSession.isLoggedIn())
+        return;
+
     var resources = {};
+  //  window.alert(window.location.href +':'+ crmSession.getUserId());
     resources[oauthResource] = {
         client_id:crmSession.getUserId() + '',
         isDefault:true,
-        redirect_uri:window.location.href,
-        authorization:'/oauth/authorize',
+        redirect_uri:window.location.href +'',
+        authorization:baseUrl + '/oauth/authorize',
         scopes:['read', 'write'],
         callback:function () {
         }};
 
     jso_configure(resources);
 
-    resources[oauthResource] = resources[oauthResource].scopes;
-    jso_ensureTokens(resources);
+  //  resources[oauthResource] = resources[oauthResource].scopes;
+    //jso_ensureTokens(resources);
 
 
 });
@@ -68,11 +72,13 @@ function ProfileController($scope, userService) {
 
     console.log('inside ProfileController.');
 
-    userService.userById(crmSession.getUserId(), function (usr) {
-        $scope.$apply(function () {
-            $scope.user = usr;
-        })
-    });
+    if (crmSession.isLoggedIn()) {
+        userService.userById(crmSession.getUserId(), function (usr) {
+            $scope.$apply(function () {
+                $scope.user = usr;
+            })
+        });
+    }
 
 }
 
