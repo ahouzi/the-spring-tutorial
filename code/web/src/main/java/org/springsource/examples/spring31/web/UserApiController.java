@@ -21,6 +21,11 @@ import java.io.OutputStream;
 @Controller
 public class UserApiController {
 
+    /**
+     * Root URL template for all modifications to a {@link User}
+     */
+    static public final String USER_COLLECTION_ENTRY_URL = "/api/users/{userId}";
+
     private Logger log = Logger.getLogger(getClass());
     private UserService userService;
 
@@ -29,20 +34,20 @@ public class UserApiController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/api/users/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
     @ResponseBody
     public User getUserById(@PathVariable("userId") Long userId) {
         return this.userService.getUserById(userId);
     }
 
-    @RequestMapping(value = "/api/user/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
     @ResponseBody
     public User updateUserById(@PathVariable("userId") Long userId, @RequestParam("email") String email, @RequestParam("password") String password) {
         return this.userService.updateUser(userId, email, password);
     }
 
 
-    @RequestMapping(value = "/api/users/{userId}/photo", method = RequestMethod.POST)
+    @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
     public Long uploadBasedOnRequestParameter(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
         try {

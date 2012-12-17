@@ -3,7 +3,8 @@
 <div ng-controller="ProfileController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-      <form class="form-horizontal" method="POST" action="j_spring_security_check">
+            <form class="form-horizontal" ng-submit="saveProfileData()">
+
                 <div class="panel">
                     <fieldset>
                         <legend><h2> Update Your Profile</h2></legend>

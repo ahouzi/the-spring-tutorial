@@ -117,15 +117,15 @@ module.factory('ajaxUtils', function () {
 });
 
 module.factory('userService', function (ajaxUtils) {
+    var usersCollectionEntryUrl = '/api/users/';
     return {
-
         updateUserById:function (userId, email, pw, callback) {
-            var updateUrl = ajaxUtils.url('/api/user/' + userId);
+            var updateUrl = ajaxUtils.url(usersCollectionEntryUrl + userId);
             var user = {email:email, password:pw, id:userId };
             ajaxUtils.oauthPut(updateUrl, user, callback);
         },
         getUserById:function (userId, callback) {
-            ajaxUtils.oauthGet(ajaxUtils.url('/api/users/' + userId), {}, callback);
+            ajaxUtils.oauthGet(ajaxUtils.url(usersCollectionEntryUrl + userId), {}, callback);
         }
     };
 });
@@ -140,15 +140,20 @@ function ProfileController($scope, userService) {
 
     console.log('inside ProfileController.');
 
-    userService.getUserById(crmSession.getUserId(), function (usr) {
+    userService.getUserById(crmSession.getUserId(), function (u) {
         $scope.$apply(function () {
-            $scope.user = usr;
+            $scope.user = u;
         })
     });
 
-    userService.updateUserById(413, 'josh@joshlong.com', 'password12132', function (updatedUsr) {
-        window.alert(JSON.stringify(updatedUsr))
-    });
+    $scope.saveProfileData = function () {
+        userService.updateUserById($scope.user.id, $scope.user.email, $scope.user.password, function (u) {
+            $scope.$apply(function () {
+                $scope.user = u;
+            });
+        });
+    };
+
 
 }
 
