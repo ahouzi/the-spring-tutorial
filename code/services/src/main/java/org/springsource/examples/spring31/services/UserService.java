@@ -4,6 +4,7 @@ package org.springsource.examples.spring31.services;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.mongodb.gridfs.GridFSDBFile;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
@@ -30,8 +31,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -50,25 +50,43 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     public static final String USER_CACHE_REGION = "users";
 
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    // variables for the file resizing
+    private long defaultImageWidth = 300;
     private Map<String, Set<String>> multiMapOfExtensionsToVariants = new ConcurrentHashMap<String, Set<String>>();
+    private String convertCommandPath = "/usr/local/bin/convert";
+
+    // oauth
     private String defaultOauth2GrantTypes = "authorization_code,implicit";
     private String defaultOauth2Scopes = "read,write";
     private String defaultOauth2Resource = "crm";
 
-    private PhotoTransformationClient photoTransformationClient;
     private TransactionTemplate transactionTemplate;
     private GridFsTemplate gridFsTemplate;
     private EntityManager entityManager;
+
+    @PostConstruct
+    public void begin() {
+
+        Set<String> t = new ConcurrentSkipListSet<String>();
+        Collections.addAll(t, "jpeg");
+
+        multiMapOfExtensionsToVariants.put("jpg", t);
+        multiMapOfExtensionsToVariants.put("gif", new HashSet<String>());
+        multiMapOfExtensionsToVariants.put("png", new HashSet<String>());
+
+        for (String k : this.multiMapOfExtensionsToVariants.keySet())
+            multiMapOfExtensionsToVariants.get(k).add(k);
+
+        for (String k : this.multiMapOfExtensionsToVariants.keySet())
+            logger.info(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
+    }
 
     @PersistenceContext
     public void setEntityManger(EntityManager em) {
         this.entityManager = em;
     }
 
-    @Inject
-    public void setPhotoTransformationClient(PhotoTransformationClient photoTransformationClient) {
-        this.photoTransformationClient = photoTransformationClient;
-    }
 
     @Inject
     public void setPlatformTransactionManager(PlatformTransactionManager platformTransactionManager) {
@@ -88,6 +106,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         entityManager.merge(user);
         return getUserById(userId);
     }
+
     public User createOrGet(String user, String pw) {
         User usr;
         if ((usr = login(user, pw)) == null) {
@@ -137,9 +156,77 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, InputStream inputStream) throws Throwable {
         writeUserProfilePhoto(userId, ogFileName, inputStream);
         String ext = deriveFileExtension(ogFileName);
-        this.photoTransformationClient.transformUserProfilePhoto(userId, ext);
+        convertAndResizeUserProfilePhoto(userId, ext);
         if (logger.isDebugEnabled())
             logger.debug("sent a request to process the userId[" + userId + "] and extension [" + ext + "]");
+    }
+
+    protected void resizeToWidth(File file, File output, long width) throws Throwable {
+
+        List<String> listOfString = Arrays.asList(convertCommandPath, file.getAbsolutePath(), "-resize " + width + "x", output.getAbsolutePath());
+
+        String totalCommand = org.apache.commons.lang.StringUtils.join(listOfString, " ");
+
+        Process process = Runtime.getRuntime().exec(totalCommand);
+        int retCode = process.waitFor();
+        assert retCode == 0 && output.exists() :
+                "Something went wrong with running the 'convert'" +
+                        " command. The return / exit code is " + retCode +
+                        " and the full output is:" + IOUtils.toString(process.getErrorStream()) +
+                        ". There should be a file at " + output.getAbsolutePath();
+
+    }
+
+    public long convertAndResizeUserProfilePhoto(Long userId, String fileExtension) throws Throwable {
+        InputStream profilePhotoBytesFromGridFs = null, fileInputStream = null;
+        OutputStream outputStream = null;
+        File tmpStagingFile = null, convertedFile = null;
+
+        try {
+            User user = getUserById(userId);
+            assert user != null : "the user reference should still be valid!";
+            tmpStagingFile = File.createTempFile("profilePhoto" + userId, "." + fileExtension);
+            convertedFile = File.createTempFile("profilePhotoConvertedAndResized" + userId, ".jpg");
+            profilePhotoBytesFromGridFs = readUserProfilePhoto(userId);
+            outputStream = new FileOutputStream(tmpStagingFile);
+            copyStreamsAndClose(profilePhotoBytesFromGridFs, outputStream);
+            resizeToWidth(tmpStagingFile, convertedFile, this.defaultImageWidth);
+            fileInputStream = new FileInputStream(convertedFile);
+            writeUserProfilePhoto(userId, convertedFile.getName(), fileInputStream);
+            logger.debug("wrote converted image for " + userId + ". The temporary staging file is " + convertedFile.getAbsolutePath());
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
+            IOUtils.closeQuietly(profilePhotoBytesFromGridFs);
+            IOUtils.closeQuietly(outputStream);
+            assert ensureRemovalOfFile(convertedFile) : "the file " + pathForFile(convertedFile) + " must be either be deleted or not exist.";
+            assert ensureRemovalOfFile(tmpStagingFile) : "the file " + pathForFile(convertedFile) + " must be either deleted or not exist.";
+        }
+
+
+        return userId;
+    }
+
+
+    private String pathForFile(File fi) {
+        return fi == null ? "null" : fi.getAbsolutePath();
+    }
+
+    /**
+     * copy the streams, and make sure that the streams' descriptors are closed.
+     *
+     * @param inputStream  the input stream
+     * @param outputStream the output stream
+     */
+    private void copyStreamsAndClose(InputStream inputStream, OutputStream outputStream) throws Exception {
+        assert null != inputStream : "the input stream can't be null";
+        assert null != outputStream : "the output stream can't be null";
+        try {
+            IOUtils.copy(inputStream, outputStream);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+
     }
 
     public void writeUserProfilePhoto(long userId, String ogFileName, InputStream inputStream) throws Throwable {
@@ -225,12 +312,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         }
 
     }
-/*
-    public CrmUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = loginByUsername(email);
-        return new CrmUserDetails(user);
-    }*/
-
 
     /**
      * Implementation of Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails} contract
@@ -243,15 +324,17 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         // mostly for use in the Oauth stuff
         public static final String SCOPE_READ = "read";
 
+
         public static final String SCOPE_WRITE = "write";
 
         public static final String ROLE_USER = "ROLE_USER";
+
         /**
          * Roles for the user
          */
         private Set<String> roles = new HashSet<String>();
-
         private Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+
         /**
          * Regular CRM user
          */
@@ -311,24 +394,12 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
     }
 
-
     private static <T> Set<T> from(T... ex) {
         Set<T> t = new ConcurrentSkipListSet<T>();
         Collections.addAll(t, ex);
         return t;
     }
 
-    @PostConstruct
-    public void begin() throws Throwable {
-        multiMapOfExtensionsToVariants.put("jpg", from("jpeg"));
-        multiMapOfExtensionsToVariants.put("gif", new HashSet<String>());
-        multiMapOfExtensionsToVariants.put("png", new HashSet<String>());
-        for (String k : this.multiMapOfExtensionsToVariants.keySet())
-            multiMapOfExtensionsToVariants.get(k).add(k);
-
-        for (String k : this.multiMapOfExtensionsToVariants.keySet())
-            logger.info(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
-    }
 
     private String deriveFileExtension(final String fileName) {
         String lowerCaseFileName = fileName.toLowerCase();
@@ -357,6 +428,11 @@ public class UserService implements ClientDetailsService, UserDetailsService {
                 return input.getAuthority();
             }
         }), ',');
+    }
+
+
+    private boolean ensureRemovalOfFile(File file) {
+        return null != file && (!file.exists() || file.delete());
     }
 
 }
