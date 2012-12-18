@@ -24,22 +24,31 @@ module.factory('ajaxUtils', function () {
             alert('error trying to connect to ');
         };
 
+    var scopes = ['read', 'write'];
+    var resources = {};
+    resources[oauthResource] = {
+        client_id:crmSession.getUserId() + '',
+        isDefault:true,
+        redirect_uri:window.location.href + '',
+        authorization:'/oauth/authorize',
+        scopes:scopes
+    };
+
+
     if (crmSession.isLoggedIn()) {
 
-        var resources = {};
-        resources[oauthResource] = {
-            client_id:crmSession.getUserId() + '',
-            isDefault:true,
-            redirect_uri:window.location.href + '',
-            authorization:'/oauth/authorize',
-            scopes:['read', 'write'],
-            callback:function () {
-            }
-        };
-        jso_configure(resources);
+        // hack, but this clears out any existing tokens
+        for (k in resources)
+            localStorage.removeItem("tokens-" + k);
+
+        jso_configure(resources, { debug:true });
 
 
+        var toEnsure = {};
+        toEnsure[oauthResource] = scopes;
+        jso_ensureTokens(toEnsure);
     }
+
 
     var baseUrl = (function () {
         var defaultPorts = {"http:":80, "https:":443};
@@ -48,8 +57,6 @@ module.factory('ajaxUtils', function () {
             && (window.location.port != defaultPorts[window.location.protocol]))
             ? (":" + window.location.port) : "");
     })();
-
-    console.debug('the base URL is ' + baseUrl);
 
     var sendDataFunction = function (ajaxFunction, argsProcessor, url, _method, data, cb) {
         var d = data || {};
@@ -72,14 +79,15 @@ module.factory('ajaxUtils', function () {
     };
 
     return {
+        establishOAuthToken:establishOAuthToken,
         url:function (u) {
             return baseUrl + u;
         },
         enrichRequestArguments:function (args) {
             var a = args || {};
             a['jso_provider'] = oauthResource;
-            a['jso_scopes'] = ["read", 'write'];
-            a['jso_allowia'] = true;
+            a['jso_scopes'] = scopes;
+            a['jso_allowia'] = false;
             return a;
         },
         put:function (url, data, cb) {
@@ -117,6 +125,7 @@ module.factory('ajaxUtils', function () {
 });
 
 module.factory('userService', function (ajaxUtils) {
+
     var usersCollectionEntryUrl = '/api/users/';
     return {
         updateUserById:function (userId, email, pw, callback) {
@@ -136,10 +145,11 @@ module.factory('userService', function (ajaxUtils) {
  *
  * @constructor
  */
-function ProfileController($scope, userService) {
+function ProfileController($scope, ajaxUtils, userService) {
 
-    console.log('inside ProfileController.');
+    ajaxUtils.establishOAuthToken();
 
+    // load the current User object into the form on load
     userService.getUserById(crmSession.getUserId(), function (u) {
         $scope.$apply(function () {
             $scope.user = u;
@@ -173,12 +183,9 @@ function NavigationController() {
  * @constructor
  */
 function SignInController($scope) {
-
     /// todo remove this and introduce Spring Security's RememberMe service !
     $scope.user = {email:'josh@joshlong.com', password:'password'};
+    jso_wipe();
 
-    //console.debug('inside SignInController ');
-
-    //jso_wipe();  // it'll work on the next page no matter what
 }
 

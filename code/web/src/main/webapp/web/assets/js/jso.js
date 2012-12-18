@@ -508,7 +508,7 @@
         var key;
         log("jso_wipe()");
         for(key in config) {
-            log("Wipping tokens for " + key);
+            log("Wiping tokens for " + key);
             api_storage.wipeTokens(key);
         }
     }
@@ -579,7 +579,7 @@
 
             if (jqXHR.status === 401) {
 
-                log("Token expired. About to delete this token");
+                log("Token expired. About to delete this token for provider ID "+ providerid);
                 log(token);
                 api_storage.wipeTokens(providerid);
 
