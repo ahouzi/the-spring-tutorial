@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xmlns:mvc="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+
+    <int:annotation-config/>
+
+
+    <int:channel id="outbound-health-status-updates"/>
+
+    <int-amqp:outbound-channel-adapter
+            channel="outbound-health-status-updates"
+            amqp-template="rabbitTemplate"
+            routing-key="health"
+            mapped-request-headers="whenISentIt,nodeId"
+            />
+
+
+    <!--
+
+<int:annotation-config/>
+
+<int:logging-channel-adapter
+log-full-message="true"
+channel="errorChannel"/>
+
+<int:channel id="profilePhotoProcessingRequests"/>
+
+&lt;!&ndash;
+<int-amqp:inbound-gateway request-channel="profilePhotoProcessingRequests"
+queue-names="photos"
+message-converter="rabbitTemplateMessageConverter"
+connection-factory="rabbitMqConnectionFactory"/>&ndash;&gt;
+
+&lt;!&ndash;    <int-amqp:inbound-channel-adapter channel="profilePhotoProcessingRequests"
+queue-names="photos"
+mapped-request-headers="fileExtension,userId"
+message-converter="rabbitTemplateMessageConverter"
+connection-factory="rabbitMqConnectionFactory"/>&ndash;&gt;
+
+
+
+<amqp:inbound-gateway request-channel="profilePhotoProcessingRequests"
+      queue-names="photos"
+      mapped-request-headers="fileExtension,userId"
+      message-converter="rabbitTemplateMessageConverter"
+      connection-factory="rabbitMqConnectionFactory"/>
+
+
+<int:service-activator ref="photoConverter"
+   input-channel="profilePhotoProcessingRequests"
+   requires-reply="true" />-->
+
+
+</beans>

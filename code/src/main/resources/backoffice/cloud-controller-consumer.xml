@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd">
+
+
+    <int:annotation-config/>
+
+    <int:channel id="inbound-health-status-updates-to-be-enriched"/>
+    <int:channel id="enriched-inbound-health-status-updates"/>
+    <int:channel id="inbound-health-status-updates"/>
+
+
+    <int-amqp:inbound-channel-adapter
+            channel="inbound-health-status-updates-to-be-enriched"
+            connection-factory="rabbitMqConnectionFactory"
+            queue-names="health"
+            channel-transacted="false"
+            mapped-request-headers="whenISentIt,nodeId"
+            />
+
+    <int:header-enricher input-channel="inbound-health-status-updates-to-be-enriched" output-channel="enriched-inbound-health-status-updates">
+        <int:error-channel ref="errorChannel"/>
+    </int:header-enricher>
+
+    <int:service-activator ref="errorPrinter"
+                           input-channel="enriched-inbound-health-status-updates"
+
+            />
+
+
+
+
+
+
+</beans>
