@@ -79,7 +79,6 @@ module.factory('ajaxUtils', function () {
     };
 
     return {
-        establishOAuthToken:establishOAuthToken,
         url:function (u) {
             return baseUrl + u;
         },
@@ -147,7 +146,7 @@ module.factory('userService', function (ajaxUtils) {
  */
 function ProfileController($scope, ajaxUtils, userService) {
 
-    ajaxUtils.establishOAuthToken();
+
 
     // load the current User object into the form on load
     userService.getUserById(crmSession.getUserId(), function (u) {

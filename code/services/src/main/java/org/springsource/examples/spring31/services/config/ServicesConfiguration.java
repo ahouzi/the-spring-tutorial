@@ -26,7 +26,6 @@ import javax.inject.Inject;
 @PropertySource("/config.properties")
 @EnableCaching
 @EnableTransactionManagement
-@ImportResource({"classpath:/services/process-profile-photo-client.xml"})
 @ComponentScan(basePackageClasses = {DataSourceConfiguration.class, UserService.class})
 @Configuration
 public class ServicesConfiguration {
