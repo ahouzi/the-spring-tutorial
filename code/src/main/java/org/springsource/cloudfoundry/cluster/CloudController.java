@@ -1,14 +1,9 @@
 package org.springsource.cloudfoundry.cluster;
 
 
-import org.springframework.integration.annotation.Header;
-import org.springframework.integration.annotation.Payload;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.integration.Message;
 import org.springframework.integration.annotation.ServiceActivator;
-
-import java.util.Date;
-
-import static org.springsource.cloudfoundry.cluster.HeaderConstants.DATE_I_SENT_IT_HEADER;
-import static org.springsource.cloudfoundry.cluster.HeaderConstants.NODE_ID_HEADER;
 
 /**
  * Handles the health of the cloud
@@ -16,22 +11,19 @@ import static org.springsource.cloudfoundry.cluster.HeaderConstants.NODE_ID_HEAD
  * Receives requests and needs to send the replies back to the Health Manager
  */
 public class CloudController {
-    private String cloudControllerName;
-
-    CloudController() {
-    }
-
-    public CloudController(String ccn) {
-        this.cloudControllerName = "cc" + ccn;
-    }
-
 
     @ServiceActivator(inputChannel = "enriched-inbound-health-status-updates")
-    public void handleMesssagesFromTheCluster(
-            @Header(DATE_I_SENT_IT_HEADER) Date date,
-            @Header(NODE_ID_HEADER) String nodeId,
-            @Payload String natsMessage) {
-        System.out.println(String.format("Received NATS message (%s)", natsMessage));
+    public void handleMesssagesFromTheCluster(Message<?> incomingSpringIntegrationMessage) {
+
+
+        System.out.println(StringUtils.repeat("-", 100));
+        System.out.println(String.format("Received a message from NATS on thread %s.", Thread.currentThread().getName()));
+        for (String k : incomingSpringIntegrationMessage.getHeaders().keySet())
+            System.out.println(String.format("%s=%s", k, incomingSpringIntegrationMessage.getHeaders().get(k)));
+        Object payload = incomingSpringIntegrationMessage.getPayload();
+
+        System.out.println(String.format("The payload is %s", payload));
+
     }
 
 

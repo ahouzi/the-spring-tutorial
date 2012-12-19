@@ -22,40 +22,5 @@
             />
 
 
-    <!--
-
-<int:annotation-config/>
-
-<int:logging-channel-adapter
-log-full-message="true"
-channel="errorChannel"/>
-
-<int:channel id="profilePhotoProcessingRequests"/>
-
-&lt;!&ndash;
-<int-amqp:inbound-gateway request-channel="profilePhotoProcessingRequests"
-queue-names="photos"
-message-converter="rabbitTemplateMessageConverter"
-connection-factory="rabbitMqConnectionFactory"/>&ndash;&gt;
-
-&lt;!&ndash;    <int-amqp:inbound-channel-adapter channel="profilePhotoProcessingRequests"
-queue-names="photos"
-mapped-request-headers="fileExtension,userId"
-message-converter="rabbitTemplateMessageConverter"
-connection-factory="rabbitMqConnectionFactory"/>&ndash;&gt;
-
-
-
-<amqp:inbound-gateway request-channel="profilePhotoProcessingRequests"
-      queue-names="photos"
-      mapped-request-headers="fileExtension,userId"
-      message-converter="rabbitTemplateMessageConverter"
-      connection-factory="rabbitMqConnectionFactory"/>
-
-
-<int:service-activator ref="photoConverter"
-   input-channel="profilePhotoProcessingRequests"
-   requires-reply="true" />-->
-
 
 </beans>

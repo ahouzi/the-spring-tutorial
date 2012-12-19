@@ -10,31 +10,19 @@
 
     <int:annotation-config/>
 
-    <int:channel id="inbound-health-status-updates-to-be-enriched"/>
-    <int:channel id="enriched-inbound-health-status-updates"/>
-    <int:channel id="inbound-health-status-updates"/>
+    <int:channel id="in"/>
+
 
 
     <int-amqp:inbound-channel-adapter
-            channel="inbound-health-status-updates-to-be-enriched"
+            channel="in"
             connection-factory="rabbitMqConnectionFactory"
             queue-names="health"
-            channel-transacted="false"
+            message-converter="messageConverter"
             mapped-request-headers="whenISentIt,nodeId"
             />
 
-    <int:header-enricher input-channel="inbound-health-status-updates-to-be-enriched" output-channel="enriched-inbound-health-status-updates">
-        <int:error-channel ref="errorChannel"/>
-    </int:header-enricher>
 
-    <int:service-activator ref="errorPrinter"
-                           input-channel="enriched-inbound-health-status-updates"
-
-            />
-
-
-
-
-
+    <int:service-activator input-channel="in" ref="cloudController" />
 
 </beans>
