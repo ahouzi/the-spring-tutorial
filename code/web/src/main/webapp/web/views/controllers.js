@@ -169,9 +169,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             // then simply show the targe div
             return;
         }
-
-
-
         var html = '<img id= "photoImage" width="300"  src="' + photoUrl + '"/>';    // todo this needs to be smoother
         console.debug('html for uploaded photo is ' + html)
         profilePhotoNode.html(html);
@@ -183,8 +180,11 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     });
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
+
         photoUrl = userService.buildBaseUserApiUrl($scope.user.id) + '/photo';
+
         console.debug('user loaded event passed for user ID# ' + userId);
+
         reRenderUserProfilePhoto(userId);
 
         profilePhotoNode.filedrop({
