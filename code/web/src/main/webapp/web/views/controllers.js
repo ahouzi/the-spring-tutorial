@@ -231,7 +231,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             uploadFinished:function (i, file, response, time) {
                 console.log('uploadFinished: ' + i + ',' + JSON.stringify(file) + ',' + JSON.stringify(response) + ', ' + JSON.stringify(time));
                 $scope.$apply(function () {
-                    $rootScope.$broadcast(profilePhotoUploadedEvent, $scope.user.id); //$rootScope.$broadcast( 'profilePhotoUploaded', $scope.blog);
+                    $rootScope.$broadcast(profilePhotoUploadedEvent, $scope.user.id);
                 })
             },
             progressUpdated:function (i, file, progress) {
