@@ -155,13 +155,24 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     var profilePhotoNode = $('#profilePhoto');
 
     $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
-        var html = '<img src="' + photoUrl + '"/>';    // todo this needs to be smoother
-        profilePhotoNode.html(html);
+        loadUser(crmSession.getUserId());
     });
+
+    function reRenderUserProfilePhoto(userId) {
+        if ($scope.user.profilePhotoImported != true) {
+            return;
+        }
+
+        var html = '<img width="' + profilePhotoNode.width() +
+            '"  src="' + photoUrl + '"/>';    // todo this needs to be smoother
+        console.debug('html for uploaded photo is ' + html)
+        profilePhotoNode.html(html);
+    }
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
         photoUrl = userService.buildBaseUserApiUrl($scope.user.id) + '/photo';
-        console.log('user loaded event passed for user ID# ' + userId);
+        console.debug('user loaded event passed for user ID# ' + userId);
+        reRenderUserProfilePhoto(userId);
 
         profilePhotoNode.filedrop({
 
@@ -234,12 +245,14 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     });
 
     // load the current User object into the form on load
-    userService.getUserById(crmSession.getUserId(), function (u) {
-        $scope.$apply(function () {
-            $scope.user = u;
-            $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
+    function loadUser(userId) {
+        userService.getUserById(userId, function (u) {
+            $scope.$apply(function () {
+                $scope.user = u;
+                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
+            });
         });
-    });
+    }
 
     $scope.saveProfileData = function () {
         userService.updateUserById($scope.user.id, $scope.user.email, $scope.user.password, function (u) {
@@ -248,6 +261,8 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             });
         });
     };
+
+    loadUser(crmSession.getUserId());
 
 
 }
