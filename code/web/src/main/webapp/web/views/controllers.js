@@ -154,9 +154,14 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     var photoUrl;
     var profilePhotoNode = $('#profilePhoto');
 
-    $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
-        loadUser(crmSession.getUserId());
-    });
+    function loadUser(userId) {
+        userService.getUserById(userId, function (u) {
+            $scope.$apply(function () {
+                $scope.user = u;
+                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
+            });
+        });
+    }
 
     function reRenderUserProfilePhoto(userId) {
         if ($scope.user.profilePhotoImported != true) {
@@ -168,6 +173,10 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         console.debug('html for uploaded photo is ' + html)
         profilePhotoNode.html(html);
     }
+
+    $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
+        loadUser(crmSession.getUserId());
+    });
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
         photoUrl = userService.buildBaseUserApiUrl($scope.user.id) + '/photo';
@@ -243,16 +252,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             }
         });
     });
-
-    // load the current User object into the form on load
-    function loadUser(userId) {
-        userService.getUserById(userId, function (u) {
-            $scope.$apply(function () {
-                $scope.user = u;
-                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
-            });
-        });
-    }
 
     $scope.saveProfileData = function () {
         userService.updateUserById($scope.user.id, $scope.user.email, $scope.user.password, function (u) {
