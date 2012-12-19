@@ -19,7 +19,7 @@ import java.util.List;
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CustomerService {
 
-    static private final String CUSTOMERS_REGION = "customers";
+    static private final String CUSTOMERS_CACHE_REGION = "customers";
 
     private EntityManager entityManager;
 
@@ -53,19 +53,19 @@ public class CustomerService {
     }
 
 
-    @Cacheable(CUSTOMERS_REGION)
+    @Cacheable(CUSTOMERS_CACHE_REGION)
     @Transactional(readOnly = true)
     public Customer getCustomerById(Long id) {
         return entityManager.find(Customer.class, id);
     }
 
-    @CacheEvict(CUSTOMERS_REGION)
+    @CacheEvict(CUSTOMERS_CACHE_REGION)
     public void deleteCustomer(Long id) {
         Customer customer = getCustomerById(id);
         entityManager.remove(customer);
     }
 
-    @CacheEvict(value = CUSTOMERS_REGION, key = "#id")
+    @CacheEvict(value = CUSTOMERS_CACHE_REGION, key = "#id")
     public void updateCustomer(Long id, String fn, String ln, Date birthday) {
         Customer customer = getCustomerById(id);
         customer.setLastName(ln);
