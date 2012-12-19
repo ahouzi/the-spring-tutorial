@@ -71,7 +71,6 @@ public class CustomerService {
         customer.setLastName(ln);
         customer.setSignupDate(birthday);
         customer.setFirstName(fn);
-        //sessionFactory.getCurrentSession().update(customer);
         entityManager.merge(customer);
     }
 }

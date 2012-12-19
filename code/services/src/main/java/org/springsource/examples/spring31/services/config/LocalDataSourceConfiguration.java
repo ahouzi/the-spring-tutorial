@@ -122,12 +122,5 @@ public class LocalDataSourceConfiguration implements DataSourceConfiguration {
         return simpleMongoDbFactory;
     }
 
-    /**
-     * Controls whether or not the database is reset when the application starts up or not
-     * @param b
-     */
-    public void setResetDatabaseOnReset(boolean b) {
-        this.resetDatabaseOnReset = b;
-    }
 
 }

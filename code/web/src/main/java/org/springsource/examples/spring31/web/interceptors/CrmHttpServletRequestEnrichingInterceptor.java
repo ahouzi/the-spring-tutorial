@@ -36,7 +36,22 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     @Override
     public void postHandle(WebRequest req, ModelMap model) throws Exception {
+         model.addAllAttributes( buildAttributesToContributeToRequest( (ServletWebRequest) req)) ;
+    }
 
+    private Map<String, Object> buildAttributesToContributeToRequest(ServletWebRequest swr) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Map<String, Object> kvs = new HashMap<String, Object>();
+        kvs.put(fullUrlAttribute, buildFullUrlAttribute(swr));
+
+        // not authenticated? principal is an AnonymousPrincipal
+        if (null == authentication || !(authentication.getPrincipal() instanceof UserService.CrmUserDetails))
+            return kvs;
+
+        UserService.CrmUserDetails userDetails = (UserService.CrmUserDetails) authentication.getPrincipal();
+        kvs.put(userIdAttribute, buildUserIdAttribute(userDetails));
+        return kvs;
     }
 
     @Override
@@ -44,21 +59,9 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         logger.debug("web request is of type " + req.getClass().getSimpleName());
         ServletWebRequest swr = (ServletWebRequest) req;
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (null == authentication || !(authentication.getPrincipal() instanceof UserService.CrmUserDetails))
-            return;
-
-        UserService.CrmUserDetails userDetails = (UserService.CrmUserDetails) authentication.getPrincipal();
-
-        Map<String, Object> kvs = new HashMap<String, Object>();
-        kvs.put(userIdAttribute, buildUserIdAttribute(userDetails));
-        kvs.put(fullUrlAttribute, buildFullUrlAttribute(swr));
-
-        // todo can this be moved back to the postHandle method that uses the ModelMap ?
+        Map<String,Object> kvs = buildAttributesToContributeToRequest( swr);
         for (String k : kvs.keySet())
             swr.setAttribute(k, kvs.get(k), RequestAttributes.SCOPE_REQUEST);
-
     }
 
     @Override

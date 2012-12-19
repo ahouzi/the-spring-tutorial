@@ -60,7 +60,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return new HibernateAwareObjectMapper();
     }
 
-    // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's l
+    // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(mappingJacksonHttpMessageConverter());
@@ -137,9 +137,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         configurer.enable();
     }
 
-    /**
-     * This method configures an error page for
-     */
+    // configures an error page
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         SimpleMappingExceptionResolver simpleMappingExceptionResolver = new SimpleMappingExceptionResolver();
         simpleMappingExceptionResolver.setDefaultErrorView("oops");

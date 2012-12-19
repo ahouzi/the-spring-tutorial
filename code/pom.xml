@@ -7,7 +7,6 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>backoffice</module>
         <module>web</module>
         <module>services</module>
     </modules>
