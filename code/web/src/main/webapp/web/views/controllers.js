@@ -164,14 +164,18 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     }
 
     function reRenderUserProfilePhoto(userId) {
+
         if ($scope.user.profilePhotoImported != true) {
+            // then simply show the targe div
             return;
         }
 
-        var html = '<img width="' + profilePhotoNode.width() +
-            '"  src="' + photoUrl + '"/>';    // todo this needs to be smoother
+
+
+        var html = '<img id= "photoImage" width="300"  src="' + photoUrl + '"/>';    // todo this needs to be smoother
         console.debug('html for uploaded photo is ' + html)
         profilePhotoNode.html(html);
+
     }
 
     $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {

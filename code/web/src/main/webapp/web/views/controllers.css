@@ -20,13 +20,10 @@
 }
 
 #profilePhoto {
-
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    min-height: 100px;
     text-align: center;
-
     border: 5px solid #0088cc;
-    padding-top:10px;
     background-color: #dddddd;
 }
 

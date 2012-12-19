@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.Callable;
 
 /**
  * Simple Spring MVC controller that can be used to adminster information about the users
@@ -50,23 +51,29 @@ public class UserApiController {
     // more convenient
     @RequestMapping(value = USER_COLLECTION_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnRequestParameter(@RequestParam("userId") long userId, @RequestParam("file") MultipartFile file) {
+    public Callable<Long> uploadBasedOnRequestParameter(@RequestParam("userId") long userId, @RequestParam("file") MultipartFile file) {
         return this.uploadBasedOnPathVariable(userId, file);
     }
 
     // more correct
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
-        try {
-            assert userId != null : "you must specify a userId when uploading!";
-            assert file != null : "you must specify a file object when uploading!";
-            byte[] bytesForImage = file.getBytes();
-            userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
-            return userId;
-        } catch (Throwable th) {
-            throw new RuntimeException("Something happened while uploading the managed upload", th);
-        }
+    public Callable<Long> uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
+
+        return new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                try {
+                    assert userId != null : "you must specify a userId when uploading!";
+                    assert file != null : "you must specify a file object when uploading!";
+                    byte[] bytesForImage = file.getBytes();
+                    userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
+                    return userId;
+                } catch (Throwable th) {
+                    throw new RuntimeException("Something happened while uploading the managed upload", th);
+                }
+            }
+        };
     }
 
 
