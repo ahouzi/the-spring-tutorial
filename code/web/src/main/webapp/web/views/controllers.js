@@ -263,7 +263,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
 
     loadUser(crmSession.getUserId());
 
-
 }
 
 /***
