@@ -24,7 +24,8 @@ public class UserApiController {
     /**
      * Root URL template for all modifications to a {@link User}
      */
-    static public final String USER_COLLECTION_ENTRY_URL = "/api/users/{userId}";
+    static public final String USER_COLLECTION_URL = "/api/users/";
+    static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
 
     private Logger log = Logger.getLogger(getClass());
     private UserService userService;
@@ -46,10 +47,17 @@ public class UserApiController {
         return this.userService.updateUser(userId, email, password);
     }
 
+    // more convenient
+    @RequestMapping(value = USER_COLLECTION_URL + "/photo", method = RequestMethod.POST)
+    @ResponseBody
+    public Long uploadBasedOnRequestParameter(@RequestParam("userId") long userId, @RequestParam("file") MultipartFile file) {
+        return this.uploadBasedOnPathVariable(userId, file);
+    }
 
+    // more correct
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnRequestParameter(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
+    public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
         try {
             assert userId != null : "you must specify a userId when uploading!";
             assert file != null : "you must specify a file object when uploading!";
@@ -62,7 +70,7 @@ public class UserApiController {
     }
 
 
-    @RequestMapping(value = "/api/users/{userId}/photo", method = RequestMethod.GET)
+    @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.GET)
     public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) {
         InputStream is = userService.readUserProfilePhoto(userId);
         httpServletResponse.setContentType("image/jpg");

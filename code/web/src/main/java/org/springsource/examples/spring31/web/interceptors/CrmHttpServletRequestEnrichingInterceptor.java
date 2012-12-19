@@ -36,7 +36,8 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     @Override
     public void postHandle(WebRequest req, ModelMap model) throws Exception {
-         model.addAllAttributes( buildAttributesToContributeToRequest( (ServletWebRequest) req)) ;
+//        Map<String, Object> kvs = buildAttributesToContributeToRequest((ServletWebRequest) req);
+//        model.addAllAttributes(kvs);
     }
 
     private Map<String, Object> buildAttributesToContributeToRequest(ServletWebRequest swr) {
@@ -59,7 +60,7 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         logger.debug("web request is of type " + req.getClass().getSimpleName());
         ServletWebRequest swr = (ServletWebRequest) req;
 
-        Map<String,Object> kvs = buildAttributesToContributeToRequest( swr);
+        Map<String, Object> kvs = buildAttributesToContributeToRequest(swr);
         for (String k : kvs.keySet())
             swr.setAttribute(k, kvs.get(k), RequestAttributes.SCOPE_REQUEST);
     }
