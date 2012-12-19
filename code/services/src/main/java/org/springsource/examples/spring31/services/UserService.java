@@ -34,7 +34,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-//@SuppressWarnings("unchecked")
+/**
+ * there are several components that need to know and understand this system's notion of users,
+ * generally we need an object that knows how to administer users (this class' primary responsibility)
+ * and we need an object that can tell Spring Security OAuth how to communicate with the user database
+ * (an implementation of {@link UserDetailsService UserDetailsService}, which this class implements,
+ * and we need a class that can tell Spring Security OAuth about which rights users have to which
+ * resources (an implementation of {@link ClientDetailsService ClientDetailsService}, which this also class
+ * implements).
+ *
+ * @author Josh Long
+ */
+@SuppressWarnings("unused")
 @Service
 @Transactional
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -45,9 +56,9 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // variables for the file resizing
-    private long defaultImageWidth = 300;
-    private Map<String, Set<String>> multiMapOfExtensionsToVariants = new ConcurrentHashMap<String, Set<String>>();
+    private long imageWidth = 300;
     private String convertCommandPath = "/usr/local/bin/convert";
+    private Map<String, Set<String>> multiMapOfExtensionsToVariants = new ConcurrentHashMap<String, Set<String>>();
 
     private GridFsTemplate gridFsTemplate;
     private EntityManager entityManager;
@@ -79,9 +90,13 @@ public class UserService implements ClientDetailsService, UserDetailsService {
                 logger.debug(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
     }
 
-
     public void setConvertCommandPath(String cmd) {
         this.convertCommandPath = cmd;
+    }
+
+
+    public void setImageWidth(long imageWidth) {
+        this.imageWidth = imageWidth;
     }
 
     @Inject
@@ -350,7 +365,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
                 IOUtils.closeQuietly(outputStream);
             }
 
-            List<String> listOfString = Arrays.asList(convertCommandPath, tmpStagingFile.getAbsolutePath(), "-resize " + this.defaultImageWidth + "x", convertedFile.getAbsolutePath());
+            List<String> listOfString = Arrays.asList(convertCommandPath, tmpStagingFile.getAbsolutePath(), "-resize " + this.imageWidth + "x", convertedFile.getAbsolutePath());
 
             String totalCommand = org.apache.commons.lang.StringUtils.join(listOfString, " ");
 
