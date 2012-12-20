@@ -79,6 +79,9 @@ module.factory('ajaxUtils', function () {
     };
 
     return {
+        accessToken : function(){
+            return jso_getToken(  oauthResource, scopes);
+        },
         url:function (u) {
             return baseUrl + u;
         },
@@ -151,7 +154,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
 
     var profilePhotoUploadedEvent = 'profilePhotoUploadedEvent';  // broadcast when the profile photo's been changed
     var userLoadedEvent = 'userLoadedEvent'; // broadcast when the user being edited is loaded
-    var photoUrl;
     var profilePhotoNode = $('#profilePhoto');
 
     function loadUser(userId) {
@@ -162,30 +164,17 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             });
         });
     }
+    function setupFileDropZone(){
 
-    function reRenderUserProfilePhoto(userId) {
+        var photoUrl = ajaxUtils.url('/api/users/photos') ;// well use the endpoint that takes the <CODE>userId</CODE> as a request param
 
-        if ($scope.user.profilePhotoImported != true) {
-            // then simply show the targe div
-            return;
-        }
-        var html = '<img id= "photoImage" width="300"  src="' + photoUrl + '"/>';    // todo this needs to be smoother
-        console.debug('html for uploaded photo is ' + html)
-        profilePhotoNode.html(html);
+        console.log('using request URL '+ photoUrl + ', which should require OAuth credentials to work.');
 
-    }
+        var accessTokenHeaderToSendInRequestForOauth = ajaxUtils.accessToken();
 
-    $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
-        loadUser(crmSession.getUserId());
-    });
+        var authHeaderForOauth= "Authorization: Authorization " + accessTokenHeaderToSendInRequestForOauth;
 
-    $rootScope.$on(userLoadedEvent, function (evt, userId) {
-
-        photoUrl = userService.buildBaseUserApiUrl($scope.user.id) + '/photo';
-
-        console.debug('user loaded event passed for user ID# ' + userId);
-
-        reRenderUserProfilePhoto(userId);
+        console.log('the oauth header is '+ authHeaderForOauth);
 
         profilePhotoNode.filedrop({
 
@@ -255,6 +244,27 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
                     'The file data has been uploaded.');
             }
         });
+    }
+    function reRenderUserProfilePhoto(userId) {
+
+        var userPhotoUrl = ajaxUtils.url(  '/api/users/'+ userId + '/photo');
+        if ($scope.user.profilePhotoImported != true) {
+            // then simply show the targe div
+            return;
+        }
+
+        var html = '<img id= "photoImage" width="300"  src="' + userPhotoUrl + '"/>';    // todo this needs to be smoother
+        console.debug('html for uploaded photo is ' + html)
+        profilePhotoNode.html(html);
+    }
+
+    $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
+        loadUser(crmSession.getUserId());
+    });
+
+    $rootScope.$on(userLoadedEvent, function (evt, userId) {
+        console.debug('user loaded event passed for user ID# ' + userId);
+        reRenderUserProfilePhoto(userId);
     });
 
     $scope.saveProfileData = function () {
@@ -265,7 +275,9 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         });
     };
 
+    setupFileDropZone();
     loadUser(crmSession.getUserId());
+
 
 }
 
