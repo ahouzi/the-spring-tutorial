@@ -79,8 +79,8 @@ module.factory('ajaxUtils', function () {
     };
 
     return {
-        accessToken : function(){
-            return jso_getToken(  oauthResource, scopes);
+        accessToken:function () {
+            return jso_getToken(oauthResource, scopes);
         },
         url:function (u) {
             return baseUrl + u;
@@ -164,17 +164,18 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             });
         });
     }
-    function setupFileDropZone(){
 
-        var photoUrl = ajaxUtils.url('/api/users/photos') ;// well use the endpoint that takes the <CODE>userId</CODE> as a request param
+    function setupFileDropZone() {
 
-        console.log('using request URL '+ photoUrl + ', which should require OAuth credentials to work.');
+        var photoUrl = ajaxUtils.url('/api/users/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
+
+        console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
 
         var accessTokenHeaderToSendInRequestForOauth = ajaxUtils.accessToken();
 
-        var authHeaderForOauth= "Authorization: Authorization " + accessTokenHeaderToSendInRequestForOauth;
+        var authHeaderForOauth = "Authorization: Authorization " + accessTokenHeaderToSendInRequestForOauth;
 
-        console.log('the oauth header is '+ authHeaderForOauth);
+        console.log('the oauth header is ' + authHeaderForOauth);
 
         profilePhotoNode.filedrop({
 
@@ -245,16 +246,14 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             }
         });
     }
-    function reRenderUserProfilePhoto(userId) {
 
-        var userPhotoUrl = ajaxUtils.url(  '/api/users/'+ userId + '/photo');
+    function reRenderUserProfilePhoto(userId) {
+        var userPhotoUrl = ajaxUtils.url('/api/users/' + userId + '/photo');
         if ($scope.user.profilePhotoImported != true) {
-            // then simply show the targe div
             return;
         }
-
-        var html = '<img id= "photoImage" width="300"  src="' + userPhotoUrl + '"/>';    // todo this needs to be smoother
-        console.debug('html for uploaded photo is ' + html)
+        var html = '<img id= "photoImage" width="300"  src="' + userPhotoUrl + '?r=' +Math.random()+ '"/>'; // todo this needs to be sexier
+        console.debug('html for uploaded photo is ' + html);
         profilePhotoNode.html(html);
     }
 
