@@ -252,7 +252,8 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         if ($scope.user.profilePhotoImported != true) {
             return;
         }
-        var html = '<img id= "photoImage" width="300"  src="' + userPhotoUrl + '?r=' +Math.random()+ '"/>'; // todo this needs to be sexier
+        var cacheBustingUrl = userPhotoUrl + '?r=' + Math.random();
+        var html = '<img id= "photoImage" width="300"  src="' + cacheBustingUrl + '"/>'; // todo this needs to be sexier
         console.debug('html for uploaded photo is ' + html);
         profilePhotoNode.html(html);
     }
@@ -275,6 +276,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     };
 
     setupFileDropZone();
+
     loadUser(crmSession.getUserId());
 
 
