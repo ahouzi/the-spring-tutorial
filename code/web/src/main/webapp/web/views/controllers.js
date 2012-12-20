@@ -296,10 +296,16 @@ function NavigationController() {
  * @param $scope
  * @constructor
  */
-function SignInController($scope) {
+function SignInController($scope, ajaxUtils) {
+
+
     /// todo remove this and introduce Spring Security's RememberMe service !
     $scope.user = {email:'josh@joshlong.com', password:'password'};
+
     jso_wipe();
 
+    $scope.signinWithFacebook = function(){
+        alert('signing in with facebook')
+    };
 }
 

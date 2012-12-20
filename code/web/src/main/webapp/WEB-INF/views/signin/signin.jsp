@@ -1,4 +1,5 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" %>
 <div ng-controller="SignInController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
@@ -6,8 +7,8 @@
             <form class="form-horizontal" method="POST" action="j_spring_security_check">
                 <div class="panel">
                     <fieldset>
-                        <legend><h2>Sign In</h2></legend>
 
+                        <legend><h2>Sign In</h2></legend>
 
                         <div class="control-group ${cgClass}">
                             <label class="control-label" for="j_username">E-Mail:</label>
@@ -26,25 +27,49 @@
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the password. </span>
                             </div>
                         </div>
-
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary" ng-model-instant>
+                            <button type="submit" class="btn btn-primary" name="action" value="signin" ng-model-instant>
                                 Sign In
                             </button>
+
 
                             <span>
                                 Don't have an account?
                                 <a href="${pageContext.request.contextPath}/crm/register.html">Register now!</a>  or
                                 <%-- todo make this button real and make it actually do something using Spring
                                      todo   Social if Spring Social is available (which it's not from within China)--%>
-                                <a href="#">Sign In With Facebook</a>
-                            </span>
-                        </div>
 
+
+
+
+
+
+
+                            </span>
+
+
+                        </div>
                     </fieldset>
                 </div>
             </form>
+            <%--
 
+
+                        <c:url value="/signin/facebook" var="facebookSignInUrl"/>
+                        <form id="tw_signin" action="${facebookSignInUrl}" method="POST"></form>
+            --%>
+
+
+            <DIV>
+                <c:url var="signinWithProvider" value="/signin/facebook"/>
+                <form method="POST" action="${signinWithProvider}">
+                    <button type="submit" >
+                        Sign in with Facebook
+                    </button>
+                </form>
+
+
+            </DIV>
         </tiles:putAttribute>
 
     </tiles:insertTemplate>
