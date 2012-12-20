@@ -34,7 +34,7 @@ import java.util.Set;
 
 @Configuration
 @EnableWebMvc
-@Import({ServicesConfiguration.class, SecurityConfiguration.class})
+@Import({ServicesConfiguration.class, SocialConfiguration.class, SecurityConfiguration.class})
 @ComponentScan(basePackageClasses = UserApiController.class)
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 

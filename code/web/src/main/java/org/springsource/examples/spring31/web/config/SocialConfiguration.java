@@ -1,10 +1,12 @@
 package org.springsource.examples.spring31.web.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.social.connect.*;
@@ -26,19 +28,12 @@ import javax.sql.DataSource;
  *
  * @author Josh Long
  */
+@Configuration
 public class SocialConfiguration {
 
 
-    class SpringSecuritySignInAdapter implements SignInAdapter {
-        public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(localUserId, null, null));
-            return null;
-        }
-    }
-
-
     private Environment environment;
+
 
     private UserService userService;
 
@@ -59,18 +54,60 @@ public class SocialConfiguration {
         this.dataSource = d;
     }
 
-    //     * When a new provider is added to the app, register its {@link org.springframework.social.connect.ConnectionFactory} here.
-//     * @see FacebookConnectionFactory
-//
+    /**
+     * when we sign in, the result should be a valid Spring Security context.
+     */
+    public static class SpringSecuritySignInAdapter implements SignInAdapter {
+
+        private UserService userService;
+
+        public SpringSecuritySignInAdapter(UserService userService) {
+            this.userService = userService;
+        }
+
+        /**
+         * local user id will invariably be the username from Facebook, e.g., 'starbuxman' or the email they signed up with.
+         * <p/>
+         * OK, so what else?
+         */
+        public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
+
+            UserService.CrmUserDetails details = userService.loadUserByUsername(localUserId);
+
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(details, details.getUser(), details.getAuthorities()));
+            return details.getUsername();
+        }
+    }
+
+    /**
+     * delegates to the {@link org.springsource.examples.spring31.services.UserService user service} object
+     * to create a new user based on credentials coming back from Facebook
+     */
+    public static class CrmUserConnectionSignUp implements ConnectionSignUp {
+
+        private UserService userService;
+
+        public CrmUserConnectionSignUp(UserService userService) {
+            this.userService = userService;
+        }
+
+        public String execute(Connection<?> connection) {
+            UserProfile userProfile = connection.fetchUserProfile();
+            return userService.createOrGet(userProfile.getUsername(), "password").getEmail();
+        }
+
+    }
+
     @Bean
     public ConnectionFactoryLocator connectionFactoryLocator() {
         ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
-        registry.addConnectionFactory(
-                new FacebookConnectionFactory(
-                        environment.getProperty("facebook.clientId"),
-                        environment.getProperty("facebook.clientSecret")));
+        String clientId = environment.getProperty("facebook.clientId"),
+                clientSecret = environment.getProperty("facebook.clientSecret");
+        registry.addConnectionFactory(new FacebookConnectionFactory(clientId, clientSecret));
         return registry;
     }
+
 
     /**
      * Singleton data access object providing access to connections across all users.
@@ -79,42 +116,9 @@ public class SocialConfiguration {
     public UsersConnectionRepository usersConnectionRepository() {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource,
                 connectionFactoryLocator(), Encryptors.noOpText());
-        repository.setConnectionSignUp(new AccountConnectionSignUp(this.userService));
+        repository.setConnectionSignUp(new CrmUserConnectionSignUp(this.userService));
+
         return repository;
-    }
-
-
-    /**
-     * delegates to the {@link org.springsource.examples.spring31.services.UserService user service} object
-     * to create a new user
-     */
-    static class AccountConnectionSignUp implements ConnectionSignUp {
-        private UserService userService;
-
-        public AccountConnectionSignUp(UserService userService) {
-            this.userService = userService;
-        }
-/*
-        private final AccountRepository accountRepository;
-
-        public AccountConnectionSignUp(AccountRepository accountRepository) {
-            this.accountRepository = accountRepository;
-        }*/
-
-        public String execute(Connection<?> connection) {
-            UserProfile userProfile = connection.fetchUserProfile();
-
-            org.springsource.examples.spring31.services.User usr =
-                    userService.createOrGet(userProfile.getEmail(), "password");
-            return usr.getEmail();
-
-            //Long.toString( usr.getId() );
-            /* UserProfile profile = connection.fetchUserProfile();
-           Account account = new Account(profile.getUsername(), profile.getFirstName(), profile.getLastName());
-           accountRepository.createAccount(account);
-           return account.getUsername();*/
-        }
-
     }
 
 
@@ -130,8 +134,13 @@ public class SocialConfiguration {
     @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
     public ConnectionRepository connectionRepository() {
-        throw new RuntimeException("this isn't setup yet!!");
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = user.getPrincipal();
+        assert principal instanceof UserService.CrmUserDetails : "the principal should be an instance of " + UserService.CrmUserDetails.class.getSimpleName();
+        UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) principal;
+        return usersConnectionRepository().createConnectionRepository(crmUserDetails.getUser().getEmail());
     }
+
 
     //
 //     * A proxy to a request-scoped object representing the current user's primary Facebook account.
@@ -148,8 +157,11 @@ public class SocialConfiguration {
 //
     @Bean
     public ProviderSignInController providerSignInController() {
-        return new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
-                new SpringSecuritySignInAdapter());
+        ProviderSignInController providerSignInController =
+                new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
+                        new SpringSecuritySignInAdapter(userService));
+        providerSignInController.setSignInUrl("/crm/signin.html");
+        return providerSignInController;
     }
 
 }
