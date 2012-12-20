@@ -121,17 +121,7 @@ public class SocialConfiguration {
         return repository;
     }
 
-
-    // Request-scoped data access object providing access to the current user's connections.
-// todo
-//    @Bean
-//    @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-//    public ConnectionRepository connectionRepository() {
-//        User user = SecurityContext.getCurrentUser();
-//        return usersConnectionRepository().createConnectionRepository(user.getId());
-//    }
-
-    @Bean
+   @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
     public ConnectionRepository connectionRepository() {
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
@@ -157,8 +147,7 @@ public class SocialConfiguration {
 //
     @Bean
     public ProviderSignInController providerSignInController() {
-        ProviderSignInController providerSignInController =
-                new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
+        ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
                         new SpringSecuritySignInAdapter(userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
         return providerSignInController;

@@ -27,21 +27,23 @@
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the password. </span>
                             </div>
                         </div>
+
                         <div class="form-actions">
+
                             <button type="submit" class="btn btn-primary" name="action" value="signin" ng-model-instant>
                                 Sign In
                             </button>
 
-
                             <span>
-                                Don't have an account?
-                                <a href="${pageContext.request.contextPath}/crm/register.html">Register now!</a>  or
-                                <%-- todo make this button real and make it actually do something using Spring
-                                     todo   Social if Spring Social is available (which it's not from within China)--%>
+                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/register.html">Register now!</a>  or
 
 
-
-
+                                    <c:url var="signinWithProvider" value="/signin/facebook"/>
+                                    <form method="POST" action="${signinWithProvider}">
+                                        <button type="submit" >
+                                            Sign in with Facebook
+                                        </button>
+                                    </form>
 
 
 
@@ -60,16 +62,7 @@
             --%>
 
 
-            <DIV>
-                <c:url var="signinWithProvider" value="/signin/facebook"/>
-                <form method="POST" action="${signinWithProvider}">
-                    <button type="submit" >
-                        Sign in with Facebook
-                    </button>
-                </form>
 
-
-            </DIV>
         </tiles:putAttribute>
 
     </tiles:insertTemplate>
