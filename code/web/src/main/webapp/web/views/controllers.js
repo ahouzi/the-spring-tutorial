@@ -171,14 +171,13 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
 
         console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
 
+        // todo do we even need to transmit this? it seems to work with just the HTTP Session Cookie
         var accessTokenHeaderToSendInRequestForOauth = ajaxUtils.accessToken();
-
         var authHeaderForOauth = "Authorization: Authorization " + accessTokenHeaderToSendInRequestForOauth;
 
-        console.log('the oauth header is ' + authHeaderForOauth);
+        console.log('the oauth header is ' + authHeaderForOauth + '.');
 
         profilePhotoNode.filedrop({
-
             dataType:'json',
             maxfilesize:20, /* in MB */
             url:photoUrl,
