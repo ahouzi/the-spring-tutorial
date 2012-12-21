@@ -51,7 +51,7 @@ import java.util.Map;
 @Configuration
 @Profile("default")
 public class LocalDataSourceConfiguration implements DataSourceConfiguration {
-    private boolean resetDatabaseOnReset = false;
+    private boolean resetDatabaseOnReset = true;
 
     @Inject
     private Environment environment;

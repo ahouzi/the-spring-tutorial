@@ -132,9 +132,9 @@ module.factory('userService', function (ajaxUtils) {
         buildBaseUserApiUrl:function (userId) {
             return ajaxUtils.url(usersCollectionEntryUrl + userId);
         },
-        updateUserById:function (userId, email, pw, callback) {
+        updateUserById:function (userId, username, pw, callback) {
             var updateUrl = this.buildBaseUserApiUrl(userId);
-            var user = {email:email, password:pw, id:userId };
+            var user = {username:username, password:pw, id:userId };
             ajaxUtils.oauthPut(updateUrl, user, callback);
         },
         getUserById:function (userId, callback) {
@@ -267,7 +267,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     });
 
     $scope.saveProfileData = function () {
-        userService.updateUserById($scope.user.id, $scope.user.email, $scope.user.password, function (u) {
+        userService.updateUserById($scope.user.id, $scope.user.username, $scope.user.password, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
             });
@@ -300,7 +300,7 @@ function SignInController($scope, ajaxUtils) {
 
 
     /// todo remove this and introduce Spring Security's RememberMe service !
-    $scope.user = {email:'josh@joshlong.com', password:'password'};
+
 
     jso_wipe();
 

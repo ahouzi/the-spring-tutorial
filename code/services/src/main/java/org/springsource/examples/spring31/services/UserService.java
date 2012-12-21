@@ -104,9 +104,9 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
-    public User updateUser(long userId, String email, String pw) {
+    public User updateUser(long userId, String un, String pw) {
         User user = getUserById(userId);
-        user.setEmail(email);
+        user.setUsername(un);
         user.setPassword(pw);
         entityManager.merge(user);
         return getUserById(userId);
@@ -121,8 +121,8 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return usr;
     }
 
-    public User login(String email, String password) {
-        User user = loginByUsername(email);
+    public User login(String username, String password) {
+        User user = loginByUsername(username);
 
         if (user != null && user.getPassword().equalsIgnoreCase(password)) {
             return user;
@@ -130,14 +130,14 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return null;
     }
 
-    public User createUser(String email, String pw) {
+    public User createUser(String username, String pw) {
         // first make sure it doesn't already exist
-        assert StringUtils.hasText(email) : "the 'email' can't be null";
+        assert StringUtils.hasText(username) : "the 'username' can't be null";
         assert StringUtils.hasText(pw) : "the 'password' can't be null";
-        assert loginByUsername(email) == null : "there is already an existing User with the email '" + email + "'";
+        assert loginByUsername(username) == null : "there is already an existing User with the username '" + username + "'";
 
         User user = new User();
-        user.setEmail(email);
+        user.setUsername(username);
         user.setPassword(pw);
         user.setSignupDate(new Date());
         entityManager.persist(user);
@@ -146,8 +146,8 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
     @Cacheable(value = USER_CACHE_REGION)
     public User loginByUsername(String user) {
-        Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.email = :email", User.class)
-                .setParameter("email", user)
+        Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.username = :username", User.class)
+                .setParameter("username", user)
                 .getResultList();
         if (customers.size() > 0)
             return customers.iterator().next();
@@ -205,7 +205,10 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
     @Override
     public CrmUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new CrmUserDetails(loginByUsername(username));
+        User user = loginByUsername(username);
+        if (null == user)
+            return null;
+        return new CrmUserDetails(user);
     }
 
     @Override
@@ -214,7 +217,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         Long userId = Long.parseLong(clientId);
         User usr = getUserById(userId);
 
-        CrmUserDetails crmUserDetails = loadUserByUsername(usr.getEmail());
+        CrmUserDetails crmUserDetails = loadUserByUsername(usr.getUsername());
 
         return new CrmClientDetails(
                 crmUserDetails.getUsername(),
@@ -288,7 +291,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
         @Override
         public String getUsername() {
-            return this.user.getEmail();
+            return this.user.getUsername();
         }
 
         @Override

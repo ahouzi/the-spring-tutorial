@@ -14,7 +14,7 @@
                             <label class="control-label" for="j_username">E-Mail:</label>
 
                             <div class="controls"><input class="input-xlarge" id="j_username" name="j_username"
-                                                         type="text" ng-model="user.email" required="required"/>
+                                                         type="text" ng-model="user.username" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail. </span>
                             </div>
                         </div>

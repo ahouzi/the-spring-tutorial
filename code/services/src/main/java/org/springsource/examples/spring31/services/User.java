@@ -22,7 +22,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Customer> customers = new HashSet<Customer>();
 
-    private String email;
+    private String username;
     private String password;
     private boolean profilePhotoImported;
     private String profilePhotoExt;
@@ -62,12 +62,12 @@ public class User {
         this.signupDate = signupDate;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

@@ -1,3 +1,5 @@
+
+
 --INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , '%s', '%s', NOW());
 -- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Juergen', 'Hoeller', NOW());
 -- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Mark', 'Fisher', NOW());
@@ -14,3 +16,17 @@
 -- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Rajdeep', 'Dua', NOW());
 -- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Monica', 'Wilkinson', NOW());
 -- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Mark', 'Pollack', NOW());
+
+create table UserConnection (userId varchar(255) not null,
+	providerId varchar(255) not null,
+	providerUserId varchar(255),
+	rank int not null,
+	displayName varchar(255),
+	profileUrl varchar(512),
+	imageUrl varchar(512),
+	accessToken varchar(255) not null,
+	secret varchar(255),
+	refreshToken varchar(255),
+	expireTime bigint,
+	primary key (userId, providerId, providerUserId));
+create unique index UserConnectionRank on UserConnection(userId, providerId, rank);

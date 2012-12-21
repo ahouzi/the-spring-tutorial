@@ -73,10 +73,10 @@ public class SocialConfiguration {
         public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
 
             UserService.CrmUserDetails details = userService.loadUserByUsername(localUserId);
-
+            if (null == details) throw new RuntimeException("could not login the user '" + localUserId + "'");
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(details, details.getUser(), details.getAuthorities()));
-            return details.getUsername();
+            return null;
         }
     }
 
@@ -94,7 +94,9 @@ public class SocialConfiguration {
 
         public String execute(Connection<?> connection) {
             UserProfile userProfile = connection.fetchUserProfile();
-            return userService.createOrGet(userProfile.getUsername(), "password").getEmail();
+            String userName = userService.createOrGet(userProfile.getUsername(), "password").getUsername();
+
+            return userName;
         }
 
     }
@@ -121,14 +123,14 @@ public class SocialConfiguration {
         return repository;
     }
 
-   @Bean
+    @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
     public ConnectionRepository connectionRepository() {
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         Object principal = user.getPrincipal();
         assert principal instanceof UserService.CrmUserDetails : "the principal should be an instance of " + UserService.CrmUserDetails.class.getSimpleName();
         UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) principal;
-        return usersConnectionRepository().createConnectionRepository(crmUserDetails.getUser().getEmail());
+        return usersConnectionRepository().createConnectionRepository(crmUserDetails.getUser().getUsername());
     }
 
 
@@ -148,7 +150,7 @@ public class SocialConfiguration {
     @Bean
     public ProviderSignInController providerSignInController() {
         ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
-                        new SpringSecuritySignInAdapter(userService));
+                new SpringSecuritySignInAdapter(userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
         return providerSignInController;
     }
