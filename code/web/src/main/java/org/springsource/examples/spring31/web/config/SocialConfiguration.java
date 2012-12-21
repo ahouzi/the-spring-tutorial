@@ -96,9 +96,7 @@ public class SocialConfiguration {
             UserProfile userProfile = connection.fetchUserProfile();
             long usrId = userService.createOrGet(userProfile.getUsername(), "password").getId();
             return userService.getUserById(usrId).getUsername();
-
         }
-
     }
 
     @Bean
