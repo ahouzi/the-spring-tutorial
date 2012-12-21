@@ -55,13 +55,6 @@
                 </button>
             </form>
 
-            <%--
-
-
-                        <c:url value="/signin/facebook" var="facebookSignInUrl"/>
-                        <form id="tw_signin" action="${facebookSignInUrl}" method="POST"></form>
-            --%>
-
 
 
         </tiles:putAttribute>

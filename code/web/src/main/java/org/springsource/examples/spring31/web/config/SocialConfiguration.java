@@ -94,9 +94,9 @@ public class SocialConfiguration {
 
         public String execute(Connection<?> connection) {
             UserProfile userProfile = connection.fetchUserProfile();
-            String userName = userService.createOrGet(userProfile.getUsername(), "password").getUsername();
+            long usrId = userService.createOrGet(userProfile.getUsername(), "password").getId();
+            return userService.getUserById(usrId).getUsername();
 
-            return userName;
         }
 
     }

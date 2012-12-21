@@ -12,7 +12,7 @@
     </modules>
     <contributors>
         <contributor>
-            <username>josh.long@springsource.com</username>
+            <email>josh.long@springsource.com</email>
             <name>Joshua Long</name>
             <organization>SpringSource, a Division of VMWare</organization>
             <organizationUrl>http://www.springsource.org</organizationUrl>

@@ -118,6 +118,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
             usr = createUser(user, pw);
         }
         assert usr != null : "there must be a valid reference for the user to be returned";
+        usr.setEnabled(true);
         return usr;
     }
 
