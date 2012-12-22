@@ -44,8 +44,13 @@ public class UserApiController {
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
     @ResponseBody
-    public User updateUserById(@PathVariable("userId") Long userId, @RequestParam("username") String username, @RequestParam("password") String password) {
-        return this.userService.updateUser(userId, username, password);
+    public User updateUserById(@PathVariable("userId") Long userId,
+                               @RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               @RequestParam("firstname") String fn,
+                               @RequestParam("lastname") String ln) {
+        User existingUser = this.getUserById(userId);
+        return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
     // more convenient

@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @author Josh Long
  */
-@Entity(name = "USERS")
+@Entity(name = "UserAccount")
 public class User {
 
     @Id
@@ -21,13 +21,37 @@ public class User {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Customer> customers = new HashSet<Customer>();
-
-    private String username;
+    private boolean importedFromServiceProvider = false;
+    private String firstName, lastName, username;
     private String password;
     private boolean profilePhotoImported;
     private String profilePhotoExt;
     private boolean enabled;
     private Date signupDate;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public boolean isImportedFromServiceProvider() {
+        return importedFromServiceProvider;
+    }
+
+    public void setImportedFromServiceProvider(boolean importedFromServiceProvider) {
+        this.importedFromServiceProvider = importedFromServiceProvider;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getProfilePhotoExt() {
         return profilePhotoExt;

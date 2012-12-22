@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity (name = "CUSTOMERS")
+@Entity (name = "Customer")
 public class Customer   {
 
     @Id

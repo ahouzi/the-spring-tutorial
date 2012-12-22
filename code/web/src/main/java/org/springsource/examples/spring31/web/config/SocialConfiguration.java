@@ -1,10 +1,12 @@
 package org.springsource.examples.spring31.web.config;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,7 @@ import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
 import javax.inject.Inject;
@@ -59,24 +62,28 @@ public class SocialConfiguration {
      */
     public static class SpringSecuritySignInAdapter implements SignInAdapter {
 
+        private AuthenticationManager authenticationManager;
         private UserService userService;
 
-        public SpringSecuritySignInAdapter(UserService userService) {
+        public SpringSecuritySignInAdapter(AuthenticationManager authenticationManager, UserService userService) {
             this.userService = userService;
+            this.authenticationManager = authenticationManager;
         }
 
         /**
          * local user id will invariably be the username from Facebook, e.g., 'starbuxman' or the email they signed up with.
          * <p/>
-         * OK, so what else?
+         * <CODE>null</CODE> is OK, it signals to Spring Social's
+         * {@link ProviderSignInController provider sign in controller}
+         * to use the default URL.
          */
         public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
-
             UserService.CrmUserDetails details = userService.loadUserByUsername(localUserId);
-            if (null == details) throw new RuntimeException("could not login the user '" + localUserId + "'");
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(details, details.getUser(), details.getAuthorities()));
-            return null;
+            assert details != null : "the " + UserService.CrmUserDetails.class.getSimpleName() + " can't be null";
+            UsernamePasswordAuthenticationToken toAuthenticate = new UsernamePasswordAuthenticationToken(
+                    details, StringUtils.isEmpty(details.getPassword()) ? null : details.getPassword(), details.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(toAuthenticate);
+            return null; // null is ok it signals to Spring Social's {@link ProviderSignInController} to use the default URL
         }
     }
 
@@ -92,10 +99,21 @@ public class SocialConfiguration {
             this.userService = userService;
         }
 
+        /**
+         * if this account is created by connecting to facebook, then we'll assign a default password
+         * and force the user to choose a password on the signup page.
+         *
+         * @param connection   the Spring Social connection object with information about the object from the social provider.
+         * @return the username
+         */
         public String execute(Connection<?> connection) {
             UserProfile userProfile = connection.fetchUserProfile();
-            long usrId = userService.createOrGet(userProfile.getUsername(), "password").getId();
-            return userService.getUserById(usrId).getUsername();
+            User u = userService.loginByUsername(userProfile.getUsername());
+            if (null == u) {
+                u = userService.createUser(userProfile.getUsername(), "", userProfile.getFirstName(), userProfile.getLastName(), true);
+
+            }
+            return u.getUsername();
         }
     }
 
@@ -148,9 +166,12 @@ public class SocialConfiguration {
     @Bean
     public ProviderSignInController providerSignInController() {
         ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
-                new SpringSecuritySignInAdapter(userService));
+                new SpringSecuritySignInAdapter(this.authenticationManager, this.userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
+        providerSignInController.setPostSignInUrl("/crm/profile.html");
         return providerSignInController;
     }
 
+    @Inject
+    private AuthenticationManager authenticationManager;
 }

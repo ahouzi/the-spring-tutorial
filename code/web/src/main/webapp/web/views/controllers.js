@@ -132,9 +132,9 @@ module.factory('userService', function (ajaxUtils) {
         buildBaseUserApiUrl:function (userId) {
             return ajaxUtils.url(usersCollectionEntryUrl + userId);
         },
-        updateUserById:function (userId, username, pw, callback) {
+        updateUserById:function (userId, username, pw, fn, ln, callback) {
             var updateUrl = this.buildBaseUserApiUrl(userId);
-            var user = {username:username, password:pw, id:userId };
+            var user = {username:username, password:pw, firstname: fn, lastname: ln, id:userId };
             ajaxUtils.oauthPut(updateUrl, user, callback);
         },
         getUserById:function (userId, callback) {
@@ -267,7 +267,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     });
 
     $scope.saveProfileData = function () {
-        userService.updateUserById($scope.user.id, $scope.user.username, $scope.user.password, function (u) {
+        userService.updateUserById($scope.user.id, $scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
             });

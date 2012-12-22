@@ -104,21 +104,26 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
-    public User updateUser(long userId, String un, String pw) {
+    public User updateUser(long userId, String un, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User user = getUserById(userId);
+        String oldUserName = user.getUsername();
         user.setUsername(un);
+        user.setFirstName(fn);
+        user.setLastName(ln);
         user.setPassword(pw);
+        user.setImportedFromServiceProvider(importedFromServiceProvider);
         entityManager.merge(user);
         return getUserById(userId);
     }
 
-    public User createOrGet(String user, String pw) {
+    public User createOrGet(String user, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User usr;
         if ((usr = login(user, pw)) == null) {
-            usr = createUser(user, pw);
+            usr = createUser(user, pw, fn, ln, importedFromServiceProvider);
         }
         assert usr != null : "there must be a valid reference for the user to be returned";
         usr.setEnabled(true);
+        usr.setImportedFromServiceProvider(importedFromServiceProvider);
         return usr;
     }
 
@@ -131,7 +136,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return null;
     }
 
-    public User createUser(String username, String pw) {
+    public User createUser(String username, String pw, String fn, String ln, boolean imported) {
         // first make sure it doesn't already exist
         assert StringUtils.hasText(username) : "the 'username' can't be null";
         assert StringUtils.hasText(pw) : "the 'password' can't be null";
@@ -139,7 +144,11 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
         User user = new User();
         user.setUsername(username);
+        user.setFirstName(fn);
+        user.setLastName(ln);
+        user.setImportedFromServiceProvider(imported);
         user.setPassword(pw);
+        user.setEnabled(true);
         user.setSignupDate(new Date());
         entityManager.persist(user);
         return user;

@@ -1,32 +1,47 @@
 
 
---INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , '%s', '%s', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Juergen', 'Hoeller', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Mark', 'Fisher', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Rod', 'Johnson', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'David', 'Syer', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Gunnar', 'Hillert', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Dave', 'McCrory', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Josh', 'Long', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Patrick', 'Chanezon', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Andy', 'Piper', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Eric', 'Bottard', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Chris', 'Richardson', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Raja', 'Rao', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Rajdeep', 'Dua', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Monica', 'Wilkinson', NOW());
--- INSERT INTO customer(id, firstname, lastname, signupdate) values( nextval( 'hibernate_sequence') , 'Mark', 'Pollack', NOW());
+-- this table is for Spring Social to manage social provider connections
+CREATE TABLE UserConnection
+(
+  userid character varying(255) NOT NULL,
+  providerid character varying(255) NOT NULL,
+  provideruserid character varying(255) NOT NULL,
+  rank integer NOT NULL,
+  displayname character varying(255),
+  profileurl character varying(512),
+  imageurl character varying(512),
+  accesstoken character varying(255) NOT NULL,
+  secret character varying(255),
+  refreshtoken character varying(255),
+  expiretime bigint,
+  CONSTRAINT userconnection_pkey PRIMARY KEY (userid , providerid , provideruserid )
+);
 
-create table UserConnection (userId varchar(255) not null,
-	providerId varchar(255) not null,
-	providerUserId varchar(255),
-	rank int not null,
-	displayName varchar(255),
-	profileUrl varchar(512),
-	imageUrl varchar(512),
-	accessToken varchar(255) not null,
-	secret varchar(255),
-	refreshToken varchar(255),
-	expireTime bigint,
-	primary key (userId, providerId, providerUserId));
-create unique index UserConnectionRank on UserConnection(userId, providerId, rank);
+CREATE TABLE UserAccount
+(
+  id bigint NOT NULL,
+  enabled boolean NOT NULL,
+  password character varying(255),
+  importedFromServiceProvider boolean not null ,
+  firstname character varying(255),
+  lastname character varying(255),
+  profilephotoext character varying(255),
+  profilephotoimported boolean NOT NULL,
+  signupdate timestamp without time zone,
+  username character varying(255),
+  CONSTRAINT users_pkey PRIMARY KEY (id )
+) ; 
+
+
+CREATE TABLE Customer
+(
+  id bigint NOT NULL,
+  firstname character varying(255),
+  lastname character varying(255),
+  signupdate timestamp without time zone,
+  user_id bigint NOT NULL,
+  CONSTRAINT customers_pkey PRIMARY KEY (id ),
+  CONSTRAINT user_fkey FOREIGN KEY (user_id)
+      REFERENCES UserAccount (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+) ;

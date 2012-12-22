@@ -11,20 +11,34 @@
 
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="j_username">E-Mail:</label>
+                            <label class="control-label" for="username">User Name:</label>
 
-                            <div class="controls"><input class="input-xlarge" id="j_username" name="j_username"
-                                                         type="text" ng-model="user.username" required="required"/>
+                            <div class="controls"><input class="input-xlarge"  id="username" type="text" ng-model="user.username" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail. </span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="j_password">Password:</label>
+                            <label class="control-label" for="password">Password:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="j_password" name="j_password" type="password"
-                                       ng-model="user.password" required="required"/>
+                                <input class="input-xlarge" id="j_password"   id="password" type="password" ng-model="user.password" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the password. </span>
+                            </div>
+                        </div>
+
+                        <div class="control-group ${cgClass}">
+                            <label class="control-label" for="firstName">E-Mail:</label>
+
+                            <div class="controls"><input class="input-xlarge"  id="firstName" type="text" ng-model="user.firstName" required="required"/>
+                                <span ng-show="${error}" class="help-inline"> Please provide a valid value for the first name. </span>
+                            </div>
+                        </div>
+
+                        <div class="control-group ${cgClass}">
+                            <label class="control-label" for="lastName">First Name:</label>
+
+                            <div class="controls"><input class="input-xlarge" id="lastName" type="text" ng-model="user.lastName" required="required"/>
+                                <span ng-show="${error}" class="help-inline"> Please provide a valid value for the last name. </span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
