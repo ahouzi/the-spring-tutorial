@@ -305,7 +305,9 @@ function SignInController($scope, ajaxUtils) {
     jso_wipe();
 
     $scope.signinWithFacebook = function(){
-        alert('signing in with facebook')
+        var facebookForm= $('#signinWithFacebook')
+        facebookForm.submit();
+        console.log ('signing in with facebook')
     };
 }
 

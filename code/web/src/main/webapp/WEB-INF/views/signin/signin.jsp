@@ -35,10 +35,11 @@
                             </button>
 
                             <span>
-                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/register.html">Register now!</a>  or
+                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/register.html">Register
+                                now!</a>  or
 
 
-
+                                    <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign in with Facebook</a>
 
                             </span>
 
@@ -49,12 +50,8 @@
             </form>
 
             <c:url var="signinWithProvider" value="/signin/facebook"/>
-            <form method="POST" action="${signinWithProvider}">
-                <button type="submit" >
-                    Sign in with Facebook
-                </button>
+            <form method="POST" id="signinWithFacebook" action="${signinWithProvider}">
             </form>
-
 
 
         </tiles:putAttribute>
