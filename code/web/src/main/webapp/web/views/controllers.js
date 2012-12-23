@@ -156,16 +156,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     var userLoadedEvent = 'userLoadedEvent'; // broadcast when the user being edited is loaded
     var profilePhotoNode = $('#profilePhoto');
 
-    function loadUser(userId) {
-        userService.getUserById(userId, function (u) {
-            $scope.$apply(function () {
-                $scope.user = u;
-                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
-            });
-        });
-    }
-
-    $scope.loadUser = $scope.loadUser || loadUser;
 
     function setupFileDropZoneForUser(userId) {
 
@@ -273,7 +263,16 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         setupFileDropZoneForUser(userId);
     });
 
-    $scope.saveProfileData = function () {
+    $scope.loadUser = $scope.loadUser || function (userId) {
+        userService.getUserById(userId, function (u) {
+            $scope.$apply(function () {
+                $scope.user = u;
+                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
+            });
+        });
+    };
+
+    $scope.saveProfileData = $scope.saveProfileData || function () {
         userService.updateUserById($scope.user.id, $scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
@@ -333,16 +332,30 @@ function CustomerController($scope, ajaxUtils) {
 
 }
 
+/**
+ * a lot of the logic that we want to provide here is already present in the more
+ * sophisticated <CODE>ProfileController</code> controller, and <CODE>SignInController</CODE>,
+ * so we simply reuse those controllers when building up this object. This is
+ * the nice part about angular.js controllers: they compose naturally
+ * because they're just functions.
+ *
+ * @param $rootScope
+ * @param $scope
+ * @param ajaxUtils
+ * @param userService
+ * @constructor
+ */
 function SignUpController($rootScope, $scope, ajaxUtils, userService) {
 
-    $scope.loadUser = function(){
-        console.log( 'loading user is not an option');
+
+    $scope.loadUser = function () {
+        console.log('loading user is not an option');
     }; // noop
+
+    $scope.saveProfileData = function(){
+        console.log('registering a new user') ;
+    }; // posts to a different endpoint for the user
 
     ProfileController($rootScope, $scope, ajaxUtils, userService);
     SignInController($scope, ajaxUtils);
-
-
-
-//  SignInController( $scope, ajaxUtils);
 }
