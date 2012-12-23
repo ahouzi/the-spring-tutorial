@@ -58,7 +58,9 @@
 
     <intercept-url pattern="/photo" access="IS_AUTHENTICATED_ANONYMOUSLY" method="GET"/>
     -->
+<!--
     <http pattern="/api/users/**/photo" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
+-->
 
     <http pattern="/api/crm/search**" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
 

@@ -66,27 +66,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         converters.add(mappingJacksonHttpMessageConverter());
     }
 
-    // todo this is for the oauth client stuff so get rid of it later
-    @Bean
-    public ConversionServiceFactoryBean conversionService() {
-        ConversionServiceFactoryBean conversionServiceFactoryBean = new ConversionServiceFactoryBean();
-        Set<Object> converters = new HashSet<Object>();
-        converters.add(new GenericConverter() {
-
-            private Set<ConvertiblePair> convertibleTypes = new HashSet<ConvertiblePair>(
-                    Arrays.asList(new ConvertiblePair(AccessTokenRequest.class, AccessTokenRequest.class)));
-
-            public Set<ConvertiblePair> getConvertibleTypes() {
-                return convertibleTypes;
-            }
-
-            public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
-                return source;
-            }
-        });
-        conversionServiceFactoryBean.setConverters(converters);
-        return conversionServiceFactoryBean;
-    }
 
     @Bean
     public UrlBasedViewResolver viewResolver() {
@@ -94,13 +73,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         viewResolver.setViewClass(TilesView.class);
         return viewResolver;
     }
-
-    /*
-    // todo what did this offer us before ?
-    @Bean
-    public BeanNameViewResolver beanNameViewResolver() {
-        return new BeanNameViewResolver();
-    }*/
 
     @Bean
     public TilesConfigurer tilesConfigurer() {
@@ -128,8 +100,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("home");
-        for (String p : "signin,profile,customers,home,oops".split(","))
+        registry.addViewController("/").setViewName("signin");
+        for (String p : "signin,signup,profile,customers,home,oops".split(","))
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 

@@ -3,8 +3,8 @@
         "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 
 <tiles-definitions>
-    <definition name="home" extends="page">
-        <put-attribute name="content" value="/WEB-INF/views/home/home.jsp"/>
+    <definition name="signup" extends="page">
+        <put-attribute name="content" value="/WEB-INF/views/signup/signup.jsp"/>
     </definition>
 
 </tiles-definitions>

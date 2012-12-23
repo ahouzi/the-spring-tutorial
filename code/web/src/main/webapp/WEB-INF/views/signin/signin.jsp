@@ -35,7 +35,7 @@
                             </button>
 
                             <span>
-                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/register.html">Register
+                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/signup.html">Register
                                 now!</a>  or
 
 

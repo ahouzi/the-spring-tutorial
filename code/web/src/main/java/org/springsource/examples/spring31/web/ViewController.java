@@ -15,12 +15,11 @@ public class ViewController {
 
 
     @RequestMapping(value = "/crm/signin.html", method = RequestMethod.GET)
-    public String showSignInPage(Model model, @RequestParam(value = "error", required = false, defaultValue = "false") String err
-
-    ) {
+    public String showSignInPage(Model model, @RequestParam(value = "error", required = false, defaultValue = "false") String err) {
 
         boolean isInError = !(StringUtils.hasText(err) &&
-                (err.toLowerCase().contains("false") || err.toLowerCase().contains("true"))) || Boolean.parseBoolean(err.toLowerCase());
+                (err.toLowerCase().contains("false") || err.toLowerCase().contains("true"))) ||
+                Boolean.parseBoolean(err.toLowerCase());
 
         model.addAttribute("cgClass", isInError ? "error" : "");
         model.addAttribute("error", isInError);

@@ -134,7 +134,7 @@ module.factory('userService', function (ajaxUtils) {
         },
         updateUserById:function (userId, username, pw, fn, ln, callback) {
             var updateUrl = this.buildBaseUserApiUrl(userId);
-            var user = {username:username, password:pw, firstname: fn, lastname: ln, id:userId };
+            var user = {username:username, password:pw, firstname:fn, lastname:ln, id:userId };
             ajaxUtils.oauthPut(updateUrl, user, callback);
         },
         getUserById:function (userId, callback) {
@@ -165,23 +165,27 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         });
     }
 
-    function setupFileDropZone() {
+    function setupFileDropZoneForUser(userId) {
 
-        var photoUrl = ajaxUtils.url('/api/users/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
+        var photoUrl = ajaxUtils.url('/api/users/' + userId + '/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
 
         console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
 
         // todo do we even need to transmit this? it seems to work with just the HTTP Session Cookie
-        var accessTokenHeaderToSendInRequestForOauth = ajaxUtils.accessToken();
-        var authHeaderForOauth = "Authorization: Authorization " + accessTokenHeaderToSendInRequestForOauth;
-
-        console.log('the oauth header is ' + authHeaderForOauth + '.');
+        //
+        //
+        //
+        //console.log('the oauth header is ' + authHeaderForOauth + '.');
 
         profilePhotoNode.filedrop({
             dataType:'json',
             maxfilesize:20, /* in MB */
             url:photoUrl,
             paramname:'file',
+            headers :{
+                'Authorization' :"Bearer " + ajaxUtils.accessToken()
+            },
+
             data:{
                 // todo how come this works? we should be required to send along the OAuth headers and so on
                 userId:function () {
@@ -264,6 +268,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
         console.debug('user loaded event passed for user ID# ' + userId);
         reRenderUserProfilePhoto(userId);
+        setupFileDropZoneForUser(userId);
     });
 
     $scope.saveProfileData = function () {
@@ -274,7 +279,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         });
     };
 
-    setupFileDropZone();
 
     loadUser(crmSession.getUserId());
 
@@ -304,10 +308,36 @@ function SignInController($scope, ajaxUtils) {
 
     jso_wipe();
 
-    $scope.signinWithFacebook = function(){
-        var facebookForm= $('#signinWithFacebook')
+    $scope.signinWithFacebook = function () {
+        var facebookForm = $('#signinWithFacebook')
         facebookForm.submit();
-        console.log ('signing in with facebook')
+        console.log('signing in with facebook')
     };
 }
 
+
+/**
+ * Designed to support the creation and import of customer data into
+ * the CRM from LinkedIn using Spring Social. Also, you can enter data
+ * in the form directly, if you like.
+ *
+ * @param $scope
+ * @param ajaxUtils
+ *
+ * @constructor
+ *
+ */
+function CustomerController($scope, ajaxUtils) {
+
+}
+
+function SignUpController($scope, ajaxUtils) {
+
+
+    $scope.signinWithFacebook = function () {
+        var facebookForm = $('#signinWithFacebook')
+        facebookForm.submit();
+        console.log('signing in with facebook')
+    };
+
+}

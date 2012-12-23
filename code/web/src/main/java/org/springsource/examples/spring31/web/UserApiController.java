@@ -61,11 +61,9 @@ public class UserApiController {
     }
 
     // more correct
-    // todo how do i handle this so that the URL for 'GET' requests is not secured (read-only) and
-    // todo requests for 'POST' ARE secured. This is the 'right' way to handle it but
-/*    @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
-    @ResponseBody*/
-    /* public */ Callable<Long> uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
+    @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
+    @ResponseBody
+    public Callable<Long> uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
 
         return new Callable<Long>() {
             @Override
