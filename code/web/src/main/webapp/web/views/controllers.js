@@ -63,20 +63,33 @@ module.factory('ajaxUtils', function () {
         var argFunc = argsProcessor || function (a) {
             return a;
         };
-        var isPost = (_method || '').toLowerCase() == 'post'; // dont specify the '_method' attribute if the request's a POST. Redundant
-        if (!isPost) d['_method'] = _method;
-        ajaxFunction(argFunc({
+        var isPost = (_method || '').toLowerCase() == 'post';
+
+        if (!isPost) {
+            d['_method'] = _method;
+        }
+
+        var arg = {
             type:'POST',
             url:url,
-            headers:(isPost ? {} : {'_method':_method}),
             data:d,
             cache:false,
             dataType:dataType,
             success:cb,
             error:errorCallback
-        })
-        );
+        };
+
+        if (!isPost) {
+            arg['headers'] = {'_method':_method};
+        }
+        ajaxFunction(argFunc(arg));
     };
+
+
+    var noopArgsProcessor = function (e) {
+        return e;
+    };
+    var oauthArgsProcessor = this.enrichRequestArguments;
 
     return {
         accessToken:function () {
@@ -93,11 +106,16 @@ module.factory('ajaxUtils', function () {
             return a;
         },
         put:function (url, data, cb) {
-            sendDataFunction($.ajax, function () {
-            }, url, 'PUT', data, cb);
+            sendDataFunction($.ajax, noopArgsProcessor, url, 'PUT', data, cb);
+        },
+        post:function (url, data, cb) {
+            sendDataFunction($.ajax, noopArgsProcessor, url, 'POST', data, cb);
         },
         oauthPut:function (url, data, cb) {
-            sendDataFunction($.oajax, this.enrichRequestArguments, url, 'PUT', data, cb);
+            sendDataFunction($.oajax, oauthArgsProcessor, url, 'PUT', data, cb);
+        },
+        oauthPost:function (url, data, cb) {
+            sendDataFunction($.oajax, oauthArgsProcessor, url, 'POST', data, cb);
         },
         oauthGet:function (url, data, cb) {
             $.oajax(this.enrichRequestArguments({
@@ -127,18 +145,22 @@ module.factory('ajaxUtils', function () {
 });
 
 module.factory('userService', function (ajaxUtils) {
-    var usersCollectionEntryUrl = '/api/users/';
+    var usersCollectionEntryUrl = '/api/users';
     return {
         buildBaseUserApiUrl:function (userId) {
-            return ajaxUtils.url(usersCollectionEntryUrl + userId);
+            return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
         },
         updateUserById:function (userId, username, pw, fn, ln, callback) {
-            var updateUrl = this.buildBaseUserApiUrl(userId);
             var user = {username:username, password:pw, firstname:fn, lastname:ln, id:userId };
-            ajaxUtils.oauthPut(updateUrl, user, callback);
+            ajaxUtils.oauthPut(this.buildBaseUserApiUrl(userId), user, callback);
         },
         getUserById:function (userId, callback) {
             ajaxUtils.oauthGet(ajaxUtils.url(usersCollectionEntryUrl + userId), {}, callback);
+        },
+        registerNewUser:function (username, pw, fn, ln, callback) {
+            var user = {username:username, password:pw, firstname:fn, lastname:ln };
+            var url = ajaxUtils.url(usersCollectionEntryUrl);
+            ajaxUtils.post(url, user, callback);
         }
     };
 })
@@ -162,12 +184,6 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         var photoUrl = ajaxUtils.url('/api/users/' + userId + '/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
 
         console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
-
-        // todo do we even need to transmit this? it seems to work with just the HTTP Session Cookie
-        //
-        //
-        //
-        //console.log('the oauth header is ' + authHeaderForOauth + '.');
 
         profilePhotoNode.filedrop({
             dataType:'json',
@@ -349,13 +365,19 @@ function SignUpController($rootScope, $scope, ajaxUtils, userService) {
 
 
     $scope.loadUser = function () {
-        console.log('loading user is not an option');
     }; // noop
 
-    $scope.saveProfileData = function(){
-        console.log('registering a new user') ;
+    $scope.saveProfileData = function () {
+        userService.registerNewUser($scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
+            console.log('registering the new user.');
+        });
+
+
     }; // posts to a different endpoint for the user
 
     ProfileController($rootScope, $scope, ajaxUtils, userService);
     SignInController($scope, ajaxUtils);
+
+    $scope.user = { username:'joshlong', password:'password', firstName:'Joshua', lastName:'Long'};
+
 }

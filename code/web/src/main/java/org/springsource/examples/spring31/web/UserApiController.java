@@ -25,7 +25,7 @@ public class UserApiController {
     /**
      * Root URL template for all modifications to a {@link User}
      */
-    static public final String USER_COLLECTION_URL = "/api/users/";
+    static public final String USER_COLLECTION_URL = "/api/users";
     static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
 
     private Logger log = Logger.getLogger(getClass());
@@ -53,11 +53,13 @@ public class UserApiController {
         return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
-    // more convenient
-    @RequestMapping(value = USER_COLLECTION_URL + "/photo", method = RequestMethod.POST)
+    @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
     @ResponseBody
-    public Callable<Long> uploadBasedOnRequestParameter(@RequestParam("userId") long userId, @RequestParam("file") MultipartFile file) {
-        return this.uploadBasedOnPathVariable(userId, file);
+    public User registerUser(@RequestParam("username") String username,
+                             @RequestParam("password") String password,
+                             @RequestParam("firstname") String fn,
+                             @RequestParam("lastname") String ln) {
+        return this.userService.createOrGet(username, password, fn, ln, false);
     }
 
     // more correct

@@ -64,11 +64,12 @@
 
     <http pattern="/api/crm/search**" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
 
-    <http pattern="/api/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
-          access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
+    <http pattern="/api/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint" access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="true"/>
         <intercept-url pattern="/api/users/**/photo" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <intercept-url pattern="/api/users/**/photo" method="POST" access="ROLE_USER,SCOPE_READ"/>
+        <!-- you should be allowed to create a new user without being logged in, obviously -->
+        <intercept-url pattern="/api/users" method="POST" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <intercept-url pattern="/api/**" access="ROLE_USER,SCOPE_READ"/>
         <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
         <access-denied-handler ref="oauthAccessDeniedHandler"/>

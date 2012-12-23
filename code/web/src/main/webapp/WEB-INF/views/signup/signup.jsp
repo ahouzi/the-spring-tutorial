@@ -5,7 +5,7 @@
 <div ng-controller="SignUpController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form class="form-horizontal" ng-submit="saveProfileData()">
+            <form class="form-horizontal" >
 
                 <div class="panel">
                     <fieldset>
@@ -51,7 +51,8 @@
 
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary" ng-model-instant> Create Profile</button>
+                            <a ng-click="saveProfileData()" href="javascript:void(0);">Sign Up   </a>
+                        <%--    <button type="submit" ng-click="saveProfileData()" onclick="javascript:void(0);" class="btn btn-primary" ng-model-instant> Create Profile</button>--%>
                             or
                               <span>
                                      <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign Up with
