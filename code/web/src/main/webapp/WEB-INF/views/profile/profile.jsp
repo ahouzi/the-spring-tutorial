@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="firstName">E-Mail:</label>
+                            <label class="control-label" for="firstName">First Name:</label>
 
                             <div class="controls"><input class="input-xlarge"  id="firstName" type="text" ng-model="user.firstName" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the first name. </span>
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="lastName">First Name:</label>
+                            <label class="control-label" for="lastName">Last Name:</label>
 
                             <div class="controls"><input class="input-xlarge" id="lastName" type="text" ng-model="user.lastName" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the last name. </span>

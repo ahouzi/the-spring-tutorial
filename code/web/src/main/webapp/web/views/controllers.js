@@ -165,6 +165,8 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         });
     }
 
+    $scope.loadUser = $scope.loadUser || loadUser;
+
     function setupFileDropZoneForUser(userId) {
 
         var photoUrl = ajaxUtils.url('/api/users/' + userId + '/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
@@ -182,8 +184,8 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
             maxfilesize:20, /* in MB */
             url:photoUrl,
             paramname:'file',
-            headers :{
-                'Authorization' :"Bearer " + ajaxUtils.accessToken()
+            headers:{
+                'Authorization':"Bearer " + ajaxUtils.accessToken()
             },
 
             data:{
@@ -280,7 +282,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     };
 
 
-    loadUser(crmSession.getUserId());
+    $scope.loadUser(crmSession.getUserId());
 
 
 }
@@ -309,7 +311,7 @@ function SignInController($scope, ajaxUtils) {
     jso_wipe();
 
     $scope.signinWithFacebook = function () {
-        var facebookForm = $('#signinWithFacebook')
+        var facebookForm = $('#signinWithFacebook');
         facebookForm.submit();
         console.log('signing in with facebook')
     };
@@ -331,13 +333,16 @@ function CustomerController($scope, ajaxUtils) {
 
 }
 
-function SignUpController($scope, ajaxUtils) {
+function SignUpController($rootScope, $scope, ajaxUtils, userService) {
+
+    $scope.loadUser = function(){
+        console.log( 'loading user is not an option');
+    }; // noop
+
+    ProfileController($rootScope, $scope, ajaxUtils, userService);
+    SignInController($scope, ajaxUtils);
 
 
-    $scope.signinWithFacebook = function () {
-        var facebookForm = $('#signinWithFacebook')
-        facebookForm.submit();
-        console.log('signing in with facebook')
-    };
 
+//  SignInController( $scope, ajaxUtils);
 }
