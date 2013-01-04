@@ -15,7 +15,7 @@ var appName = 'crm';
 var module = angular.module(appName, ['ngResource']);
 
 
-// idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separte object
+// idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separate object
 module.factory('ajaxUtils', function () {
     var contentType = 'application/json; charset=utf-8' ,
         dataType = 'json',
@@ -155,7 +155,7 @@ module.factory('userService', function (ajaxUtils) {
             ajaxUtils.oauthPut(this.buildBaseUserApiUrl(userId), user, callback);
         },
         getUserById:function (userId, callback) {
-            ajaxUtils.oauthGet(ajaxUtils.url(usersCollectionEntryUrl + userId), {}, callback);
+            ajaxUtils.oauthGet( this.buildBaseUserApiUrl(userId), {}, callback);
         },
         registerNewUser:function (username, pw, fn, ln, callback) {
             var user = {username:username, password:pw, firstname:fn, lastname:ln };
