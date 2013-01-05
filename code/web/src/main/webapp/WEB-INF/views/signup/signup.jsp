@@ -2,15 +2,34 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" %>
 
+
+<div ng-controller="TooltipCtrl">
+    <a title="Easiest. Binding. Ever!" ui-jq="tooltip">Hover over me for static Tooltip</a>
+
+    <a data-original-title="{{tooltip}}" ui-jq="tooltip">Fill the input for a dynamic Tooltip:</a>
+    <input type="text" ng-model="tooltip" placeholder="Tooltip Content"/>
+
+    <script language="JavaScript" type="text/javascript">
+        function TooltipCtrl($scope) {
+            $scope.item = {
+                title:'Title',
+                body:'Tooltip Body...'
+            };
+        }
+
+
+    </script>
+</div>
 <div ng-controller="SignUpController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form class="form-horizontal" >
+            <form class="form-horizontal">
 
                 <div class="panel">
                     <fieldset>
                         <legend><h2> Sign Up
                         </h2></legend>
+
 
 
                         <div class="control-group ${cgClass}">
@@ -51,8 +70,8 @@
 
 
                         <div class="form-actions">
-                            <a ng-click="saveProfileData()" href="javascript:void(0);">Sign Up   </a>
-                        <%--    <button type="submit" ng-click="saveProfileData()" onclick="javascript:void(0);" class="btn btn-primary" ng-model-instant> Create Profile</button>--%>
+                            <a ng-click="saveProfileData()" href="javascript:void(0);">Sign Up </a>
+                                <%--    <button type="submit" ng-click="saveProfileData()" onclick="javascript:void(0);" class="btn btn-primary" ng-model-instant> Create Profile</button>--%>
                             or
                               <span>
                                      <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign Up with

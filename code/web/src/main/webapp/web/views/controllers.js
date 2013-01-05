@@ -12,8 +12,18 @@ $.ajaxSetup({
 });
 
 var appName = 'crm';
-var module = angular.module(appName, ['ngResource']);
+var module = angular.module(appName, ['ngResource','ui']);
 
+module.value('ui.config', {
+    // The ui-jq directive namespace
+    jq:{
+        // The Tooltip namespace
+        tooltip:{
+            // Tooltip options. This object will be used as the defaults
+            placement:'right'
+        }
+    }
+});
 
 // idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separate object
 module.factory('ajaxUtils', function () {
@@ -270,7 +280,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     }
 
     $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
-        loadUser(crmSession.getUserId());
+        $scope.loadUser(crmSession.getUserId());
     });
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
