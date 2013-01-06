@@ -7,16 +7,15 @@
 <html ng-app="crm">
 <head>
     <%-- Hack for IE. bleargh. --%>
-    <!--[if IE]>
+    <%--    <!--[if IE]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <![endif]-->--%>
 
-    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery.js"></script>
     <script type="text/javascript">
 
         var crmSession = {
-            isLoggedIn: function(){
-                return !(this.getUserId()  == null ) ;
+            isLoggedIn:function () {
+                return !(this.getUserId() == null );
             },
             getUserId:function () {
                 var uid = "${userId}";
@@ -30,13 +29,40 @@
 
     </script>
 
+    <%--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>--%>
+
+    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-ui.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-filedrop.js"></script>
-
+    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-masked.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular-ui.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular-resource.js"></script>
-
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jso.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/bootstrap.js"></script>
+
+    <%--
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+    --%>
+
+
+    <%--
+    <script src="http://code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
+    --%>
+    <%--
+    <script src="http://angular-ui.github.com/angular-ui/build/angular-ui.js"></script>
+    <script src="http://angular-ui.github.com/js/prettify.js"></script>
+    <script src="http://angular-ui.github.com/lib/maskedinput/jquery.maskedinput.js"></script>
+    <script src="http://angular-ui.github.com/lib/select2/select2.js"></script>
+    --%>
+    <%--<script src="http://angular-ui.github.com/lib/CodeMirror/lib/codemirror.js"></script>
+   <script src="http://angular-ui.github.com/lib/CodeMirror/mode/javascript/javascript.js"></script>--%>
+    <%--<script src="http://fiddle.tinymce.com/tinymce/3.5.4.1/jquery.tinymce.js"></script>
+   <script src="http://fiddle.tinymce.com/tinymce/3.5.4.1/tiny_mce_jquery_src.js"></script>--%>
+    <%--<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>--%>
+
 
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/views/controllers.js"></script>
 
@@ -46,8 +72,13 @@
               todo
     --%>
 
+    <%--<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" rel="stylesheet"/>--%>
+    <link href="${pageContext.request.contextPath}/web/assets/css/jquery-ui.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/assets/bootstrap/bootstrap.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/views/controllers.css" rel="stylesheet"/>
+
+    <!--[if lte IE 8]>
+    <script src="build/angular-ui-ieshiv.js"></script><![endif]-->
 
 </head>
 <body>

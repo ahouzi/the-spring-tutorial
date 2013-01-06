@@ -12,10 +12,20 @@ $.ajaxSetup({
 });
 
 var appName = 'crm';
-var module = angular.module(appName, ['ngResource']);
+var module = angular.module(appName, ['ngResource', 'ui']);
 
+module.value('ui.config', {
+    // The ui-jq directive namespace
+    jq:{
+        // The Tooltip namespace
+        tooltip:{
+            // Tooltip options. This object will be used as the defaults
+            placement:'right'
+        }
+    }
+});
 
-// idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separte object
+// idea try moving the module.run logic into this ajaxUtils object and then try separating this out into a separate object
 module.factory('ajaxUtils', function () {
     var contentType = 'application/json; charset=utf-8' ,
         dataType = 'json',
@@ -63,20 +73,33 @@ module.factory('ajaxUtils', function () {
         var argFunc = argsProcessor || function (a) {
             return a;
         };
-        var isPost = (_method || '').toLowerCase() == 'post'; // dont specify the '_method' attribute if the request's a POST. Redundant
-        if (!isPost) d['_method'] = _method;
-        ajaxFunction(argFunc({
+        var isPost = (_method || '').toLowerCase() == 'post';
+
+        if (!isPost) {
+            d['_method'] = _method;
+        }
+
+        var arg = {
             type:'POST',
             url:url,
-            headers:(isPost ? {} : {'_method':_method}),
             data:d,
             cache:false,
             dataType:dataType,
             success:cb,
             error:errorCallback
-        })
-        );
+        };
+
+        if (!isPost) {
+            arg['headers'] = {'_method':_method};
+        }
+        ajaxFunction(argFunc(arg));
     };
+
+
+    var noopArgsProcessor = function (e) {
+        return e;
+    };
+    var oauthArgsProcessor = this.enrichRequestArguments;
 
     return {
         accessToken:function () {
@@ -93,11 +116,16 @@ module.factory('ajaxUtils', function () {
             return a;
         },
         put:function (url, data, cb) {
-            sendDataFunction($.ajax, function () {
-            }, url, 'PUT', data, cb);
+            sendDataFunction($.ajax, noopArgsProcessor, url, 'PUT', data, cb);
+        },
+        post:function (url, data, cb) {
+            sendDataFunction($.ajax, noopArgsProcessor, url, 'POST', data, cb);
         },
         oauthPut:function (url, data, cb) {
-            sendDataFunction($.oajax, this.enrichRequestArguments, url, 'PUT', data, cb);
+            sendDataFunction($.oajax, oauthArgsProcessor, url, 'PUT', data, cb);
+        },
+        oauthPost:function (url, data, cb) {
+            sendDataFunction($.oajax, oauthArgsProcessor, url, 'POST', data, cb);
         },
         oauthGet:function (url, data, cb) {
             $.oajax(this.enrichRequestArguments({
@@ -127,18 +155,27 @@ module.factory('ajaxUtils', function () {
 });
 
 module.factory('userService', function (ajaxUtils) {
-    var usersCollectionEntryUrl = '/api/users/';
+    var usersCollectionEntryUrl = '/api/users';
     return {
         buildBaseUserApiUrl:function (userId) {
-            return ajaxUtils.url(usersCollectionEntryUrl + userId);
+            return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
+        },
+        isUserNameTaken:function (username, cb) {
+            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames/' + username);
+            console.log('url for isUserNameTaken is ' + url);
+            ajaxUtils.get(url, {}, cb);
         },
         updateUserById:function (userId, username, pw, fn, ln, callback) {
-            var updateUrl = this.buildBaseUserApiUrl(userId);
             var user = {username:username, password:pw, firstname:fn, lastname:ln, id:userId };
-            ajaxUtils.oauthPut(updateUrl, user, callback);
+            ajaxUtils.oauthPut(this.buildBaseUserApiUrl(userId), user, callback);
         },
         getUserById:function (userId, callback) {
-            ajaxUtils.oauthGet(ajaxUtils.url(usersCollectionEntryUrl + userId), {}, callback);
+            ajaxUtils.oauthGet(this.buildBaseUserApiUrl(userId), {}, callback);
+        },
+        registerNewUser:function (username, pw, fn, ln, callback) {
+            var user = {username:username, password:pw, firstname:fn, lastname:ln };
+            var url = ajaxUtils.url(usersCollectionEntryUrl);
+            ajaxUtils.post(url, user, callback);
         }
     };
 })
@@ -150,20 +187,12 @@ module.factory('userService', function (ajaxUtils) {
  *
  * @constructor
  */
-function ProfileController($rootScope, $scope, ajaxUtils, userService) {
+function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService) {
+    // so that its not null on initial calls before ajax
 
     var profilePhotoUploadedEvent = 'profilePhotoUploadedEvent';  // broadcast when the profile photo's been changed
     var userLoadedEvent = 'userLoadedEvent'; // broadcast when the user being edited is loaded
     var profilePhotoNode = $('#profilePhoto');
-
-    function loadUser(userId) {
-        userService.getUserById(userId, function (u) {
-            $scope.$apply(function () {
-                $scope.user = u;
-                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
-            });
-        });
-    }
 
     function setupFileDropZoneForUser(userId) {
 
@@ -171,19 +200,13 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
 
         console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
 
-        // todo do we even need to transmit this? it seems to work with just the HTTP Session Cookie
-        //
-        //
-        //
-        //console.log('the oauth header is ' + authHeaderForOauth + '.');
-
         profilePhotoNode.filedrop({
             dataType:'json',
             maxfilesize:20, /* in MB */
             url:photoUrl,
             paramname:'file',
-            headers :{
-                'Authorization' :"Bearer " + ajaxUtils.accessToken()
+            headers:{
+                'Authorization':"Bearer " + ajaxUtils.accessToken()
             },
 
             data:{
@@ -262,7 +285,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     }
 
     $rootScope.$on(profilePhotoUploadedEvent, function (evt, userId) {
-        loadUser(crmSession.getUserId());
+        $scope.loadUser(crmSession.getUserId());
     });
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
@@ -271,7 +294,32 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         setupFileDropZoneForUser(userId);
     });
 
-    $scope.saveProfileData = function () {
+    $scope.originalUsername = null;
+
+    $scope.$watch('user.username', function (username) {
+        console.log('the original username is ' + $scope.originalUsername);
+        if (username != null && username != '' && username != $scope.originalUsername) {
+            userService.isUserNameTaken(username, function (taken) {
+                $scope.$apply(function () {
+                    $scope.usernameTaken = taken && !($scope.originalUsername == username);
+                });
+            });
+        } else {
+            $scope.usernameTaken = false;
+        }
+    });
+
+    $scope.loadUser = $scope.loadUser || function (userId) {
+        userService.getUserById(userId, function (u) {
+            $scope.$apply(function () {
+                $scope.user = u;
+                $scope.originalUsername = u.username; // so we can see if the 'conflict' is ourself
+                $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
+            });
+        });
+    };
+
+    $scope.saveProfileData = $scope.saveProfileData || function () {
         userService.updateUserById($scope.user.id, $scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
@@ -280,7 +328,7 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
     };
 
 
-    loadUser(crmSession.getUserId());
+    $scope.loadUser(crmSession.getUserId());
 
 
 }
@@ -301,15 +349,11 @@ function NavigationController() {
  * @constructor
  */
 function SignInController($scope, ajaxUtils) {
-
-
     /// todo remove this and introduce Spring Security's RememberMe service !
-
-
     jso_wipe();
 
     $scope.signinWithFacebook = function () {
-        var facebookForm = $('#signinWithFacebook')
+        var facebookForm = $('#signinWithFacebook');
         facebookForm.submit();
         console.log('signing in with facebook')
     };
@@ -331,13 +375,35 @@ function CustomerController($scope, ajaxUtils) {
 
 }
 
-function SignUpController($scope, ajaxUtils) {
+/**
+ * a lot of the logic that we want to provide here is already present in the more
+ * sophisticated <CODE>ProfileController</code> controller, and <CODE>SignInController</CODE>,
+ * so we simply reuse those controllers when building up this object. This is
+ * the nice part about angular.js controllers: they compose naturally
+ * because they're just functions.
+ *
+ * @param $rootScope
+ * @param $scope
+ * @param ajaxUtils
+ * @param userService
+ * @constructor
+ */
+function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService) {
 
 
-    $scope.signinWithFacebook = function () {
-        var facebookForm = $('#signinWithFacebook')
-        facebookForm.submit();
-        console.log('signing in with facebook')
-    };
+    $scope.loadUser = function () {
+    }; // noop
+
+    $scope.saveProfileData = function () {
+        userService.registerNewUser($scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
+            console.log('registering the new user.');
+        });
+
+
+    }; // posts to a different endpoint for the user
+
+    ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService);
+    SignInController($scope, ajaxUtils);
+
 
 }

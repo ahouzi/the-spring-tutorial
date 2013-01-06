@@ -29,9 +29,8 @@
     </http>
 
 
-
     <!-- The OAuth2 protected resources are separated out into their own block so we can deal with authorization and error handling
-         separately. This isn't mandatory, but it makes it easier to control the behaviour. -->
+separately. This isn't mandatory, but it makes it easier to control the behaviour. -->
     <http pattern="/oauth/(users|clients)/.*" request-matcher="regex" create-session="stateless"
           entry-point-ref="oauthAuthenticationEntryPoint"
           use-expressions="true" xmlns="http://www.springframework.org/schema/security">
@@ -58,17 +57,21 @@
 
     <intercept-url pattern="/photo" access="IS_AUTHENTICATED_ANONYMOUSLY" method="GET"/>
     -->
-<!--
-    <http pattern="/api/users/**/photo" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
--->
+    <!--
+        <http pattern="/api/users/**/photo" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
+    -->
 
-    <http pattern="/api/crm/search**" create-session="never"  xmlns="http://www.springframework.org/schema/security" security="none"/>
+    <http pattern="/api/crm/search**" create-session="never" xmlns="http://www.springframework.org/schema/security"
+          security="none"/>
 
     <http pattern="/api/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
           access-decision-manager-ref="accessDecisionManager" xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="true"/>
         <intercept-url pattern="/api/users/**/photo" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <intercept-url pattern="/api/users/usernames/**" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <intercept-url pattern="/api/users/**/photo" method="POST" access="ROLE_USER,SCOPE_READ"/>
+        <!-- you should be allowed to create a new user without being logged in, obviously -->
+        <intercept-url pattern="/api/users" method="POST" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <intercept-url pattern="/api/**" access="ROLE_USER,SCOPE_READ"/>
         <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
         <access-denied-handler ref="oauthAccessDeniedHandler"/>
@@ -80,7 +83,6 @@
         <intercept-url pattern="/crm/customers.html" access="ROLE_USER"/>
         <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
         <form-login login-page="/crm/signin.html"
-                    authentication-success-handler-ref="signinSuccessHandler"
                     default-target-url="/crm/profile.html"
                     authentication-failure-url="/crm/signin.html?error=true"/>
         <intercept-url pattern="/web/views/**" access="ROLE_USER"/>

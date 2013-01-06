@@ -15,8 +15,6 @@ import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEn
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.vote.ScopeVoter;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springsource.examples.spring31.web.security.RoleAwareAuthenticationSuccessHandler;
 import org.springsource.examples.spring31.web.security.RoleAwareOAuthTokenServicesUserApprovalHandler;
 
 import javax.inject.Inject;
@@ -32,8 +30,6 @@ import java.util.List;
 @Configuration
 @ImportResource({"classpath:/security/security.xml"})
 public class SecurityConfiguration {
-    @Inject
-    private ClientDetailsService jpaUserCredentialsService;
 
     @Bean
     public InMemoryTokenStore tokenStore() {
@@ -48,6 +44,9 @@ public class SecurityConfiguration {
         decisionVoters.add(new AuthenticatedVoter());
         return new UnanimousBased(decisionVoters);
     }
+
+    @Inject
+    private ClientDetailsService jpaUserCredentialsService;
 
     @Bean
     public DefaultTokenServices tokenServices() {
@@ -90,10 +89,6 @@ public class SecurityConfiguration {
         return approvalHandler;
     }
 
-    @Bean
-    public AuthenticationSuccessHandler signinSuccessHandler() throws Throwable {
-        return new RoleAwareAuthenticationSuccessHandler();
-    }
 }
 
 
