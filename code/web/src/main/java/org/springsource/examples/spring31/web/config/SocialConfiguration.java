@@ -103,7 +103,7 @@ public class SocialConfiguration {
          * if this account is created by connecting to facebook, then we'll assign a default password
          * and force the user to choose a password on the signup page.
          *
-         * @param connection   the Spring Social connection object with information about the object from the social provider.
+         * @param connection the Spring Social connection object with information about the object from the social provider.
          * @return the username
          */
         public String execute(Connection<?> connection) {
@@ -164,14 +164,13 @@ public class SocialConfiguration {
 //       The Spring MVC Controller that allows users to sign-in with their provider accounts.
 //
     @Bean
-    public ProviderSignInController providerSignInController() {
+    @Inject
+    public ProviderSignInController providerSignInController(AuthenticationManager authenticationManager) {
         ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
-                new SpringSecuritySignInAdapter(this.authenticationManager, this.userService));
+                new SpringSecuritySignInAdapter(authenticationManager, this.userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
         providerSignInController.setPostSignInUrl("/crm/profile.html");
         return providerSignInController;
     }
 
-    @Inject
-    private AuthenticationManager authenticationManager;
 }

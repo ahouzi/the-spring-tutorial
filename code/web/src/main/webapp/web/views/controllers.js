@@ -12,7 +12,7 @@ $.ajaxSetup({
 });
 
 var appName = 'crm';
-var module = angular.module(appName, ['ngResource','ui']);
+var module = angular.module(appName, ['ngResource', 'ui']);
 
 module.value('ui.config', {
     // The ui-jq directive namespace
@@ -160,12 +160,17 @@ module.factory('userService', function (ajaxUtils) {
         buildBaseUserApiUrl:function (userId) {
             return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
         },
+        isUserNameTaken:function (username, cb) {
+            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames/' + username);
+            console.log('url for isUserNameTaken is ' + url);
+            ajaxUtils.get(url, {}, cb);
+        },
         updateUserById:function (userId, username, pw, fn, ln, callback) {
             var user = {username:username, password:pw, firstname:fn, lastname:ln, id:userId };
             ajaxUtils.oauthPut(this.buildBaseUserApiUrl(userId), user, callback);
         },
         getUserById:function (userId, callback) {
-            ajaxUtils.oauthGet( this.buildBaseUserApiUrl(userId), {}, callback);
+            ajaxUtils.oauthGet(this.buildBaseUserApiUrl(userId), {}, callback);
         },
         registerNewUser:function (username, pw, fn, ln, callback) {
             var user = {username:username, password:pw, firstname:fn, lastname:ln };
@@ -182,12 +187,12 @@ module.factory('userService', function (ajaxUtils) {
  *
  * @constructor
  */
-function ProfileController($rootScope, $scope, ajaxUtils, userService) {
+function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService) {
+    // so that its not null on initial calls before ajax
 
     var profilePhotoUploadedEvent = 'profilePhotoUploadedEvent';  // broadcast when the profile photo's been changed
     var userLoadedEvent = 'userLoadedEvent'; // broadcast when the user being edited is loaded
     var profilePhotoNode = $('#profilePhoto');
-
 
     function setupFileDropZoneForUser(userId) {
 
@@ -289,10 +294,26 @@ function ProfileController($rootScope, $scope, ajaxUtils, userService) {
         setupFileDropZoneForUser(userId);
     });
 
+    $scope.originalUsername = null;
+
+    $scope.$watch('user.username', function (username) {
+        console.log('the original username is ' + $scope.originalUsername);
+        if (username != null && username != '' && username != $scope.originalUsername) {
+            userService.isUserNameTaken(username, function (taken) {
+                $scope.$apply(function () {
+                    $scope.usernameTaken = taken && !($scope.originalUsername == username);
+                });
+            });
+        } else {
+            $scope.usernameTaken = false;
+        }
+    });
+
     $scope.loadUser = $scope.loadUser || function (userId) {
         userService.getUserById(userId, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
+                $scope.originalUsername = u.username; // so we can see if the 'conflict' is ourself
                 $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
             });
         });
@@ -328,11 +349,7 @@ function NavigationController() {
  * @constructor
  */
 function SignInController($scope, ajaxUtils) {
-
-
     /// todo remove this and introduce Spring Security's RememberMe service !
-
-
     jso_wipe();
 
     $scope.signinWithFacebook = function () {
@@ -371,7 +388,7 @@ function CustomerController($scope, ajaxUtils) {
  * @param userService
  * @constructor
  */
-function SignUpController($rootScope, $scope, ajaxUtils, userService) {
+function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService) {
 
 
     $scope.loadUser = function () {
@@ -385,9 +402,8 @@ function SignUpController($rootScope, $scope, ajaxUtils, userService) {
 
     }; // posts to a different endpoint for the user
 
-    ProfileController($rootScope, $scope, ajaxUtils, userService);
+    ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService);
     SignInController($scope, ajaxUtils);
 
-    $scope.user = { username:'joshlong', password:'password', firstName:'Joshua', lastName:'Long'};
 
 }

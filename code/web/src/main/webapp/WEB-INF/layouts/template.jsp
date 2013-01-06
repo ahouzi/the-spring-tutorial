@@ -35,6 +35,7 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-ui.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-filedrop.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jquery-masked.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular-ui.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular-resource.js"></script>

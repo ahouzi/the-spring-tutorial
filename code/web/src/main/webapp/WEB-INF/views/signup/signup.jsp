@@ -2,24 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" %>
 
-
-<div ng-controller="TooltipCtrl">
-    <a title="Easiest. Binding. Ever!" ui-jq="tooltip">Hover over me for static Tooltip</a>
-
-    <a data-original-title="{{tooltip}}" ui-jq="tooltip">Fill the input for a dynamic Tooltip:</a>
-    <input type="text" ng-model="tooltip" placeholder="Tooltip Content"/>
-
-    <script language="JavaScript" type="text/javascript">
-        function TooltipCtrl($scope) {
-            $scope.item = {
-                title:'Title',
-                body:'Tooltip Body...'
-            };
-        }
-
-
-    </script>
-</div>
 <div ng-controller="SignUpController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
@@ -27,17 +9,20 @@
 
                 <div class="panel">
                     <fieldset>
-                        <legend><h2> Sign Up
-                        </h2></legend>
-
+                        <legend>
+                            <h2> Sign Up </h2>
+                        </legend>
 
 
                         <div class="control-group ${cgClass}">
                             <label class="control-label" for="username">User Name:</label>
 
-                            <div class="controls"><input class="input-xlarge" id="username" type="text"
-                                                         ng-model="user.username" required="required"/>
-                                <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail. </span>
+                            <div class="controls"><input class="input-xlarge"
+                                                         id="username"
+                                                         type="text"
+                                                         ng-model="user.username"/>
+                                <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail.   </span>
+                                <span ng-show="usernameTaken"> This user name is already taken. Please choose a unique name. </span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">

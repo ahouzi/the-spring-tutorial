@@ -53,6 +53,14 @@ public class UserApiController {
         return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
+    @RequestMapping(value = USER_COLLECTION_URL + "/usernames/{username}", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean isUserNameTaken(@PathVariable("username") String username) {
+        boolean taken = this.userService.isUserNameAlreadyTaken(username);
+        log.debug("the username " + username + " is taken: " + taken);
+        return taken;
+    }
+
     @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
     @ResponseBody
     public User registerUser(@RequestParam("username") String username,

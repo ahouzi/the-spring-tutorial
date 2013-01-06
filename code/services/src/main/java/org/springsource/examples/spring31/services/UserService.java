@@ -116,6 +116,14 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return getUserById(userId);
     }
 
+    /**
+     * todo optimize this with a faster query that simply does a COUNT(*) or something
+     */
+    public boolean isUserNameAlreadyTaken (String username){
+        User u = this.loginByUsername( username ) ;
+        return u != null ;
+    }
+
     public User createOrGet(String user, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User usr;
         if ((usr = login(user, pw)) == null) {
