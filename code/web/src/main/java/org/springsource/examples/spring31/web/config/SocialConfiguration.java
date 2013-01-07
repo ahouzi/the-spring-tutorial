@@ -17,6 +17,7 @@ import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springsource.examples.spring31.services.User;
@@ -135,7 +136,6 @@ public class SocialConfiguration {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource,
                 connectionFactoryLocator(), Encryptors.noOpText());
         repository.setConnectionSignUp(new CrmUserConnectionSignUp(this.userService));
-
         return repository;
     }
 
@@ -155,10 +155,16 @@ public class SocialConfiguration {
 //     * @throws org.springframework.social.connect.NotConnectedException if the user is not connected to facebook.
 //
     @Bean
+    @Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)
+    public Facebook facebook() {
+        Connection<Facebook> facebook = connectionRepository().findPrimaryConnection(Facebook.class);
+        return facebook != null ? facebook.getApi() : new FacebookTemplate();
+    }
+/*    @Bean
     @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
     public Facebook facebook() {
         return connectionRepository().getPrimaryConnection(Facebook.class).getApi();
-    }
+    }*/
 
     //
 //       The Spring MVC Controller that allows users to sign-in with their provider accounts.

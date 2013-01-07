@@ -5,7 +5,7 @@
 <div ng-controller="SignUpController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form class="form-horizontal">
+            <form name="form" class="form-horizontal">
 
                 <div class="panel">
                     <fieldset>
@@ -19,19 +19,37 @@
 
                             <div class="controls"><input class="input-xlarge"
                                                          id="username"
+                                                         name="username"
                                                          type="text"
+                                                         ui-validate="{ validUsername : isUsernameValid }"
+                                                         required="required"
                                                          ng-model="user.username"/>
-                                <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail.   </span>
-                                <span ng-show="usernameTaken"> This user name is already taken. Please choose a unique name. </span>
+                                <span ng-show="${error}" class="help-block"> Please provide a valid value for the e-mail.   </span>
+                                <span ng-show="form.username.$error.validUsername" class="help-block"> The username you specified is not valid.
+                                    Please
+                                ensure that it is a minimum of 8 characters and that it has no spaces or any non alpha numeric characters (a-z, A-Z and 1-10).
+                                </span>
+                                <span ng-show="usernameTaken" class="help-block"> This user name is already taken. Please choose a unique name. </span>
                             </div>
                         </div>
+
                         <div class="control-group ${cgClass}">
                             <label class="control-label" for="password">Password:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="j_password" id="password" type="password"
-                                       ng-model="user.password" required="required"/>
+                                <input class="input-xlarge" id="j_password"   id="password" type="password" ng-model="user.password" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the password. </span>
+                            </div>
+                        </div>
+                        <div class="control-group ${cgClass}">
+                            <label class="control-label" for="password">Confirm Password:</label>
+
+                            <div class="controls">
+                                <input class="input-xlarge" ui-validate="{ confirmPassword : confirmPasswordMatches }"  type="password"
+                                       name="passwordConfirmation"
+                                       ng-model="user.passwordConfirmation" required="required"/>
+                                <span ng-show="form.passwordConfirmation.$error.confirmPassword" class="help-block"> Your passwords do not match </span>
+                                <span ng-show="${error}" class="help-inline">  Please confirm your password </span>
                             </div>
                         </div>
 
@@ -55,12 +73,14 @@
 
 
                         <div class="form-actions">
-                            <a ng-click="saveProfileData()" href="javascript:void(0);">Sign Up </a>
-                                <%--    <button type="submit" ng-click="saveProfileData()" onclick="javascript:void(0);" class="btn btn-primary" ng-model-instant> Create Profile</button>--%>
-                            or
+
+
+                            <button type="submit" ng-disabled="form.$invalid" ng-click="saveProfileData()"  href="javascript:void(0);" class="btn btn-primary" name="action" value="signin" ng-model-instant>
+                                Sign Up
+                            </button>
+                                or
                               <span>
-                                     <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign Up with
-                                         Facebook</a>
+                             <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign Up with Facebook</a>
 
                             </span>
 

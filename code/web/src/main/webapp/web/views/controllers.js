@@ -289,15 +289,35 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     });
 
     $rootScope.$on(userLoadedEvent, function (evt, userId) {
-        console.debug('user loaded event passed for user ID# ' + userId);
         reRenderUserProfilePhoto(userId);
         setupFileDropZoneForUser(userId);
     });
 
+    $scope.isUsernameValid = function (u) {
+        var isString = typeof u == typeof '';
+        if (!isString) return true;
+        var m = u.match(/\w{8,}$/) != null;
+        console.log('does [' + u + '] match? ' + m);
+        return m;
+    };
+
+    $scope.confirmPasswordMatches = function (cpw) {
+        if (!($scope.user  )) {
+            return true;
+        }
+        var pw = $scope.user.password;
+        return  pw != null && cpw != null && pw == cpw;
+    };
+
     $scope.originalUsername = null;
 
+    $scope.$watch('user.password', function (v) {
+        if ($scope.user && $scope.user.passwordConfirmation != v) {
+            $scope.user.passwordConfirmation = '';
+        }
+    });
+
     $scope.$watch('user.username', function (username) {
-        console.log('the original username is ' + $scope.originalUsername);
         if (username != null && username != '' && username != $scope.originalUsername) {
             userService.isUserNameTaken(username, function (taken) {
                 $scope.$apply(function () {
@@ -313,7 +333,8 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
         userService.getUserById(userId, function (u) {
             $scope.$apply(function () {
                 $scope.user = u;
-                $scope.originalUsername = u.username; // so we can see if the 'conflict' is ourself
+                $scope.user.passwordConfirmation = u.password; // set it to the be the same thing initially
+                $scope.originalUsername = u.username; // so we can see if the 'conflict' is our self
                 $rootScope.$broadcast(userLoadedEvent, $scope.user.id);
             });
         });
