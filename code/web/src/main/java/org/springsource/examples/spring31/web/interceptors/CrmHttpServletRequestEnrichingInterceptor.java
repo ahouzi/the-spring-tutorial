@@ -10,6 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springsource.examples.spring31.services.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,9 +23,15 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     private Logger logger = Logger.getLogger(getClass());
 
+    private String usernameAttribute = "username";
+
     private String userIdAttribute = "userId";
 
     private String fullUrlAttribute = "fullUrl";
+
+    public void setUsernameAttribute(String u) {
+        this.usernameAttribute = u;
+    }
 
     public void setUserIdAttribute(String u) {
         this.userIdAttribute = u;
@@ -46,12 +53,22 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         Map<String, Object> kvs = new HashMap<String, Object>();
         kvs.put(fullUrlAttribute, buildFullUrlAttribute(swr));
 
+        // let's see if the 'username' attribute is available
+        HttpServletRequest httpServletRequest = swr.getNativeRequest(HttpServletRequest.class) ;
+        String usernameValue = httpServletRequest.getParameter(this.usernameAttribute) ;
+      //  Object usernameAttribute = swr.getRequest().getAttribute("username");
+        if (null != usernameAttribute)
+            kvs.put(this.usernameAttribute,  usernameValue);
+
         // not authenticated? principal is an AnonymousPrincipal
         if (null == authentication || !(authentication.getPrincipal() instanceof UserService.CrmUserDetails))
             return kvs;
 
         UserService.CrmUserDetails userDetails = (UserService.CrmUserDetails) authentication.getPrincipal();
         kvs.put(userIdAttribute, buildUserIdAttribute(userDetails));
+
+
+
         return kvs;
     }
 

@@ -14,6 +14,13 @@
     <script type="text/javascript">
 
         var crmSession = {
+            getUsername  : function(){
+                var un = "${username}";
+                var pi;
+                if(un=='' )
+                return null ;
+                return un;
+            },
             isLoggedIn:function () {
                 return !(this.getUserId() == null );
             },

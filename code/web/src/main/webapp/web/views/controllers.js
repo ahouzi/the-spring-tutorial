@@ -14,6 +14,7 @@ $.ajaxSetup({
 var appName = 'crm';
 var module = angular.module(appName, ['ngResource', 'ui']);
 
+
 module.value('ui.config', {
     // The ui-jq directive namespace
     jq:{
@@ -369,9 +370,16 @@ function NavigationController() {
  * @param $scope
  * @constructor
  */
-function SignInController($scope, ajaxUtils) {
+function SignInController($scope, $location) {
     /// todo remove this and introduce Spring Security's RememberMe service !
     jso_wipe();
+
+    // 'u' is the username request parameter that we'll expect to preload the username
+    // typically after someone's successfully finished the signup flow
+    var u = crmSession.getUsername();
+    if (u != null) {
+        $scope.user = { username:u };
+    }
 
     $scope.signinWithFacebook = function () {
         var facebookForm = $('#signinWithFacebook');
@@ -409,7 +417,7 @@ function CustomerController($scope, ajaxUtils) {
  * @param userService
  * @constructor
  */
-function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService) {
+function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService, $location) {
 
 
     $scope.loadUser = function () {
@@ -418,13 +426,18 @@ function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userServi
     $scope.saveProfileData = function () {
         userService.registerNewUser($scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
             console.log('registering the new user.');
+            //http://localhost:8080/crm/signin.html?username=starbuxman
+            var urlToRedirectTo = ajaxUtils.url('/crm/signin.html?username=' + u.username);
+            console.log('url ' + urlToRedirectTo);
+            window.location.href = urlToRedirectTo;
+            // now we redirect to...
         });
 
 
     }; // posts to a different endpoint for the user
 
     ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService);
-    SignInController($scope, ajaxUtils);
+    SignInController($scope, $location);
 
 
 }
