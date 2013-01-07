@@ -26,11 +26,14 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
         String profile = cloudEnvironment.isCloudFoundry() ? "cloud" : "default";
         applicationContext.getEnvironment().setActiveProfiles(profile);
         Class<?>[] configs = {ServicesConfiguration.class, WebMvcConfiguration.class};
-        String[] basePkgs = new String[configs.length];
+        for( Class <?> clzz : configs)
+                applicationContext.register( clzz);
+
+        /*String[] basePkgs = new String[configs.length];
         int i = 0;
         for (Class<?> pkg : configs)
-            basePkgs[i++] = pkg.getPackage().getName();
-        applicationContext.scan(basePkgs);
-        applicationContext.refresh();
+            basePkgs[i++] = pkg.getPackage().getName();*/
+//        applicationContext.scan(basePkgs);
+        //applicationContext.refresh();
     }
 }

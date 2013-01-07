@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.social.config.support.JdbcConnectionRepositoryConfigSupport;
 import org.springframework.social.connect.*;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
@@ -35,9 +36,7 @@ import javax.sql.DataSource;
 @Configuration
 public class SocialConfiguration {
 
-
     private Environment environment;
-
 
     private UserService userService;
 
@@ -119,6 +118,7 @@ public class SocialConfiguration {
     }
 
     @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
     public ConnectionFactoryLocator connectionFactoryLocator() {
         ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
         String clientId = environment.getProperty("facebook.clientId"),
@@ -128,10 +128,8 @@ public class SocialConfiguration {
     }
 
 
-    /**
-     * Singleton data access object providing access to connections across all users.
-     */
     @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
     public UsersConnectionRepository usersConnectionRepository() {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource,
                 connectionFactoryLocator(), Encryptors.noOpText());
@@ -139,37 +137,27 @@ public class SocialConfiguration {
         return repository;
     }
 
-    @Bean
-    @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
+/*    @Bean
+    @Scope(value = "request", proxyMode = ScopedProxyMode.)
     public ConnectionRepository connectionRepository() {
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         Object principal = user.getPrincipal();
         assert principal instanceof UserService.CrmUserDetails : "the principal should be an instance of " + UserService.CrmUserDetails.class.getSimpleName();
         UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) principal;
-        return usersConnectionRepository().createConnectionRepository(crmUserDetails.getUser().getUsername());
-    }
+        ConnectionRepository cr  = usersConnectionRepository().createConnectionRepository(crmUserDetails.getUser().getUsername());
+        return cr ;
+    }*/
 
 
-    //
-//     * A proxy to a request-scoped object representing the current user's primary Facebook account.
-//     * @throws org.springframework.social.connect.NotConnectedException if the user is not connected to facebook.
-//
-    @Bean
-    @Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)
+ /*   @Bean
+    @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
     public Facebook facebook() {
         Connection<Facebook> facebook = connectionRepository().findPrimaryConnection(Facebook.class);
         return facebook != null ? facebook.getApi() : new FacebookTemplate();
-    }
-/*    @Bean
-    @Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
-    public Facebook facebook() {
-        return connectionRepository().getPrimaryConnection(Facebook.class).getApi();
     }*/
 
-    //
-//       The Spring MVC Controller that allows users to sign-in with their provider accounts.
-//
     @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
     @Inject
     public ProviderSignInController providerSignInController(AuthenticationManager authenticationManager) {
         ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
@@ -178,5 +166,6 @@ public class SocialConfiguration {
         providerSignInController.setPostSignInUrl("/crm/profile.html");
         return providerSignInController;
     }
+
 
 }
