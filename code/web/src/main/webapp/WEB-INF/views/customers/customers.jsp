@@ -1,82 +1,103 @@
-<div class="box">
-    <form action="http://localhost:8080/api/users/3/photo" method="post" enctype="multipart/form-data">
-        <label for="file">Filename:</label>
-        <input type="file" name="file" id="file"/>
-        <br/>
-        <input type="submit" name="submit" value="Submit"/>
-    </form>
-</div>
-<div ng-controller="CustomerCtrl">
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+<%@ page session="false" %>
+<div ng-controller="CustomerController">
+    <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
+        <tiles:putAttribute name="content">
+            <style type="text/css">
+                    /*http://meyerweb.com/eric/articles/webrev/200006b.html*/
 
-    <div style=" z-index: -21; float: left;padding-top :10px; padding:10px;min-width: 250px;max-width:300px;  ">
-        <form class="well form-search" ng-submit="search()">
-            <div>
-                <input type="text" id="search" class="input-medium search-query" ng-model="query"/>
-                <a href="#" class="icon-search" ng-click="search()"></a>
-            </div>
-            <div style="padding-top: 10px;">
-                <div ng-show=" !searchResultsFound()">
-                    <span class="no-records">(no results)</span>
-                </div>
+                .cell {
+                    display: inline-block;
+                    height: 30px;
+                    vertical-align: baseline;
+                }
 
-                <div ng-show=" searchResultsFound()">
+                .id {
+                    width: 50px;
+                    text-align: right;
+                    padding-right: 10px;
+                }
 
-                    <div ng-repeat="customer in customers" class="search-results">
-                            <span class="title">
-                                <span style="font-size: smaller"><span>#</span>{{customer.id}}</span>
-                                <a ng-click="load(customer)">{{customer.firstName}} {{customer.lastName}}</a> </span>
-                    </div>
+                .ln {
+                    display: inline-block;
+                    width: 230px;
+                }
 
-                </div>
-            </div>
-        </form>
-    </div>
-    <%--
+                .hr > span {
+                    padding-top: 8px;
+                }
 
-    <div>
-        <form class="well form-search" ng-submit="lookupCustomer()">
-            <label> Search by Name</label>
-            <input type="text" ng-model="name" class="input-medium search-query" width="5" size="5"
-                   placeholder="customer name">
-            <button type="submit" class="btn btn-primary" ng-click="lookupCustomer()">
-                <a class="icon-search"></a>
-            </button>
-        </form>
-    </div>--%>
+                .tr {
+                    display: block;
+                    height: 45px;
+                    font-weight: bold;
+                }
 
-    <form class="form-horizontal" ng-submit="updateCustomer">
-        <fieldset>
-            <legend>
-                <span class="customer-visible-{{!isCustomerLoaded()}}"> Create New Customer </span>
-                <span class="customer-visible-{{isCustomerLoaded()}}"> Update {{customer.firstName}} {{customer.lastName}} - {{customer.id}} </span>
-            </legend>
-            <div class="control-group">
-                <label class="control-label" for="fn">First Name:</label>
+                .tr > * > input {
+                    margin-top: 8px;
+                }
 
-                <div class="controls">
-                    <input class="input-xlarge" id="fn" type="text" ng-model="customer.firstName"
-                           placeholder="first name" required="required"/>
+                .fn {
+                    display: inline-block;
+                    width: 230px;
+                }
 
-                    <p class="help-block">Change the first name</p>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="ln">Last Name:</label>
+                .btns {
+                    width: 200px
+                }
+            </style>
 
-                <div class="controls">
-                    <input class="input-xlarge" id="ln" type="text" ng-model="customer.lastName" placeholder="last name"
-                           required="required"/>
 
-                    <p class="help-block">Change the last name</p>
-                </div>
-            </div>
+            <fieldset>
+                <legend><h2> Customer Data </h2></legend>
+            </fieldset>
+            <DIV>
+                <DIV class="tr hr">
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary" ng-click="save()" ng-model-instant>
-                    <a class="icon-plus"></a> Save
-                </button>
-                <button class="btn " ng-click="trash()"><a class="icon-trash"></a> Cancel</button>
-            </div>
-        </fieldset>
-    </form>
+                          <span class="cell id  ">
+                               ID#
+                        </span>
+                        <span class="cell fn ">
+                         First Name
+                        </span>
+                    <span class=" cell ln  ">  Last Name</span>
+                    <span class="cell btns "></span>
+
+
+                </DIV>
+                <div class="tr" ng-repeat="customer in customers">
+
+
+                          <span class="cell id ">
+                               <span style="color:gray">{{'#'+customer.id}}</span>
+                        </span>
+                        <span class="cell fn "> <input class="input-large" type="text" ng-model="customer.firstName"
+                                                       size="30"/> </span>
+                        <span class="cell ln "><input class="input-large" type="text" ng-model="customer.lastName"
+                                                      size="30"/> </span>
+                        <span class="cell btns ">
+                            <a ng-click="updateCustomer( customer.id )" class="btn   btn-small"><i
+                                    class="icon-check"></i></a>
+                            <a ng-click="deleteCustomer ( customer.id )" class="btn   btn-small"><i
+                                    class="icon-trash"></i></a>
+                        </span>
+                </DIV>
+                <div class="tr">
+
+
+                    <span class="cell id "> &nbsp; </span>
+                    <span class="cell  fn"> <input class="input-large" type="text" ng-model="firstName"
+                                                   size="30"/> </span>
+                    <span class="cell  ln"> <input class="input-large" type="text" ng-model="lastName"
+                                                   size="30"/> </span>
+                        <span class="cell  btns">
+                             <a ng-click="addCustomer()" class="btn btn-small"><i class="icon-plus"></i></a>
+                        </span>
+                </DIV>
+            </DIV>
+
+
+        </tiles:putAttribute></tiles:insertTemplate>
+
+
 </div>

@@ -402,7 +402,62 @@ function SignInController($scope, $location) {
  */
 function CustomerController($scope, ajaxUtils) {
 
+    $scope.customers = [];
+
+    // todo remove this when our calls are asynchronous ajax and not hardcoded data
+    // Array Remove - By John Resig (MIT Licensed)
+    Array.prototype.remove = function (from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+
+    function c(f, l, id, d) {
+        return { firstName:f, lastName:l, signupDate:d, id:id };
+    }
+
+    function resetNewCustomerForm() {
+        $scope.firstName = null;
+        $scope.lastName = null
+    }
+
+    function nc(f, l) {
+        var id = 0;
+        for (var i = 0; i < $scope.customers.length; i++) {
+            if ($scope.customers[i].id > id) id = $scope.customers[i].id;
+        }
+        return c(f, l, id + 1, new Date());
+    }
+
+    var nameTuples = 'mario,gray;josh,long;rod,johnson;mark,fisher'.split(';')
+    for (var i = 0; i < nameTuples.length; i++) {
+        var n = nameTuples[i]
+        var fn = n.split(',')[0] , ln = n.split(',')[1];
+        $scope.customers.push(nc(fn, ln));
+    }
+
+    $scope.deleteCustomer = function (id) {
+        console.log('delete customer #' + id);
+        for (var i = 0; i < $scope.customers.length; i++) {
+            if ($scope.customers[i].id == id) {
+                $scope.customers.remove(i);
+            }
+        }
+    };
+
+    $scope.updateCustomer = function (id) {
+        console.log('update customer #' + id);
+    };
+
+    $scope.addCustomer = function () {
+        $scope.customers.push(nc($scope.firstName, $scope.lastName));
+        resetNewCustomerForm();
+    };
+
+
+    resetNewCustomerForm();
 }
+
 
 /**
  * a lot of the logic that we want to provide here is already present in the more

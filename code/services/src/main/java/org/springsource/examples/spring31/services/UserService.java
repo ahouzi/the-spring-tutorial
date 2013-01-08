@@ -239,7 +239,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
         return new CrmClientDetails(
                 crmUserDetails.getUsername(),
-                "crm",   // resource
+                "crm",   // tmpDir
                 CrmUserDetails.SCOPE_READ + "," + CrmUserDetails.SCOPE_WRITE, // scope
                 "authorization_code,implicit", // grant types
                 org.apache.commons.lang.StringUtils.join(Collections2.transform(crmUserDetails.getAuthorities(), new Function<GrantedAuthority, String>() {
