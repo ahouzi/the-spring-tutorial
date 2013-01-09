@@ -1,12 +1,12 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springsource.examples.spring31.services.Customer;
 import org.springsource.examples.spring31.services.CustomerService;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * A {@link Controller controller} implementation that exposes a RESTful API to clients
  * of the system.
- *
+ * <p/>
  * This API is to be secured using Spring Security OAuth as it supports full mutation of all
  * {@link Customer business data}.
  *
@@ -23,10 +23,18 @@ import java.util.List;
 @Controller
 public class CustomerApiController {
 
+    static public final String CUSTOMER_COLLECTION_URL = "/api/crm/{userId}/customers";
+
+    static public final String CUSTOMER_COLLECTION_ENTRY_URL = CUSTOMER_COLLECTION_URL + "/{customerId}";
+
     private Logger log = Logger.getLogger(getClass());
 
-    @Autowired
     private CustomerService customerService;
+
+    @Inject
+    public void setCustomerService(CustomerService customerService) {
+        this.customerService = customerService;
+    }
 
     @ResponseBody
     @RequestMapping(value = "/api/crm/search", method = RequestMethod.GET)
@@ -38,38 +46,37 @@ public class CustomerApiController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/api/crm/customer/{id}", method = RequestMethod.GET)
-    public Customer customerById(@PathVariable("id") Long  id) {
+    @RequestMapping(value = CUSTOMER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
+    public Customer customerById(@PathVariable("customerId") Long id) {
         return this.customerService.getCustomerById(id);
     }
 
-    // http://springmvc31.joshlong.micro/crm/customers
     @ResponseBody
-    @RequestMapping(value = "/api/crm/customers", method = RequestMethod.GET)
-    public List<Customer> customers() {
-        return this.customerService.getAllCustomers();
+    @RequestMapping(value = CUSTOMER_COLLECTION_URL, method = RequestMethod.GET)
+    public List<Customer> customers(@PathVariable("userId") Long userId) {
+        return this.customerService.getAllUserCustomers(userId);
     }
 
-    // http://springmvc31.joshlong.micro/crm/customers
     @ResponseBody
-    @RequestMapping(value = "/api/crm/customers", method = RequestMethod.PUT)
-    public Long  addCustomer(@RequestParam("firstName") String fn, @RequestParam("lastName") String ln) {
-        return customerService.createCustomer(fn, ln, new Date()).getId();
+    @RequestMapping(value = CUSTOMER_COLLECTION_URL, method = RequestMethod.POST)
+    public Long addCustomer(@PathVariable("userId") Long userId, @RequestParam("firstName") String fn, @RequestParam("lastName") String ln) {
+        return customerService.createCustomer(userId, fn, ln, new Date()).getId();
     }
 
 
     @ResponseBody
-    @RequestMapping(value = "/api/crm/customer/{id}", method = RequestMethod.POST)
-    public Long  updateCustomer(@PathVariable("id") Long  id, @RequestBody Customer customer) {
-        customerService.updateCustomer(id, customer.getFirstName(), customer.getLastName(), customer.getSignupDate());
+    @RequestMapping(value = CUSTOMER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
+    public Long updateCustomer(@PathVariable("customerId") Long id, @RequestParam("firstName") String fn, @RequestParam("lastName") String ln) {
+        Customer customer = this.customerService.getCustomerById(id);
+        customerService.updateCustomer(id, fn, ln, customer.getSignupDate());
         return id;
     }
 
-/*    @ResponseBody
-    @RequestMapping(value = "/customer/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Integer deleteCustomer(@PathVariable("id") Integer id) {
+    @ResponseBody
+    @RequestMapping(value = CUSTOMER_COLLECTION_ENTRY_URL, method = RequestMethod.DELETE)
+    public Long deleteCustomer(@PathVariable("customerId") Long id) {
         customerService.deleteCustomer(id);
         return id;
-    }*/
+    }
 
 }             

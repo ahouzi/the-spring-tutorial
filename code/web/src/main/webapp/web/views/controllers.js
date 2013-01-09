@@ -100,7 +100,13 @@ module.factory('ajaxUtils', function () {
     var noopArgsProcessor = function (e) {
         return e;
     };
-    var oauthArgsProcessor = this.enrichRequestArguments;
+    var oauthArgsProcessor = function (args) {
+        var a = args || {};
+        a['jso_provider'] = oauthResource;
+        a['jso_scopes'] = scopes;
+        a['jso_allowia'] = false;
+        return a;
+    };
 
     return {
         accessToken:function () {
@@ -109,13 +115,7 @@ module.factory('ajaxUtils', function () {
         url:function (u) {
             return baseUrl + u;
         },
-        enrichRequestArguments:function (args) {
-            var a = args || {};
-            a['jso_provider'] = oauthResource;
-            a['jso_scopes'] = scopes;
-            a['jso_allowia'] = false;
-            return a;
-        },
+        enrichRequestArguments:oauthArgsProcessor,
         put:function (url, data, cb) {
             sendDataFunction($.ajax, noopArgsProcessor, url, 'PUT', data, cb);
         },
@@ -127,6 +127,9 @@ module.factory('ajaxUtils', function () {
         },
         oauthPost:function (url, data, cb) {
             sendDataFunction($.oajax, oauthArgsProcessor, url, 'POST', data, cb);
+        },
+        oauthDelete:function (url, data, cb) {
+            sendDataFunction($.oajax, oauthArgsProcessor, url, 'DELETE', data, cb);
         },
         oauthGet:function (url, data, cb) {
             $.oajax(this.enrichRequestArguments({
@@ -153,6 +156,50 @@ module.factory('ajaxUtils', function () {
 
 
     };
+});
+
+module.factory('customerService', function (ajaxUtils) {
+
+    var customersCollectionUrl = '/api/crm/userId/customers';
+    return {
+        buildBaseUserCustomerApiUrl:function (userId) {
+            return ajaxUtils.url(customersCollectionUrl.replace('userId', userId + ''))
+        },
+        buildBaseCustomerApiUrl:function (userId, customerId) {
+            return ajaxUtils.url(customersCollectionUrl.replace('userId', userId + '') + '/' + customerId);
+        },
+        loadCustomers:function (userId, cb) {
+            var u = this.buildBaseUserCustomerApiUrl(userId)
+            console.log('loadCustomers url ' + u)
+            ajaxUtils.oauthGet(u, {}, function (customers) {
+                customers.sort(function (a, b) {
+                    return a.id - b.id;
+                });
+                cb(customers)
+            });
+        },
+        getCustomerById:function (userId, customerId, cb) {
+            var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
+            ajaxUtils.oauthGet(urlForCustomer, {}, cb);
+        },
+        deleteCustomerById:function ( userId,customerId,callback) {
+            var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
+            ajaxUtils.oauthDelete(urlForCustomer, {}, callback);
+
+        },
+        updateCustomerById:function (userId, customerId, fn, ln, callback) {
+            var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
+            console.log('called updateCustomerById, the URL is: ' + urlForCustomer);
+            ajaxUtils.oauthPut(urlForCustomer, { firstName:fn, lastName:ln}, callback);
+        },
+        addNewCustomer:function (userId, fn, ln, callback) {
+            var user = {  firstName:fn, lastName:ln };
+            var url = this.buildBaseUserCustomerApiUrl(userId);
+            ajaxUtils.oauthPost(url, user, callback);
+        }
+
+    };
+
 });
 
 module.factory('userService', function (ajaxUtils) {
@@ -400,62 +447,66 @@ function SignInController($scope, $location) {
  * @constructor
  *
  */
-function CustomerController($scope, ajaxUtils) {
+function CustomerController($scope, customerService, ajaxUtils) {
+
+    // the user id of the currently logged in user
+    var userId = crmSession.getUserId();
+
+    console.log('inside CustomerController, the userId is ' + userId + ' and the acess token is ' + ajaxUtils.accessToken());
 
     $scope.customers = [];
-
-    // todo remove this when our calls are asynchronous ajax and not hardcoded data
-    // Array Remove - By John Resig (MIT Licensed)
-    Array.prototype.remove = function (from, to) {
-        var rest = this.slice((to || from) + 1 || this.length);
-        this.length = from < 0 ? this.length + from : from;
-        return this.push.apply(this, rest);
-    };
-
-    function c(f, l, id, d) {
-        return { firstName:f, lastName:l, signupDate:d, id:id };
-    }
 
     function resetNewCustomerForm() {
         $scope.firstName = null;
         $scope.lastName = null
     }
 
-    function nc(f, l) {
-        var id = 0;
-        for (var i = 0; i < $scope.customers.length; i++) {
-            if ($scope.customers[i].id > id) id = $scope.customers[i].id;
-        }
-        return c(f, l, id + 1, new Date());
-    }
-
-    var nameTuples = 'mario,gray;josh,long;rod,johnson;mark,fisher'.split(';')
-    for (var i = 0; i < nameTuples.length; i++) {
-        var n = nameTuples[i]
-        var fn = n.split(',')[0] , ln = n.split(',')[1];
-        $scope.customers.push(nc(fn, ln));
+    function customerById(id, cb) {
+        for (var i = 0; i < $scope.customers.length; i++)
+            if ($scope.customers[i].id == id)
+                cb($scope.customers[i], i);
     }
 
     $scope.deleteCustomer = function (id) {
         console.log('delete customer #' + id);
-        for (var i = 0; i < $scope.customers.length; i++) {
-            if ($scope.customers[i].id == id) {
-                $scope.customers.remove(i);
-            }
-        }
+        customerById(id, function (customer, arrIndx) {
+
+            customerService.deleteCustomerById( userId,customer.id,function(){
+               $scope.refreshCustomers()
+            })
+            //$scope.customers[arrIndx].remove();
+        });
+        console.log('deleteCustomer() does not currently actually delete a resource on the server...');
     };
 
     $scope.updateCustomer = function (id) {
         console.log('update customer #' + id);
+        customerById(id, function (customer, arrIndx) {
+            customerService.updateCustomerById(userId, customer.id, customer.firstName, customer.lastName, $scope.refreshCustomers)
+        });
     };
+
+    $scope.refreshCustomers = function () {
+        customerService.loadCustomers(userId, function (customers) {
+            $scope.$apply(function () {
+                $scope.customers = customers;
+                console.log('refreshed customers result = ' + customers.length)
+            });
+        })
+    }
+    ;
 
     $scope.addCustomer = function () {
-        $scope.customers.push(nc($scope.firstName, $scope.lastName));
-        resetNewCustomerForm();
+        var fn = $scope.firstName, ln = $scope.lastName;
+        console.log("trying to add fn = " + fn + ", ln =" + ln + ", and accessToken = " + ajaxUtils.accessToken())
+
+        customerService.addNewCustomer(userId, $scope.firstName, $scope.lastName, function () {
+            $scope.refreshCustomers();
+            resetNewCustomerForm();
+        });
     };
-
-
     resetNewCustomerForm();
+    $scope.refreshCustomers();
 }
 
 
