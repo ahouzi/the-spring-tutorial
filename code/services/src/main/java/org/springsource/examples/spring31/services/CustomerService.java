@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Collection;
@@ -23,21 +25,35 @@ public class CustomerService {
 
     private EntityManager entityManager;
 
+    private UserService userService;
+
+    @Inject
+    public void setUserService(UserService us) {
+        this.userService = us;
+    }
+
     @PersistenceContext
     public void setEntityManger(EntityManager em) {
         this.entityManager = em;
     }
 
-    public Customer createCustomer(String firstName, String lastName, Date signupDate) {
+    public Customer createCustomer(Long userId, String firstName, String lastName, Date signupDate) {
+        User user = userService.getUserById(userId);
+
         Customer customer = new Customer();
         customer.setFirstName(firstName);
         customer.setLastName(lastName);
         customer.setSignupDate(signupDate);
+        customer.setUser(user);
         entityManager.persist(customer);
+
         return customer;
     }
 
+    // todo do we need this ?
+    @Cacheable(CUSTOMERS_CACHE_REGION)
     public Collection<Customer> search(String name) {
+        assert StringUtils.hasText(name) && name.length() > 2 : "search by a name"; // must have at least two characters in query
         String sqlName = ("%" + name + "%").toLowerCase();
         String sql = "select c.* from customers c where (LOWER( c.firstName ) LIKE :fn OR LOWER( c.lastName ) LIKE :ln)";
         return entityManager.createNativeQuery(sql, Customer.class)
@@ -48,10 +64,11 @@ public class CustomerService {
 
 
     @Transactional(readOnly = true)
-    public List<Customer> getAllCustomers() {
-        return entityManager.createQuery("SELECT * FROM " + Customer.class.getName()).getResultList();
+    public List<Customer> getAllUserCustomers(Long userid) {
+        return entityManager.createQuery("SELECT c  FROM " + Customer.class.getName() + " c where c.user.id = :userId")
+                .setParameter("userId", userid)
+                .getResultList();
     }
-
 
     @Cacheable(CUSTOMERS_CACHE_REGION)
     @Transactional(readOnly = true)
@@ -62,6 +79,8 @@ public class CustomerService {
     @CacheEvict(CUSTOMERS_CACHE_REGION)
     public void deleteCustomer(Long id) {
         Customer customer = getCustomerById(id);
+        customer.getUser().getCustomers().remove(customer);
+        entityManager.merge(customer.getUser());
         entityManager.remove(customer);
     }
 

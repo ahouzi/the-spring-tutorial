@@ -163,7 +163,7 @@ public class SocialConfiguration {
         ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository(),
                 new SpringSecuritySignInAdapter(authenticationManager, this.userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
-        providerSignInController.setPostSignInUrl("/crm/profile.html");
+        providerSignInController.setPostSignInUrl("/crm/customers.html");
         return providerSignInController;
     }
 

@@ -72,6 +72,8 @@ separately. This isn't mandatory, but it makes it easier to control the behaviou
         <intercept-url pattern="/api/users/**/photo" method="POST" access="ROLE_USER,SCOPE_READ"/>
         <!-- you should be allowed to create a new user without being logged in, obviously -->
         <intercept-url pattern="/api/users" method="POST" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+
+        <intercept-url pattern="/api/crm/**" access="ROLE_USER,SCOPE_READ"/>
         <intercept-url pattern="/api/**" access="ROLE_USER,SCOPE_READ"/>
         <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
         <access-denied-handler ref="oauthAccessDeniedHandler"/>
