@@ -3,26 +3,18 @@ package org.springsource.examples.spring31.web.config;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.social.config.annotation.EnableJdbcConnectionRepository;
+import org.springframework.social.config.xml.SpringSecurityAuthenticationNameUserIdSource;
+import org.springframework.social.config.xml.UserIdSource;
 import org.springframework.social.connect.*;
-import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
-import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.SignInAdapter;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.social.facebook.config.annotation.EnableFacebook;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
-
-import javax.sql.DataSource;
 
 /**
  * Configuration for Spring Social so that users may sign in
@@ -30,11 +22,25 @@ import javax.sql.DataSource;
  *
  * @author Josh Long
  */
-//@Configuration
-//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Configuration
+@EnableJdbcConnectionRepository
+@EnableFacebook(appId = "${facebook.clientId}", appSecret = "${facebook.clientSecret}")
 public class SocialConfiguration {
 
 
+
+    @Bean
+    public UserIdSource userIdSource() {
+        return new SpringSecurityAuthenticationNameUserIdSource();
+    }
+    @Bean
+    public ProviderSignInController providerSignInController(UsersConnectionRepository usersConnectionRepository, UserService userService, ConnectionFactoryLocator connectionFactoryLocator) {
+        ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator, usersConnectionRepository,
+                new SpringSecuritySignInAdapter(userService));
+        providerSignInController.setSignInUrl("/crm/signin.html");
+        providerSignInController.setPostSignInUrl("/crm/customers.html");
+        return providerSignInController;
+    }
     /**
      * when we sign in, the result should be a valid Spring Security context.
      */
@@ -91,7 +97,7 @@ public class SocialConfiguration {
             return u.getUsername();
         }
     }
-
+/*
     @Bean
     public ConnectionFactoryLocator connectionFactoryLocator(Environment environment) {
         ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
@@ -103,6 +109,7 @@ public class SocialConfiguration {
 
 
     @Bean
+    @Scope(proxyMode = ScopedProxyMode.NO )
     public UsersConnectionRepository usersConnectionRepository(DataSource dataSource, UserService userService, ConnectionFactoryLocator connectionFactoryLocator) {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
         repository.setConnectionSignUp(new CrmUserConnectionSignUp(userService));
@@ -121,19 +128,9 @@ public class SocialConfiguration {
     @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
     public Facebook facebook(ConnectionRepository connectionRepository) {
         return connectionRepository.getPrimaryConnection(Facebook.class).getApi();
+     }
 
-//        Connection<Facebook> facebook = connectionRepository.findPrimaryConnection(Facebook.class);
-//        return facebook != null ? facebook.getApi() : new FacebookTemplate();
-    }
-
-    @Bean
-    public ProviderSignInController providerSignInController(UsersConnectionRepository usersConnectionRepository, UserService userService, ConnectionFactoryLocator connectionFactoryLocator) {
-        ProviderSignInController providerSignInController = new ProviderSignInController(connectionFactoryLocator, usersConnectionRepository,
-                new SpringSecuritySignInAdapter(userService));
-        providerSignInController.setSignInUrl("/crm/signin.html");
-        providerSignInController.setPostSignInUrl("/crm/customers.html");
-        return providerSignInController;
-    }
+   */
 
 
 }
