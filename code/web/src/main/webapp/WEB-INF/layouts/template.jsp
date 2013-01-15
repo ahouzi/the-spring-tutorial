@@ -14,11 +14,12 @@
     <script type="text/javascript">
 
         var crmSession = {
-            getUsername  : function(){
+
+            getUsername:function () {
                 var un = "${username}";
                 var pi;
-                if(un=='' )
-                return null ;
+                if (un == '')
+                    return null;
                 return un;
             },
             isLoggedIn:function () {
@@ -48,45 +49,11 @@
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/angular-resource.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/jso.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/assets/js/bootstrap.js"></script>
-
-    <%--
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-    --%>
-
-
-    <%--
-    <script src="http://code.angularjs.org/1.0.1/angular-1.0.1.min.js"></script>
-    --%>
-    <%--
-    <script src="http://angular-ui.github.com/angular-ui/build/angular-ui.js"></script>
-    <script src="http://angular-ui.github.com/js/prettify.js"></script>
-    <script src="http://angular-ui.github.com/lib/maskedinput/jquery.maskedinput.js"></script>
-    <script src="http://angular-ui.github.com/lib/select2/select2.js"></script>
-    --%>
-    <%--<script src="http://angular-ui.github.com/lib/CodeMirror/lib/codemirror.js"></script>
-   <script src="http://angular-ui.github.com/lib/CodeMirror/mode/javascript/javascript.js"></script>--%>
-    <%--<script src="http://fiddle.tinymce.com/tinymce/3.5.4.1/jquery.tinymce.js"></script>
-   <script src="http://fiddle.tinymce.com/tinymce/3.5.4.1/tiny_mce_jquery_src.js"></script>--%>
-    <%--<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>--%>
-
-
     <script type="text/javascript" src="${pageContext.request.contextPath}/web/views/controllers.js"></script>
-
-    <%--      todo plugin in integration.js, rest.js
-              todo ping scott on how to do oauth dance with rest.js
-              todo check out monty hall example game (i think thats in adrian's keynote for examples on rest.js
-              todo
-    --%>
-
-    <%--<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" rel="stylesheet"/>--%>
     <link href="${pageContext.request.contextPath}/web/assets/css/jquery-ui.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/assets/bootstrap/bootstrap.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/views/controllers.css" rel="stylesheet"/>
-
-    <!--[if lte IE 8]>
-    <script src="build/angular-ui-ieshiv.js"></script><![endif]-->
-
+    <!--[if lte IE 8]><script src="build/angular-ui-ieshiv.js"></script><![endif]-->
 </head>
 <body>
 

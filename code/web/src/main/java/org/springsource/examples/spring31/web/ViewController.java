@@ -2,7 +2,9 @@ package org.springsource.examples.spring31.web;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInAttempt;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
+import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
@@ -25,22 +28,14 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class ViewController {
 
-    /**
-     * todo
-     * - support a checkbox to 'get profile image from facebook'
-     * - redirect the user to a login screen with the newly created user name already filled in on successfull account creation
-     * - finish the Customer display screen
-     *
-     * @return
-     */
-
     private Facebook facebook;
-
     private UserService userService;
+    private UserSignInUtilities userSignInUtilities;
+    private UsersConnectionRepository usersConnectionRepository;
 
     @Inject
-    public void setFacebook(Facebook facebook) {
-        this.facebook = facebook;
+    public void setUsersConnectionRepository(UsersConnectionRepository usersConnectionRepository) {
+        this.usersConnectionRepository = usersConnectionRepository;
     }
 
     @Inject
@@ -48,26 +43,41 @@ public class ViewController {
         this.userService = userService;
     }
 
+    @Inject
+    public void setFacebook(Facebook facebook) {
+        this.facebook = facebook;
+    }
+
+
+    @Inject
+    public void setUserSignInUtilities(UserSignInUtilities userSignInUtilities) {
+        this.userSignInUtilities = userSignInUtilities;
+    }
+
     // todo since we no longer have the ConnectionSignup, we need to take the sign in attempt,
     // todo redirect to a signup page with most information pre-filled out.
     @RequestMapping(value = "/crm/signup.html")
     public String signup(HttpSession session) {
-
-        ProviderSignInAttempt signInAttempt = (ProviderSignInAttempt) session.getAttribute(ProviderSignInAttempt.class.getName());
+        String providerSignInAttemptSessionAttribute =ProviderSignInAttempt.class.getName() ;
+        ProviderSignInAttempt signInAttempt = (ProviderSignInAttempt) session.getAttribute(providerSignInAttemptSessionAttribute);
         if (null != signInAttempt) {
-
             Connection<?> connection = signInAttempt.getConnection();
             UserProfile userProfile = connection.fetchUserProfile();
-            User u = userService.loginByUsername(userProfile.getUsername());
-            if (null == u) {
-                u = userService.createUser(userProfile.getUsername(), "", userProfile.getFirstName(), userProfile.getLastName(), true);
+
+            User user;
+
+            if ((user = userService.loginByUsername(userProfile.getUsername())) == null) {
+                user = this.userService.createUser(userProfile.getUsername(), "", userProfile.getFirstName(), userProfile.getLastName(), true);
             }
-            String username = u.getUsername();
-            // then we need to make the connection information available in the session and prompt the user to sign up
 
+            ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(user.getUsername());
+            connectionRepository.addConnection(connection);
+            userSignInUtilities.signIn(userProfile.getUsername());
+
+            session.removeAttribute(providerSignInAttemptSessionAttribute);
+
+            return "redirect:/crm/profile.html";
         }
-
-        ///System.out.println(ToStringBuilder.reflectionToString(facebookProfile));
         return "signup";
     }
 

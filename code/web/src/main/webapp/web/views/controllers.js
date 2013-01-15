@@ -182,7 +182,7 @@ module.factory('customerService', function (ajaxUtils) {
             var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
             ajaxUtils.oauthGet(urlForCustomer, {}, cb);
         },
-        deleteCustomerById:function ( userId,customerId,callback) {
+        deleteCustomerById:function (userId, customerId, callback) {
             var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
             ajaxUtils.oauthDelete(urlForCustomer, {}, callback);
 
@@ -220,8 +220,8 @@ module.factory('userService', function (ajaxUtils) {
         getUserById:function (userId, callback) {
             ajaxUtils.oauthGet(this.buildBaseUserApiUrl(userId), {}, callback);
         },
-        registerNewUser:function (username, pw, fn, ln, callback) {
-            var user = {username:username, password:pw, firstname:fn, lastname:ln };
+        registerNewUser:function (username, pw, fn, ln, imported, callback) {
+            var user = {username:username, password:pw, firstname:fn, lastname:ln, imported:imported};
             var url = ajaxUtils.url(usersCollectionEntryUrl);
             ajaxUtils.post(url, user, callback);
         }
@@ -350,7 +350,7 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     };
 
     $scope.confirmPasswordMatches = function (cpw) {
-        if (!($scope.user  )) {
+        if (!$scope.user) {
             return true;
         }
         var pw = $scope.user.password;
@@ -358,12 +358,6 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     };
 
     $scope.originalUsername = null;
-
-    $scope.$watch('user.password', function (v) {
-        if ($scope.user && $scope.user.passwordConfirmation != v) {
-            $scope.user.passwordConfirmation = '';
-        }
-    });
 
     $scope.$watch('user.username', function (username) {
         if (username != null && username != '' && username != $scope.originalUsername) {
@@ -471,8 +465,8 @@ function CustomerController($scope, customerService, ajaxUtils) {
         console.log('delete customer #' + id);
         customerById(id, function (customer, arrIndx) {
 
-            customerService.deleteCustomerById( userId,customer.id,function(){
-               $scope.refreshCustomers()
+            customerService.deleteCustomerById(userId, customer.id, function () {
+                $scope.refreshCustomers()
             })
             //$scope.customers[arrIndx].remove();
         });
@@ -524,26 +518,20 @@ function CustomerController($scope, customerService, ajaxUtils) {
  * @constructor
  */
 function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService, $location) {
-
+    $scope.user = {username:null, firstName:null, lastName:null };
 
     $scope.loadUser = function () {
     }; // noop
 
     $scope.saveProfileData = function () {
-        userService.registerNewUser($scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, function (u) {
-            console.log('registering the new user.');
-            //http://localhost:8080/crm/signin.html?username=starbuxman
+        userService.registerNewUser($scope.user.username, $scope.user.password, $scope.user.firstName, $scope.user.lastName, false, function (u) {
             var urlToRedirectTo = ajaxUtils.url('/crm/signin.html?username=' + u.username);
-            console.log('url ' + urlToRedirectTo);
             window.location.href = urlToRedirectTo;
-            // now we redirect to...
         });
-
-
-    }; // posts to a different endpoint for the user
-
+    };
     ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userService);
     SignInController($scope, $location);
+
 
 
 }

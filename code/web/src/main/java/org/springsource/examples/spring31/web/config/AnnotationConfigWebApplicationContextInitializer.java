@@ -23,23 +23,12 @@ import org.springsource.examples.spring31.web.UserApiController;
  */
 public class AnnotationConfigWebApplicationContextInitializer implements ApplicationContextInitializer<AnnotationConfigWebApplicationContext> {
 
-    private CloudEnvironment cloudEnvironment = new CloudEnvironment();
+    // todo restore this
+    //private CloudEnvironment cloudEnvironment = new CloudEnvironment();
 
     @Override
     public void initialize(AnnotationConfigWebApplicationContext applicationContext) {
-      //  String profile = cloudEnvironment.isCloudFoundry() ? "cloud" : "default";
-
-        //for (Class<?> c : new Class<?>[]{ CustomerService.class, CustomerApiController.class, WebMvcConfiguration.class})
-          //  applicationContext.scan(c.getPackage().getName());
-
-        /*    Class<?>[] configs = {ServicesConfiguration.class, WebMvcConfiguration.class};
-    for (Class<?> clzz : configs)
-        applicationContext.register(clzz);*/
-      //  applicationContext.getEnvironment().setActiveProfiles(profile);
-
         applicationContext.register( WebMvcConfiguration.class );
         applicationContext.refresh();
-
-       // applicationContext.start();
     }
 }

@@ -2,6 +2,9 @@ package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.ConnectionSignUp;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,11 +69,11 @@ public class UserApiController {
     public User registerUser(@RequestParam("username") String username,
                              @RequestParam("password") String password,
                              @RequestParam("firstname") String fn,
-                             @RequestParam("lastname") String ln) {
-        return this.userService.createOrGet(username, password, fn, ln, false);
+                             @RequestParam("lastname") String ln,
+                             @RequestParam("imported") boolean importedFromServiceProvider) {
+        return this.userService.createOrGet(username, password, fn, ln, importedFromServiceProvider);
     }
 
-    // more correct
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
     public Callable<Long> uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {

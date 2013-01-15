@@ -35,6 +35,7 @@ import org.springsource.examples.spring31.services.config.ServicesConfiguration;
 import org.springsource.examples.spring31.web.CustomerApiController;
 import org.springsource.examples.spring31.web.UserApiController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
+import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import javax.inject.Inject;
@@ -58,6 +59,10 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return commonsMultipartResolver;
     }
 
+    @Bean
+    public UserSignInUtilities userSignInUtilities(UserService userService) {
+        return new UserSignInUtilities(userService);
+    }
 
      protected MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter() {
         MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
