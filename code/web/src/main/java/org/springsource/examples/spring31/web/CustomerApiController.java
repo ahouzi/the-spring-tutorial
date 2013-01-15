@@ -24,7 +24,7 @@ import java.util.List;
 public class CustomerApiController {
 
     static public final String CUSTOMER_COLLECTION_URL = "/api/crm/{userId}/customers";
-
+    static public final String CUSTOMER_SEARCH = "/api/crm/search";
     static public final String CUSTOMER_COLLECTION_ENTRY_URL = CUSTOMER_COLLECTION_URL + "/{customerId}";
 
     private Logger log = Logger.getLogger(getClass());
@@ -37,7 +37,7 @@ public class CustomerApiController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/api/crm/search", method = RequestMethod.GET)
+    @RequestMapping(value = CUSTOMER_SEARCH, method = RequestMethod.GET)
     public Collection<Customer> search(@RequestParam("q") String query) throws Exception {
         Collection<Customer> customers = customerService.search(query);
         if (log.isDebugEnabled())
