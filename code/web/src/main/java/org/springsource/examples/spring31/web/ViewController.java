@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.stereotype.Controller;
@@ -26,9 +27,6 @@ import javax.inject.Inject;
 @Controller
 public class ViewController {
 
-    @Inject
-    private SocialConfiguration social;
-
     /**
      * todo
      * - support a checkbox to 'get profile image from facebook'
@@ -38,17 +36,17 @@ public class ViewController {
      * @return
      */
 
-    public ConnectionRepository connectionRepository() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails crmUserDetails = (UserDetails) principal;
-        return social.usersConnectionRepository().createConnectionRepository(crmUserDetails.getUsername());
+    private Facebook facebook ;
+
+    @Inject
+    public void setFacebook(Facebook facebook ){
+        this.facebook = facebook ;
     }
+
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     @ResponseBody
     public FacebookProfile test() {
-        Connection<Facebook> co = connectionRepository().findPrimaryConnection(Facebook.class);
-        Facebook facebook = co.getApi();
         FacebookProfile facebookProfile = facebook.userOperations().getUserProfile();
         System.out.println(ToStringBuilder.reflectionToString(facebookProfile));
         return facebookProfile;

@@ -17,8 +17,8 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 @Service
-@Transactional
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Transactional
 public class CustomerService {
 
     static private final String CUSTOMERS_CACHE_REGION = "customers";

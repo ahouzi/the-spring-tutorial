@@ -53,11 +53,9 @@ import java.util.Map;
 public class LocalDataSourceConfiguration implements DataSourceConfiguration {
     private boolean resetDatabaseOnReset = false;
 
-    @Inject
-    private Environment environment;
 
     @Bean
-    public ConnectionFactory rabbitMqConnectionFactory() throws Exception {
+    public ConnectionFactory rabbitMqConnectionFactory(Environment environment) throws Exception {
         String host = environment.getProperty("rabbit.host");
         int port = Integer.parseInt(environment.getProperty("rabbit.port"));
         CachingConnectionFactory cachingConnectionFactory;
@@ -70,7 +68,7 @@ public class LocalDataSourceConfiguration implements DataSourceConfiguration {
     }
 
     @Bean(destroyMethod = "close")
-    public DataSource dataSource() throws Exception {
+    public DataSource dataSource(Environment environment) throws Exception {
         String user = environment.getProperty("dataSource.user"),
                 pw = environment.getProperty("dataSource.password"),
                 host = environment.getProperty("dataSource.host");
@@ -113,7 +111,7 @@ public class LocalDataSourceConfiguration implements DataSourceConfiguration {
     }
 
     @Bean
-    public MongoDbFactory mongoDbFactory() throws Exception {
+    public MongoDbFactory mongoDbFactory(Environment environment) throws Exception {
         String dbName = environment.getProperty("mongo.fsbucket");
         String host = environment.getProperty("mongo.host");
         Mongo mongo = new Mongo(host);

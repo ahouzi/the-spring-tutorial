@@ -1,8 +1,6 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.*;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
@@ -12,12 +10,12 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.vote.ScopeVoter;
 import org.springsource.examples.spring31.web.security.RoleAwareOAuthTokenServicesUserApprovalHandler;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +43,10 @@ public class SecurityConfiguration {
         return new UnanimousBased(decisionVoters);
     }
 
-    @Inject
-    private ClientDetailsService jpaUserCredentialsService;
-
     @Bean
-    public DefaultTokenServices tokenServices() {
+    public DefaultTokenServices tokenServices(InMemoryTokenStore tokenStore, ClientDetailsService jpaUserCredentialsService) {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenStore(this.tokenStore());
+        defaultTokenServices.setTokenStore(tokenStore);
         defaultTokenServices.setSupportRefreshToken(true);
         defaultTokenServices.setClientDetailsService(jpaUserCredentialsService);
         return defaultTokenServices;
@@ -69,8 +64,7 @@ public class SecurityConfiguration {
         return new OAuth2AccessDeniedHandler();
     }
 
-    @Inject
-    @Bean
+    @Bean   @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
     public ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter(AuthenticationManager authenticationManager) {
         ClientCredentialsTokenEndpointFilter endpointFilter = new ClientCredentialsTokenEndpointFilter() {
         };
@@ -82,10 +76,10 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public RoleAwareOAuthTokenServicesUserApprovalHandler oauthTokenServicesUserApprovalHandler() {
+    public RoleAwareOAuthTokenServicesUserApprovalHandler oauthTokenServicesUserApprovalHandler(AuthorizationServerTokenServices tokenServices) {
         RoleAwareOAuthTokenServicesUserApprovalHandler approvalHandler = new RoleAwareOAuthTokenServicesUserApprovalHandler();
         approvalHandler.setUseTokenServices(true);
-        approvalHandler.setTokenServices(this.tokenServices());
+        approvalHandler.setTokenServices(tokenServices);
         return approvalHandler;
     }
 

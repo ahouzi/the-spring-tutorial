@@ -52,15 +52,15 @@ public class CloudFoundryDataSourceConfiguration implements DataSourceConfigurat
     private CloudEnvironment cloudEnvironment = new CloudEnvironment();
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() throws Exception {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory ) throws Exception {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory );
         return redisTemplate;
     }
 
     @Bean
-    public CacheManager cacheManager() throws Exception {
-        return new RedisCacheManager(redisTemplate());
+    public CacheManager cacheManager( RedisTemplate<String, Object>  rt ) throws Exception {
+        return new RedisCacheManager( rt);
     }
 
     @Bean

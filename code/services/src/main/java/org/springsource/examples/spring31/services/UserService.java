@@ -47,8 +47,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
  */
 @SuppressWarnings("unused")
 @Service
-@Transactional
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Transactional
 public class UserService implements ClientDetailsService, UserDetailsService {
 
     public static final String USER_CACHE_REGION = "users";

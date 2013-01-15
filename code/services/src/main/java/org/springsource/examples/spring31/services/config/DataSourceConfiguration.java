@@ -20,9 +20,6 @@ import java.util.Map;
  * @author Josh Long
  */
 public interface DataSourceConfiguration {
-    CacheManager cacheManager() throws Exception ;
-    ConnectionFactory rabbitMqConnectionFactory() throws Exception;
-    MongoDbFactory mongoDbFactory() throws Exception;
-    DataSource dataSource() throws Exception;
+
     Map<String, String> contributeJpaEntityManagerProperties() throws Exception;
 }

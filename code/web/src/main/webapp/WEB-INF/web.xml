@@ -51,7 +51,7 @@
 
     <context-param>
         <param-name>contextInitializerClasses</param-name>
-        <param-value>org.springsource.examples.spring31.web.config.SpringApplicationContextInitializer</param-value>
+        <param-value>org.springsource.examples.spring31.web.config.AnnotationConfigWebApplicationContextInitializer</param-value>
     </context-param>
 
     <context-param>

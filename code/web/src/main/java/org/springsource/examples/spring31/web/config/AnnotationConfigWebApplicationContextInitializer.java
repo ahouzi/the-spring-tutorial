@@ -3,7 +3,11 @@ package org.springsource.examples.spring31.web.config;
 import org.cloudfoundry.runtime.env.CloudEnvironment;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springsource.examples.spring31.services.config.ServicesConfiguration;
+import org.springsource.examples.spring31.services.Customer;
+import org.springsource.examples.spring31.services.CustomerService;
+import org.springsource.examples.spring31.services.UserService;
+import org.springsource.examples.spring31.web.CustomerApiController;
+import org.springsource.examples.spring31.web.UserApiController;
 
 /**
  * Simple class that sets up the web application environment. This configures the {@link AnnotationConfigWebApplicationContext application context}
@@ -17,23 +21,25 @@ import org.springsource.examples.spring31.services.config.ServicesConfiguration;
  *
  * @author Josh Long
  */
-public class SpringApplicationContextInitializer implements ApplicationContextInitializer<AnnotationConfigWebApplicationContext> {
+public class AnnotationConfigWebApplicationContextInitializer implements ApplicationContextInitializer<AnnotationConfigWebApplicationContext> {
 
     private CloudEnvironment cloudEnvironment = new CloudEnvironment();
 
     @Override
     public void initialize(AnnotationConfigWebApplicationContext applicationContext) {
-        String profile = cloudEnvironment.isCloudFoundry() ? "cloud" : "default";
-        applicationContext.getEnvironment().setActiveProfiles(profile);
-        Class<?>[] configs = {ServicesConfiguration.class, WebMvcConfiguration.class};
-        for( Class <?> clzz : configs)
-                applicationContext.register( clzz);
+      //  String profile = cloudEnvironment.isCloudFoundry() ? "cloud" : "default";
 
-        /*String[] basePkgs = new String[configs.length];
-        int i = 0;
-        for (Class<?> pkg : configs)
-            basePkgs[i++] = pkg.getPackage().getName();*/
-//        applicationContext.scan(basePkgs);
-        //applicationContext.refresh();
+        //for (Class<?> c : new Class<?>[]{ CustomerService.class, CustomerApiController.class, WebMvcConfiguration.class})
+          //  applicationContext.scan(c.getPackage().getName());
+
+        /*    Class<?>[] configs = {ServicesConfiguration.class, WebMvcConfiguration.class};
+    for (Class<?> clzz : configs)
+        applicationContext.register(clzz);*/
+      //  applicationContext.getEnvironment().setActiveProfiles(profile);
+
+        applicationContext.register( WebMvcConfiguration.class );
+        applicationContext.refresh();
+
+       // applicationContext.start();
     }
 }
