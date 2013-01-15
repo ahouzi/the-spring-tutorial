@@ -1,12 +1,9 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionRepository;
-import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.web.ProviderSignInAttempt;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.FacebookProfile;
 import org.springframework.stereotype.Controller;
@@ -16,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
-import org.springsource.examples.spring31.web.config.SocialConfiguration;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Josh Long
@@ -36,13 +34,42 @@ public class ViewController {
      * @return
      */
 
-    private Facebook facebook ;
+    private Facebook facebook;
+
+    private UserService userService;
 
     @Inject
-    public void setFacebook(Facebook facebook ){
-        this.facebook = facebook ;
+    public void setFacebook(Facebook facebook) {
+        this.facebook = facebook;
     }
 
+    @Inject
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    // todo since we no longer have the ConnectionSignup, we need to take the sign in attempt,
+    // todo redirect to a signup page with most information pre-filled out.
+    @RequestMapping(value = "/crm/signup.html")
+    public String signup(HttpSession session) {
+
+        ProviderSignInAttempt signInAttempt = (ProviderSignInAttempt) session.getAttribute(ProviderSignInAttempt.class.getName());
+        if (null != signInAttempt) {
+
+            Connection<?> connection = signInAttempt.getConnection();
+            UserProfile userProfile = connection.fetchUserProfile();
+            User u = userService.loginByUsername(userProfile.getUsername());
+            if (null == u) {
+                u = userService.createUser(userProfile.getUsername(), "", userProfile.getFirstName(), userProfile.getLastName(), true);
+            }
+            String username = u.getUsername();
+            // then we need to make the connection information available in the session and prompt the user to sign up
+
+        }
+
+        ///System.out.println(ToStringBuilder.reflectionToString(facebookProfile));
+        return "signup";
+    }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     @ResponseBody

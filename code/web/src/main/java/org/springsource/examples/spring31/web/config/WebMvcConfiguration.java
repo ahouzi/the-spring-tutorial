@@ -108,7 +108,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("signin");
-        for (String p : "signin,signup,profile,customers,home,oops".split(","))
+        for (String p : "signin,profile,customers,home,oops".split(","))
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 

@@ -27,8 +27,6 @@ import org.springsource.examples.spring31.services.UserService;
 @EnableFacebook(appId = "${facebook.clientId}", appSecret = "${facebook.clientSecret}")
 public class SocialConfiguration {
 
-
-
     @Bean
     public UserIdSource userIdSource() {
         return new SpringSecurityAuthenticationNameUserIdSource();
@@ -39,6 +37,7 @@ public class SocialConfiguration {
                 new SpringSecuritySignInAdapter(userService));
         providerSignInController.setSignInUrl("/crm/signin.html");
         providerSignInController.setPostSignInUrl("/crm/customers.html");
+        providerSignInController.setSignUpUrl("/crm/signup.html");
         return providerSignInController;
     }
     /**
@@ -98,14 +97,7 @@ public class SocialConfiguration {
         }
     }
 /*
-    @Bean
-    public ConnectionFactoryLocator connectionFactoryLocator(Environment environment) {
-        ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
-        String clientId = environment.getProperty("facebook.clientId"),
-                clientSecret = environment.getProperty("facebook.clientSecret");
-        registry.addConnectionFactory(new FacebookConnectionFactory(clientId, clientSecret));
-        return registry;
-    }
+
 
 
     @Bean
@@ -116,19 +108,7 @@ public class SocialConfiguration {
         return repository;
     }
 
-    @Bean
-    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
-    public ConnectionRepository connectionRepository(UsersConnectionRepository usersConnectionRepository) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails crmUserDetails = (UserDetails) principal;
-        return usersConnectionRepository.createConnectionRepository(crmUserDetails.getUsername());
-    }
 
-    @Bean
-    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
-    public Facebook facebook(ConnectionRepository connectionRepository) {
-        return connectionRepository.getPrimaryConnection(Facebook.class).getApi();
-     }
 
    */
 

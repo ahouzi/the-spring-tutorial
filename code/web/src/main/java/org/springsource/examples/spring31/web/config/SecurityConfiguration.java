@@ -41,6 +41,7 @@ public class SecurityConfiguration {
     public TextEncryptor textEncryptor() {
         return Encryptors.noOpText();
     }
+
     @Bean
     public InMemoryTokenStore tokenStore() {
         return new InMemoryTokenStore();
@@ -76,7 +77,8 @@ public class SecurityConfiguration {
         return new OAuth2AccessDeniedHandler();
     }
 
-    @Bean   @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+    @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
     public ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter(AuthenticationManager authenticationManager) {
         ClientCredentialsTokenEndpointFilter endpointFilter = new ClientCredentialsTokenEndpointFilter() {
         };
