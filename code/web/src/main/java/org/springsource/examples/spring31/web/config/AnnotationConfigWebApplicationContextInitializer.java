@@ -1,13 +1,7 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.cloudfoundry.runtime.env.CloudEnvironment;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springsource.examples.spring31.services.Customer;
-import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.services.UserService;
-import org.springsource.examples.spring31.web.CustomerApiController;
-import org.springsource.examples.spring31.web.UserApiController;
 
 /**
  * Simple class that sets up the web application environment. This configures the {@link AnnotationConfigWebApplicationContext application context}
