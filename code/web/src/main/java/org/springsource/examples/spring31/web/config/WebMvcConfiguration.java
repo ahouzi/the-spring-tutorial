@@ -52,8 +52,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
 
-    @Bean(name = "multipartResolver")
-    public CommonsMultipartResolver commonsMultipartResolver() {
+    @Bean(name = "filterMultipartResolver")
+    public CommonsMultipartResolver filterMultipartResolver() {
         CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
         commonsMultipartResolver.setMaxUploadSize(maxUploadSizeInMb);
         return commonsMultipartResolver;
