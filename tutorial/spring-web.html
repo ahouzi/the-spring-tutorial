@@ -1,0 +1,92 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head><title>The Spring Tutorial: Web </title>
+    <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
+    <style type="text/css"> .wikipedia {
+    }
+
+    .diagram {
+        width: 500px;
+    }
+
+    .diagram img {
+        width: 500px;
+    }
+
+    .caption {
+        font-style: italic;
+        font-size: smaller;
+        display: block;
+    }
+
+    code, .class-reference {
+        font-family: courier, monospace;
+        background-color: #dcdcdc;
+    } </style>
+    <script type="text/javascript"></script>
+</head>
+<body><h1>  Embracing the Web with Spring MVC  </h1>
+
+<p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span
+        module="spring-web" class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that
+    Spring founder Rod Johnson wrote in his study in England in 2001 were to support Java-based web applications
+    environments. Spring's always had a great support for the web. From the beginning, Spring has featured an MVC
+    framework, called Spring MVC. Spring MVC at the time looked conceptually very similar to the then entrenched Struts
+    framework. While Spring MVC evolved on its own merits, Spring did everything possible to ease the lives of
+    developers using other web frameworks, like Struts. The Spring-Struts integration support in the core Spring web
+    modules made Struts a much nicer proposition for developers who were stuck using Struts, but wanted a cleaner,
+    POJO-centric component model. Indeed, Springs JSF integration for 1.0 and 2.0, as well as the JSF-centric Spring Web
+    Flow, offer drastically improved user experiences for developers stuck on those web frameworks. While Struts is
+    largely a distant memory, and JSF is fast-becoming one, Spring MVC has emerged as, and remained, the most popular
+    Java web framework in the world. </p>
+
+<P> There are a lot of reasons for this, but I think it's because Spring MVC has <EM>embraced</EM> the web, not
+    attempted to hide developers from it. Indeed, if Spring MVC can be said to <EM>hide</EM> anything, it is the
+    complexities of building scalable Servlet-based applications, <EM>not</EM> the web. </P>
+
+<P> Conceptually, web programming is simple: HTTP requests come in, and responses are created and sent in response. No
+    state is retained in between requests on either the server or the client, by default. This can be deceptively
+    simple. As requests come in, they invariably are handled by some component that acts on them, and is then charged
+    with sending a response. A response, in the common case, is some sort of HTML-based page. Unfortunately, there's
+    often a disconnect between effective handling of requests (and tying those requests to the appropriate back-end
+    business logic) and rendering of nice responses. Put another way, programmers are rarely good user-interface
+    designers. So, a separation of the two domains - business logic and server-side handling from designing and
+    rendering rich interactive user interfaces - is often necessary. This way, programmers can work on the part that
+    matters most to them - the business logic - and the Adobe Dreamweaver-toting designers can focus on the styling and
+    design of the user interface. To keep programming applications that behave in this way simpler, programmers have
+    adopted a variant of the popular <span class="wikipedia">MVC</span> pattern called
+    <span id="model2mvc" class="wikipedia">Model-2 MVC</span>. This pattern is best visually described like this: </P>
+
+<div class="diagram"><img src="images/model 2 mvc.png"/> <span class="caption"> The Model-2 MVC pattern </span></div>
+<P> As HTTP requests come in, they're routed to the <EM>front controller</EM> - the <span class="class-reference">org.springframework.web.servlet.DispatcherServlet</span>
+    in Spring MVC - which then selects from among the registered <EM>controller</EM> classes and chooses the right one
+    to handle the HTTP request. There needs to be some stipulation between the <EM>front controller</EM> and the
+    registered controllers as to which controller should handle which request. When the controller is activated, it is
+    given access to all the data about the request and it can react accordingly. Once the request is handled, the
+    controller must somehow signal that a response should be rendered. Typically, this means telling the framework
+    which <EM>view</EM>, or <EM>response</EM>, to render. A view might be a designer-provided template that merges data
+    into itself and then renders as HTML. The response might also be something constructed  in code in the
+    controller, like file data or the binary data for a PDF or spreadsheet. </P>
+
+<p>
+    Working with Spring MVC is <EM>very</EM> straightforward!    If you're using a Servlet 3.0 container like
+    the market and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier!
+
+
+</p>
+<!-- todo code showing hwo to setup the simplest possible spring MVC application and configuration!  -->
+<h1>
+      The Changing Face of the Web
+</h1>
+<P>
+       While individual  resources, such as CSS and images and JavaScript are served up the web server, and while initial
+     HTML pagses are sent down from the server, much of  the  interaction  that happens between the user and the user interface
+     happens these days entirely on the cleint. The server doesn't really need to get involved too much in rendering HTML,
+    besides serving the initial page load and the resources to support it. Nowadays, the client can do a <EM>lot</EM>
+     of interesting things, and doesn't need to rely on the server to keep user-interface state.  Indeed all the
+    server has to do is keep <EM>business</EM> state, and make that available to the cleint.
+     <!-- it does this thorugh REST ... -->
+    </p><P> It does through REST, which was introduced by Roy Fielding in his 2000 doctoral disseration....
+ </p>
+
+</body>
+</html>
