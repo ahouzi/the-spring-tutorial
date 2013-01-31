@@ -5,9 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.*;
@@ -16,17 +13,14 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.web.CustomerApiController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
-import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
-import java.util.Arrays;
 import java.util.List;
 
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackageClasses = {CustomerService.class, CustomerApiController.class, WebMvcConfiguration.class})
+@ComponentScan(basePackageClasses = {CustomerService.class, WebMvcConfiguration.class})
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
@@ -37,17 +31,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         commonsMultipartResolver.setMaxUploadSize(maxUploadSizeInMb);
         return commonsMultipartResolver;
     }
-
-
-    // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-        mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-        converters.add(mappingJacksonHttpMessageConverter);
-    }
-
 
     @Bean
     public UrlBasedViewResolver viewResolver() {
@@ -66,16 +49,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         tilesConfigurer.setCheckRefresh(true);
         return tilesConfigurer;
     }
-
-    // todo show and teach i18n
-    @Bean
-    public MessageSource messageSource() {
-        String[] baseNames = "messages".split(",");
-        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-        resourceBundleMessageSource.setBasenames(baseNames);
-        return resourceBundleMessageSource;
-    }
-
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/web/**").addResourceLocations("/web/");
@@ -103,6 +76,4 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
     }
-
-
 }
