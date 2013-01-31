@@ -16,10 +16,8 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.services.UserService;
 import org.springsource.examples.spring31.web.CustomerApiController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
-import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import java.util.Arrays;
@@ -38,11 +36,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
         commonsMultipartResolver.setMaxUploadSize(maxUploadSizeInMb);
         return commonsMultipartResolver;
-    }
-
-    @Bean
-    public UserSignInUtilities userSignInUtilities(UserService userService) {
-        return new UserSignInUtilities(userService);
     }
 
 

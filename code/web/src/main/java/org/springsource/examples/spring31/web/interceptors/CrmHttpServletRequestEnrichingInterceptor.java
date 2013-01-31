@@ -43,8 +43,6 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     @Override
     public void postHandle(WebRequest req, ModelMap model) throws Exception {
-//        Map<String, Object> kvs = buildAttributesToContributeToRequest((ServletWebRequest) req);
-//        model.addAllAttributes(kvs);
     }
 
     private Map<String, Object> buildAttributesToContributeToRequest(ServletWebRequest swr) {
@@ -54,11 +52,11 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         kvs.put(fullUrlAttribute, buildFullUrlAttribute(swr));
 
         // let's see if the 'username' attribute is available
-        HttpServletRequest httpServletRequest = swr.getNativeRequest(HttpServletRequest.class) ;
-        String usernameValue = httpServletRequest.getParameter(this.usernameAttribute) ;
-      //  Object usernameAttribute = swr.getRequest().getAttribute("username");
+        HttpServletRequest httpServletRequest = swr.getNativeRequest(HttpServletRequest.class);
+        String usernameValue = httpServletRequest.getParameter(this.usernameAttribute);
+        //  Object usernameAttribute = swr.getRequest().getAttribute("username");
         if (null != usernameAttribute)
-            kvs.put(this.usernameAttribute,  usernameValue);
+            kvs.put(this.usernameAttribute, usernameValue);
 
         // not authenticated? principal is an AnonymousPrincipal
         if (null == authentication || !(authentication.getPrincipal() instanceof UserService.CrmUserDetails))
@@ -68,13 +66,11 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         kvs.put(userIdAttribute, buildUserIdAttribute(userDetails));
 
 
-
         return kvs;
     }
 
     @Override
     public void preHandle(WebRequest req) throws Exception {
-        logger.debug("web request is of type " + req.getClass().getSimpleName());
         ServletWebRequest swr = (ServletWebRequest) req;
 
         Map<String, Object> kvs = buildAttributesToContributeToRequest(swr);

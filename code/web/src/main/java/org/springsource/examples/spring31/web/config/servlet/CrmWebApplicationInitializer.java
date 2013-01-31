@@ -28,7 +28,7 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
 
-        registerFilter(servletContext, "springSecurityFilterChain", new DelegatingFilterProxy());
+     //   registerFilter(servletContext, "springSecurityFilterChain", new DelegatingFilterProxy());
         registerFilter(servletContext, "hiddenHttpMethodFilter", new HiddenHttpMethodFilter());
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
