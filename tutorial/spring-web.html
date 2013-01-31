@@ -18,7 +18,7 @@
         display: block;
     }
 
-    code, .class-reference {
+    code, .git-code, .class-reference {
         font-family: courier, monospace;
         background-color: #dcdcdc;
     } </style>
@@ -53,46 +53,84 @@
     rendering rich interactive user interfaces - is often necessary. This way, programmers can work on the part that
     matters most to them - the business logic - and the Adobe Dreamweaver-toting designers can focus on the styling and
     design of the user interface. To keep programming applications that behave in this way simpler, programmers have
-    adopted a variant of the popular <span class="wikipedia">MVC</span> pattern called
-    <span id="model2mvc" class="wikipedia">Model-2 MVC</span>. This pattern is best visually described like this: </P>
+    adopted a variant of the popular <span class="wikipedia">MVC</span> pattern called <span id="model2mvc"
+                                                                                             class="wikipedia">Model-2 MVC</span>.
+    This pattern is best visually described like this: </P>
 
 <div class="diagram"><img src="images/model 2 mvc.png"/> <span class="caption"> The Model-2 MVC pattern </span></div>
-<P> As HTTP requests come in, they're routed to the <EM>front controller</EM> - the <span class="class-reference">org.springframework.web.servlet.DispatcherServlet</span>
+<P> As HTTP requests come in, they're routed to the <EM>front controller</EM> - the <span module="spring-web"
+                                                                                          class="class-reference">org.springframework.web.servlet.DispatcherServlet</span>
     in Spring MVC - which then selects from among the registered <EM>controller</EM> classes and chooses the right one
     to handle the HTTP request. There needs to be some stipulation between the <EM>front controller</EM> and the
     registered controllers as to which controller should handle which request. When the controller is activated, it is
     given access to all the data about the request and it can react accordingly. Once the request is handled, the
-    controller must somehow signal that a response should be rendered. Typically, this means telling the framework
-    which <EM>view</EM>, or <EM>response</EM>, to render. A view might be a designer-provided template that merges data
-    into itself and then renders as HTML. The response might also be something constructed in code in the
-    controller, like file data or the binary data for a PDF or spreadsheet. </P>
+    controller must somehow signal that a response should be rendered. Typically, this means telling the framework which
+    <EM>view</EM>, or <EM>response</EM>, to render. A view might be a designer-provided template that merges data into
+    itself and then renders as HTML. The response might also be something constructed in code in the controller, like
+    file data or the binary data for a PDF or spreadsheet. </P>
 
-<p>
-    Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like
-    the market and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier!
+<P> Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
+    Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
+    records. We already have Hibernate-based backend services that manage user (<span module="services"
+                                                                                      class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
+    and customer (<span module="services" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
+    data for us. We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes
+    in our web application. </P>
 
+<p> Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like the market
+    and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier! Our initial Java
+    web application consists of three classes - <span module="web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    <span module="web" class="class-reference">org.springsource.examples.spring31.web.config.WebMvcConfiguration</span>,
+    and <span module="web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and
+    several artifacts to generate the HTML views. Let's look at these classes. </p>
 
-</p>
-<!-- todo code showing hwo to setup the simplest possible spring MVC application and configuration!  -->
-<h1>
-    The Changing Face of the Web
-</h1>
+<P> To work with any web framework, like Spring MVC, you need to install the various Servlet components using a
+    deployment descriptor (<code>web.xml</code>) or, alternatively, in Servlet 3 environments, a Java initializer class.
+    This is a Java Servlet 3.0-compatible web application. Servlet 3.0 applications run in any web container that
+    supports Servlet 3.0, including Apache Tomcat 7. You can use Spring in containers that support earlier versions of
+    the Servlet specification, however some Servlet 3.0-specific capabilities - such as Java-based initializer classes
+    and features designed to support asynchronous responses won't work in those environments. We'll mention the Servlet
+    3.0 specific bits as we encounter them. </p>
 
-<P>
-    While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
+<P> The Servlet environment provides a few low level class types that can be used to help you build many powerful types
+    of web applications. They are, however, very low level, and provide very little save for the hooks to build more
+    sophisticated infrastructure, which Spring MVC provides. </P>
+<OL>
+    <LI><B>Servlets</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Servlet</code>
+        that are given a chance to act on incoming HTTP requests and produce replies. This is the most common type of
+        component. <CODE>Servlet</CODE>s are mapped to the URLs that they will respond to by a type of pattern.
+    </LI>
+    <LI><B>Listener</B> - objects of type <CODE module="servlets" class="class-reference">java.util.EventListener</CODE>
+        - typically of a Servlet-speciifc subclass like <CODE module="servlets" class="class-reference">javax.servlet.ServletContextListener</CODE>
+        or <CODE module="servlets" class="class-reference">javax.servlet.http.HttpSessionAttributeListener</CODE>. These
+        classes are notified of various events in the web application such as the creation of data stored in memory, the
+        changes in the Servlet container itself, or changes in one of the Servlets managed by a web application
+        container. .
+    </LI>
+    <LI><B>Filters</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Filter</CODE>
+        that are given a chance to act on, or possibly change, incoming HTTP requests before they are routed to the
+        <CODE module="servlets" class="class-reference">javax.servlet.Servlet</CODE>s to which they've been routed and
+        all outbound HTTP replies produced by those <CODE>Servlets</CODE>. This is useful in many scenarios - such as
+        processing security on all requests, or handling things like GZip compression.
+    </LI>
+</OL>
+<div class="walkthrough">
+    <div module="web" class="git-code">
+        org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer
+    </div>
+    <div></div>
+</div>
+<!-- todo code showing hwo to setup the simplest possible spring MVC application and configuration! --> <h1> The
+    Changing Face of the Web </h1>
+
+<P> While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
     HTML pagses are sent down from the server, much of the interaction that happens between the user and the user
-    interface
-    happens these days entirely on the cleint. The server doesn't really need to get involved too much in rendering
-    HTML,
-    besides serving the initial page load and the resources to support it. Nowadays, the client can do a <EM>lot</EM>
-    of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all the
-    server has to do is keep <EM>business</EM> state, and make that available to the client.
-    <!-- it does this thorugh REST ... -->
-</p>
+    interface happens these days entirely on the client. The server doesn't really need to get involved too much in
+    rendering HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a
+    <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all
+    the server has to do is keep <EM>business</EM> state, and make that available to the client.
+    <!-- it does this thorugh REST ... --> </p>
 
 <P> It does through REST, which was introduced by Roy Fielding in his <a href="">2000 doctoral dissertation
-    <!--todo link to roy fieldings paper--></a>.
-</p>
-
-</body>
+    <!--todo link to roy fieldings paper--></a>. </p></body>
 </html>
