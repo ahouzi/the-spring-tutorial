@@ -1,26 +1,13 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.social.connect.*;
-import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
-import org.springframework.social.connect.support.ConnectionFactoryRegistry;
-import org.springframework.social.connect.web.ProviderSignInController;
-import org.springframework.social.connect.web.SignInAdapter;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.*;
@@ -29,18 +16,12 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
-import org.springsource.examples.spring31.services.config.ServicesConfiguration;
 import org.springsource.examples.spring31.web.CustomerApiController;
-import org.springsource.examples.spring31.web.UserApiController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
-import javax.inject.Inject;
-import javax.sql.DataSource;
-import java.lang.annotation.Inherited;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,18 +45,14 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return new UserSignInUtilities(userService);
     }
 
-     protected MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter() {
-        MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-        mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-        return mappingJacksonHttpMessageConverter;
-    }
-
 
     // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(mappingJacksonHttpMessageConverter() );
+        MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
+        mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
+        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
+        converters.add(mappingJacksonHttpMessageConverter);
     }
 
 
@@ -133,7 +110,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
     }
-
 
 
 }
