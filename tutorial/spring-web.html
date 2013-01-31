@@ -77,9 +77,7 @@
                                                                                       class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
     and customer (<span module="services" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
     data for us. We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes
-    in our web application.
-
-    <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework, or how to use Apache Maven, please see our introduction tutorial.</SPAN>
+    in our web application. <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework, or how to use Apache Maven, please see our introduction tutorial.</SPAN>
 </P>
 
 <p> Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like the market
@@ -127,39 +125,62 @@
     <div module="web" class="git-code">
         org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer
     </div>
-    <div><P>
-        The class implements the Spring interface, <span class="class-reference" module="spring-web">org.springframework.web.WebApplicationInitializer</span>.
-        which
-        provides a callback method <CODE>void onStartup(ServletContext servletContext) throws ServletException</CODE>.
-        This
-        method is called as the application is started by the application container, providing a reference to the
-        current
-        <CODE>ServletContext</CODE> which in turn can be used to programmatically construct the vrious
-        Spring MVC framework components.</P>
+    <div><P> The class implements the Spring interface, <span class="class-reference" module="spring-web">org.springframework.web.WebApplicationInitializer</span>.
+        which provides a callback method <CODE>void onStartup(ServletContext servletContext) throws
+            ServletException</CODE>. This method is called as the application is started by the application container,
+        providing a reference to the current <CODE>ServletContext</CODE> which in turn can be used to programmatically
+        construct the various Spring MVC framework components.</P>
 
-        <P> This code does two things. It registers a
-            <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
-            that in turn instantaites our Spring  <CODE module="spring-module">org.springframework.context.ApplicationContext</CODE>
-              implementation   (<code class="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
-            and makes it available to the entire application and all the    Servlet components we register.
-            </p><P> Next, we register  the
-            <code  class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</code>.
+        <P> This code does two things. It registers a <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
+            that in turn instantaites our Spring <CODE class="class-reference" module="spring-module">org.springframework.context.ApplicationContext</CODE>
+            implementation (<code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
+            and makes it available to the entire application and all the Servlet components we register. </p>
 
-            This is the class that Spring provides to handle all incoming HTTP requests (the aforementioned <EM>front controller</EM>), routing them to the correct  <EM>controllers</EM>
-            and working with the other parts of the framework  to handle common use cases for us.
-           The <CODE>DispatcherServlet</CODE> can manage its own  <CODE>ApplicationContext</CODE> as well as see and  work with the
-            <COde>ApplicationContext</COde> instances that the <CODE>ContextLoaderListener</CODE> creates.  The
-             <CODE>DispatcherServlet</CODE>'s <CODE>ApplicationContext</CODE> is said to be <EM>parented</EM> by the
-             <CODE>ContextLoaderListener</CODE>  <CODE>ApplicationContext</CODE>.
-        </p>
+        <P> Next, we register the <code class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</code>.
+            This is the class that Spring provides to handle all incoming HTTP requests (the aforementioned <EM>front
+                controller</EM>), routing them to the correct <EM>controllers</EM> and working with the other parts of
+            the framework to handle common use cases for us. The <CODE>DispatcherServlet</CODE> can manage its own
+            <CODE>ApplicationContext</CODE> as well as see and work with the <COde>ApplicationContext</COde> instances
+            that the <CODE>ContextLoaderListener</CODE> creates. The <CODE>DispatcherServlet</CODE>'s <CODE>ApplicationContext</CODE>
+            is said to be <EM>parented</EM> by the <CODE>ContextLoaderListener</CODE> <CODE>ApplicationContext</CODE>.
+            You could, for example, register different <CODE>DispatcherServlet</CODE> instances for different parts of
+            the application, and they could share beans in the <EM>parent</EM> <CODE>ApplicationContext</CODE> managed
+            by the <CODE>ContextLoaderListener</CODE>. </p>
 
-    </div>
+        <P> As we're running in a Servlet 3 environment, and want to take advanage of <EM>asynchronous</EM> Spring MVC
+            controllers, this code activates <EM>async</EM> support on all components where appropriate by calling
+            <CODE>setAsync(true)</CODE>. Since we want Spring MVC to have control over the entire application, this code
+            <EM>maps</EM> all components to <CODE>/*</CODE> where possible. This means that <EM>all</EM> requests will
+            be handled by Spring MVC. We can later specialize our routing from within Spring MVC, of course. </P></div>
 </div>
+<h2> Configuring our Spring Application </h2>
 
-<h2> Configuring our Spring Application
-</h2>
- <P>  Once we've configured our application, it's trivial to then </P>
-
+<P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
+    and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
+    MVC, you simply need to add <CODE module="spring-webmvc" class="class-reference">org.springframework.web.servlet.config.annotation.EnableWebMvc</CODE>
+    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. By default,
+    this will activate many things based on conventions and the availability of certain libraries on the class path.
+    Some of the things supported out of the box: </P>
+<OL>
+    <LI> The Spring MVC <CODE class="class-reference"
+                              module="spring-context">org.springframework.stereotype.Controller</CODE>-annotation based
+        component model is turned on. All Spring beans annotated with this stereotype annotation will automatically be
+        processed and exported as HTTP handlers. If your application is running in a Servlet 3 environment, then <EM>asynchronous</EM>
+        controllers are supported as well.
+    </LI>
+    <LI></LI>
+    <LI></LI>
+    <LI><CODE>.jsp</CODE> template dispatch, rendering views at the root of the application.</LI>
+    <LI>REST and JSON and XML marshalling support if the Jackson JSON-Object marshalling library or a JAXB
+        implementation is on the class path.
+    </LI>
+    <LI>Bean and form validation if a JSR 303 implementation like Hibernate Validator is on the classpath.</LI>
+</OL>
+<P> Most of what we will configure in Spring MVC has to do with customizing how Spring MVC renders templates for pages.
+    to understand these use cases better, let's look at the pages and screens we know we will need to support. </P>
+<OL>
+    <LI></LI>
+</OL>
 <h1> The Changing Face of the Web </h1>
 
 <P> While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
