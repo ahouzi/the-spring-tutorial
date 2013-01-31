@@ -20,7 +20,7 @@
 
     code, .git-code, .class-reference {
         font-family: courier, monospace;
-        background-color: #dcdcdc;
+       /* background-color: #dcdcdc;*/
     } </style>
     <script type="text/javascript"></script>
 </head>
@@ -161,26 +161,65 @@
     to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. By default,
     this will activate many things based on conventions and the availability of certain libraries on the class path.
     Some of the things supported out of the box: </P>
-<OL>
+<uL>
     <LI> The Spring MVC <CODE class="class-reference"
                               module="spring-context">org.springframework.stereotype.Controller</CODE>-annotation based
         component model is turned on. All Spring beans annotated with this stereotype annotation will automatically be
         processed and exported as HTTP handlers. If your application is running in a Servlet 3 environment, then <EM>asynchronous</EM>
         controllers are supported as well.
     </LI>
-    <LI></LI>
-    <LI></LI>
-    <LI><CODE>.jsp</CODE> template dispatch, rendering views at the root of the application.</LI>
+    <LI> File upload support through the Apache Commons FileUpload library (if detected on the class path) or via the
+        Servlet 3 <CODE class="class-reference" module="servlets"> javax.servlet.http.Part </CODE> API.
+    </LI>
+    <LI><CODE>.jsp</CODE> resource rendering, rendering views at the root of the application.</LI>
     <LI>REST and JSON and XML marshalling support if the Jackson JSON-Object marshalling library or a JAXB
         implementation is on the class path.
     </LI>
     <LI>Bean and form validation if a JSR 303 implementation like Hibernate Validator is on the classpath.</LI>
-</OL>
-<P> Most of what we will configure in Spring MVC has to do with customizing how Spring MVC renders templates for pages.
-    to understand these use cases better, let's look at the pages and screens we know we will need to support. </P>
-<OL>
-    <LI></LI>
-</OL>
+</uL>
+<P> So, while the default configuration gives you a lot out of the box, we will tailor the code a little bit to support
+    our application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
+    Spring MVC renders templates for pages. to understand these use cases better, let's look at the pages and screens we
+    know we will need to support. </P>
+<TABLE>
+    <thead>
+    <th> Page</th>
+    <th> Preview of Page</th>
+    <th> Description</th>
+    </thead>
+    <tr>
+        <td><b> signin</b></td>
+        <TD><img src="images/signin.png"/></TD>
+        <td> a page where users can sign in. This should be the home page users are greeted with when they visit the
+            application for the first time.
+        </td>
+    </tr>
+    <tr>
+        <td><b>signup</b></td>
+        <TD><img src="images/signup.png"/></TD>
+        <td> users should be able to sign up for a new account and potentially register via FaceBook</td>
+    </tr>
+    <tr>
+        <td><b> oopd </b></td>
+        <TD><img src="images/oops.png"/></TD>
+        <td> this is the page to show when ever there is an error in the system. Maybe the user accesses the wrong page
+            and needs to be given a 404, or perhaps the system throws some sort of awful as-yet-uknown error. Handling
+            this gracefully is a sign of polis.
+        </td>
+    </tr>
+    <tr>
+        <td><b> profile </b></td>
+        <TD><img src="images/profile.png"/></TD>
+        <td> there needs to be some place where users can update their profile information like their password and other
+            features (like a profile photo?).
+        </td>
+    </tr>
+    <tr>
+        <td><b>customers </b></td>
+        <TD><img src="images/customers.png"/></TD>
+        <td>there should of course be a screen to work with data related to customers.</td>
+    </tr>
+</TABLE>
 <h1> The Changing Face of the Web </h1>
 
 <P> While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
