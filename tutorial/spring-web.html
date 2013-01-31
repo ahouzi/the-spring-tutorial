@@ -69,6 +69,8 @@
     itself and then renders as HTML. The response might also be something constructed in code in the controller, like
     file data or the binary data for a PDF or spreadsheet. </P>
 
+<h2> Working with Servlet Applications </h2>
+
 <P> Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
     Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
     records. We already have Hibernate-based backend services that manage user (<span module="services"
@@ -86,15 +88,15 @@
 
 <P> To work with any web framework, like Spring MVC, you need to install the various Servlet components using a
     deployment descriptor (<code>web.xml</code>) or, alternatively, in Servlet 3 environments, a Java initializer class.
-    This is a Java Servlet 3.0-compatible web application. Servlet 3.0 applications run in any web container that
+       Ours will be a Java Servlet 3.0-compatible web application. Servlet 3.0 applications run in any web container that
     supports Servlet 3.0, including Apache Tomcat 7. You can use Spring in containers that support earlier versions of
     the Servlet specification, however some Servlet 3.0-specific capabilities - such as Java-based initializer classes
     and features designed to support asynchronous responses won't work in those environments. We'll mention the Servlet
     3.0 specific bits as we encounter them. </p>
 
-<P> The Servlet environment provides a few low level class types that can be used to help you build many powerful types
-    of web applications. They are, however, very low level, and provide very little save for the hooks to build more
-    sophisticated infrastructure, which Spring MVC provides. </P>
+<P> The Servlet environment provides a few low level class types that can be used   in
+building web applications.   Here are some of the types of classes that we need to be aware of.
+</P>
 <OL>
     <LI><B>Servlets</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Servlet</code>
         that are given a chance to act on incoming HTTP requests and produce replies. This is the most common type of
@@ -114,11 +116,21 @@
         processing security on all requests, or handling things like GZip compression.
     </LI>
 </OL>
+<P> Unfortunately,  the Servlet environment itself is devoid of most of the basics that any modern web application
+will need. Fortunately, Spring provides these building blocks, letting you assemble them as you like, and letting you focus on
+the task at hand: the business of your application.
+ Here is our Java-based application initializer which installs Spring's Servlet infrastructure classes to support our application.
+
+</P>
+
 <div class="walkthrough">
     <div module="web" class="git-code">
         org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer
     </div>
-    <div></div>
+    <div>
+
+
+    </div>
 </div>
 <!-- todo code showing hwo to setup the simplest possible spring MVC application and configuration! --> <h1> The
     Changing Face of the Web </h1>
