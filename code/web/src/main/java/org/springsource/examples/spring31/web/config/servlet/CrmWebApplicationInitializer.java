@@ -32,14 +32,15 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         registerFilter(servletContext, "hiddenHttpMethodFilter", new HiddenHttpMethodFilter());
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
+        servletContext.addListener(new HttpSessionEventPublisher());
+        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, WebMvcConfiguration.class)));
+
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);
         ServletRegistration.Dynamic spring = servletContext.addServlet(this.springServletName, dispatcherServlet);
         spring.addMapping(patternAll);
         spring.setAsyncSupported(true);
 
-        servletContext.addListener(new HttpSessionEventPublisher());
-        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, WebMvcConfiguration.class)));
     }
 
     protected void registerFilter(ServletContext servletContext, String name, Filter filter) {
