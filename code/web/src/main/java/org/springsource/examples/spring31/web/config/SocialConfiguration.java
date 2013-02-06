@@ -2,9 +2,10 @@ package org.springsource.examples.spring31.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.EnableJdbcConnectionRepository;
-import org.springframework.social.config.xml.SpringSecurityAuthenticationNameUserIdSource;
-import org.springframework.social.config.xml.UserIdSource;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -27,7 +28,13 @@ public class SocialConfiguration {
 
     @Bean
     public UserIdSource userIdSource() {
-        return new SpringSecurityAuthenticationNameUserIdSource();
+        return new UserIdSource() {
+            @Override
+            public String getUserId() {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                return authentication.getName();
+            }
+        };
     }
 
     @Bean
