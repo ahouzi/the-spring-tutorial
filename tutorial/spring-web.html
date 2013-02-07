@@ -106,7 +106,7 @@
             }
             mapOfModulesToLinks ['servlets'] = new ServletsModule();
 
-            // then we handle .class-reference elements
+            // then we handle .class-reference elements including links to SpringSource and Java (TM) JavaDocs
             visitElements('.class-reference', ['module'], function (node, val, attrs) {
                 try {
                     val = val + '';
@@ -119,6 +119,7 @@
                     console.log('ERROR! ' + e)  //  console.log('hit an error ' + e)
                 }
             });
+
             // handle links to wikipedia
             visitElements('.wikipedia', [], function (node, val, attrs) {
                 val = val + '';
