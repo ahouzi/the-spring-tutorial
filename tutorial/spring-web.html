@@ -39,7 +39,7 @@
             // module supporting resolution of SpringSource JavaDoc URLs
 
             var StringUtils = {
-                a : function (label, url) {
+                a: function (label, url) {
                     return '<a href="' + url + '">' + label + '</a>';
                 },
                 encodeFullyQualifiedPath: function (ref) {
@@ -47,7 +47,7 @@
                     while (url.indexOf('.') != -1) {
                         url = url.replace('.', '/');
                     }
-                    return    url + '.html'
+                    return    url ;
                 },
                 classForFullyQualifiedClass: function (ref) {
                     var lastPeriod = ref.lastIndexOf('.');
@@ -57,12 +57,29 @@
                 }
             };
 
+            // todo handle gists http://developer.github.com/v3/gists/#list-gists
+
             function GenericModule(self, bu) {
                 self.baseUrl = bu;
-                self.urlForCodeReference = function (ref) {
-                    return self.baseUrl + StringUtils.encodeFullyQualifiedPath(ref);
+                self.urlForCodeReference = function (ref, attrs) {
+                    return self.baseUrl + StringUtils.encodeFullyQualifiedPath(ref) +'.html';
                 };
-                self.labelForCodeReference = function (ref) {
+                self.labelForCodeReference = function (ref, attrs) {
+                    return StringUtils.classForFullyQualifiedClass(ref);
+                };
+            }
+
+            function GitHubProjectModule(mod) {
+                var self = this;
+                var ghUrl = 'https://github.com/joshlong/the-spring-tutorial/blob/_Q_/code/' + mod + '/src/main/java/';
+                console.log('the github url is ' + ghUrl);
+                self.urlForCodeReference = function (ref, attrs) {
+                    var q = attrs['q'];
+                    var u = ghUrl.replace('_Q_',q) +   StringUtils.encodeFullyQualifiedPath(ref) +'.java';
+                    console.log('url=' + u);
+                    return u;
+                };
+                self.labelForCodeReference = function (ref, attrs) {
                     return StringUtils.classForFullyQualifiedClass(ref);
                 };
             }
@@ -78,7 +95,7 @@
 
             //
             // generic visitor function that can be used to cherry pick DOM elements and
-            // return the correct implementations of the DOM element sbased on CSS selectors
+            // return the correct implementations of the DOM elements based on CSS selectors
             function visitElements(css, attrs, callback) {
                 $(css).each(function (indx) {
                     var node = $(this);
@@ -106,17 +123,26 @@
             }
             mapOfModulesToLinks ['servlets'] = new ServletsModule();
 
+            var codeModules = 'services,web'.split(',');
+            for (var i = 0; i < codeModules.length; i++) {
+                var m = codeModules[i];
+                mapOfModulesToLinks[m] = new GitHubProjectModule(m);
+            }
+
             // then we handle .class-reference elements including links to SpringSource and Java (TM) JavaDocs
-            visitElements('.class-reference', ['module'], function (node, val, attrs) {
+            visitElements('.class-reference', ['module', 'q'], function (node, val, attrs) {
                 try {
                     val = val + '';
                     var processor = mapOfModulesToLinks[attrs['module']];
-                    var url = processor.urlForCodeReference(val),
-                            label = processor.labelForCodeReference(val);
-                    console.log('the url is ' + url)
-                    node.html( StringUtils.a ( label , url));
+                    var url = processor.urlForCodeReference(val, attrs),
+                            label = processor.labelForCodeReference(val, attrs);
+                    console.log('the url is ' + url);
+                    if (attrs['q']) {
+                        console.log('q=' + attrs['q'])
+                    }
+                    node.html(StringUtils.a(label, url));
                 } catch (e) {
-                    console.log('ERROR! ' + e)  //  console.log('hit an error ' + e)
+                    console.log('ERROR! ' + e + ' in processing module ' + attrs['module'])  //  console.log('hit an error ' + e)
                 }
             });
 
@@ -124,7 +150,7 @@
             visitElements('.wikipedia', [], function (node, val, attrs) {
                 val = val + '';
                 var url = 'http://wikipedia.org/wiki/' + val.trim();
-                node.html( StringUtils.a ( val,url ));
+                node.html(StringUtils.a(val, url));
 
             });
         })
@@ -142,15 +168,15 @@
 
     Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
     Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
-    records. We already have Hibernate-based backend services that manage user (<span module="services"
+    records. We already have Hibernate-based backend services that manage user (<span module="services" q="tut_web"
                                                                                       class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
-    and customer (<span module="services" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
+    and customer (<span module="services" q="tut_web" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
     data for us. We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes
     in our web application. <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework, or how to use Apache Maven, please see our introduction tutorial.</SPAN>
 </p>
 
 <P> TODO we need to show them how to setup the database and the sample application
-    Check out the data tutorial for details on data access with SPring. For a complete step by step introduction
+    Check out the data tutorial for details on data access with Spring. For a complete step by step introduction
     opn how to setup the sample application please refer to the <CODE>README</CODE>.
 </P>
 
@@ -159,7 +185,7 @@
     <LI> Create a working web application</LI>
     <LI> Handle form submissions</LI>
     <LI> Build a screen to handle data</LI>
-    <LI> Learn how to expose your data as RESTful webservices</LI>
+    <LI> Learn how to expose your data as RESTful web services</LI>
     <LI> Learn how to work with Spring Security for login and logout support</LI>
     <LI> Learn how to work with OAuth and Spring Security OAuth</LI>
 </uL>
@@ -176,7 +202,8 @@
 <h2> Building Web Applications with MVC</h2>
 
 <p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span
-        module="spring-web" class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that
+        module="spring-web" q="tut_web"
+        class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that
     Spring founder Rod Johnson wrote in his study in England in 2001 were to support Java-based web applications
     environments. Spring's always had a great support for the web. From the beginning, Spring has featured an MVC
     framework, called Spring MVC. Spring MVC at the time looked conceptually very similar to the then entrenched Struts
@@ -203,8 +230,9 @@
     rendering rich interactive user interfaces - is often necessary. This way, programmers can work on the part that
     matters most to them - the business logic - and the Adobe Dreamweaver-toting designers can focus on the styling and
     design of the user interface. To keep programming applications that behave in this way simpler, programmers have
-    adopted a variant of the popular <span class="wikipedia">model-view-controller</span> (MVC) pattern called <span id="model2mvc"
-                                                                                             class="wikipedia">Model_2</span> MVC.
+    adopted a variant of the popular <span class="wikipedia">model-view-controller</span> (MVC) pattern called <span
+            id="model2mvc"
+            class="wikipedia">Model_2</span> MVC.
     This pattern is best visually described like this: </P>
 
 <div class="diagram"><img src="images/model 2 mvc.png"/> <span class="caption"> The Model-2 MVC pattern </span></div>
@@ -225,9 +253,10 @@
 
 <p> Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like the market
     and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier! Our initial Java
-    web application consists of three classes - <span module="web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
-    <span module="web" class="class-reference">org.springsource.examples.spring31.web.config.WebMvcConfiguration</span>,
-    and <span module="web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and
+    web application consists of three classes - <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.WebMvcConfiguration</span>,
+    and <span module="web" q="tut_web"
+              class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and
     several artifacts to generate the HTML views. Let's look at these classes. </p>
 
 <P>
@@ -267,7 +296,7 @@
     installs Spring's Servlet infrastructure classes to support our application. </P>
 
 <div class="walkthrough">
-    <div module="web" class="git-code">
+    <div module="web" q="tut_web" class="git-code">
         org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer
     </div>
     <div><P> The class implements the Spring interface, <span class="class-reference" module="spring-web">org.springframework.web.WebApplicationInitializer</span>.
@@ -278,7 +307,7 @@
 
         <P> This code does two things. It registers a <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
             that in turn instantaites our Spring <CODE class="class-reference" module="spring-context">org.springframework.context.ApplicationContext</CODE>
-            implementation (<code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
+            implementation (<code class="class-reference" q="tut_web" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
             and makes it available to the entire application and all the Servlet components we register. </p>
 
         <P> Next, we register the <code class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</code>.
