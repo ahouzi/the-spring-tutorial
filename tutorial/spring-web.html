@@ -39,6 +39,9 @@
             // module supporting resolution of SpringSource JavaDoc URLs
 
             var StringUtils = {
+                a : function (label, url) {
+                    return '<a href="' + url + '">' + label + '</a>';
+                },
                 encodeFullyQualifiedPath: function (ref) {
                     var url = ref;//
                     while (url.indexOf('.') != -1) {
@@ -111,13 +114,20 @@
                     var url = processor.urlForCodeReference(val),
                             label = processor.labelForCodeReference(val);
                     console.log('the url is ' + url)
-                    node.html('<A href="' + url + '">' + label + '</A>');
+                    node.html( StringUtils.a ( label , url));
                 } catch (e) {
                     console.log('ERROR! ' + e)  //  console.log('hit an error ' + e)
                 }
             });
+            // handle links to wikipedia
+            visitElements('.wikipedia', [], function (node, val, attrs) {
+                val = val + '';
+                var url = 'http://wikipedia.org/wiki/' + val.trim();
+                node.html( StringUtils.a ( val,url ));
 
-        });
+            });
+        })
+        ;
 
     </script>
 </head>
@@ -192,8 +202,8 @@
     rendering rich interactive user interfaces - is often necessary. This way, programmers can work on the part that
     matters most to them - the business logic - and the Adobe Dreamweaver-toting designers can focus on the styling and
     design of the user interface. To keep programming applications that behave in this way simpler, programmers have
-    adopted a variant of the popular <span class="wikipedia">MVC</span> pattern called <span id="model2mvc"
-                                                                                             class="wikipedia">Model-2 MVC</span>.
+    adopted a variant of the popular <span class="wikipedia">model-view-controller</span> (MVC) pattern called <span id="model2mvc"
+                                                                                             class="wikipedia">Model_2</span> MVC.
     This pattern is best visually described like this: </P>
 
 <div class="diagram"><img src="images/model 2 mvc.png"/> <span class="caption"> The Model-2 MVC pattern </span></div>
