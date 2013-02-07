@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .wikipedia {
@@ -26,9 +26,143 @@
         font-family: courier, monospace;
         /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript"></script>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+        /* we need to support several types of handlers */
+
+        $(function () {
+
+
+            //// global functions
+
+            //
+            // module supporting resolution of SpringSource JavaDoc URLs
+
+            var StringUtils = {
+                encodeFullyQualifiedPath: function (ref) {
+                    var url = ref;//
+                    while (url.indexOf('.') != -1) {
+                        url = url.replace('.', '/');
+                    }
+                    return    url + '.html'
+                },
+                classForFullyQualifiedClass: function (ref) {
+                    var lastPeriod = ref.lastIndexOf('.');
+                    if (lastPeriod == -1)
+                        return ref;
+                    return  ref.substring(lastPeriod + 1);
+                }
+            };
+
+            function GenericModule(self, bu) {
+                self.baseUrl = bu;
+                self.urlForCodeReference = function (ref) {
+                    return self.baseUrl + StringUtils.encodeFullyQualifiedPath(ref);
+                };
+                self.labelForCodeReference = function (ref) {
+                    return StringUtils.classForFullyQualifiedClass(ref);
+                };
+            }
+
+            function ServletsModule(baseUrl) {
+                GenericModule(this, 'http://docs.oracle.com/javaee/6/api/');
+            }
+
+            function SpringModule(baseUrl) {
+                GenericModule(this, 'http://static.springsource.org/spring/docs/current/javadoc-api/');
+            }
+
+
+            //
+            // generic visitor function that can be used to cherry pick DOM elements and
+            // return the correct implementations of the DOM element sbased on CSS selectors
+            function visitElements(css, attrs, callback) {
+                $(css).each(function (indx) {
+                    var node = $(this);
+                    var classRefValue = node.html().trim();
+                    var collectedAttributes = {};
+                    for (var i = 0; i < attrs.length; i++)
+                        collectedAttributes[ attrs[i]] = node.attr(attrs[i]);
+                    callback(node, classRefValue, collectedAttributes);
+                });
+
+            }
+
+            // todo class-reference && module
+            var mapOfModulesToLinks = {};
+
+            // first lets bootstrap
+            visitElements('.class-reference', ['module'], function (node, val, attrs) {
+                mapOfModulesToLinks [attrs['module']] = {};
+            });
+
+            // then we register module handlers for the 'spring-*' modules
+            for (var x in mapOfModulesToLinks) {
+                if (x.indexOf('spring-') != -1)
+                    mapOfModulesToLinks[x] = new SpringModule();
+            }
+            mapOfModulesToLinks ['servlets'] = new ServletsModule();
+
+            // then we handle .class-reference elements
+            visitElements('.class-reference', ['module'], function (node, val, attrs) {
+                try {
+                    val = val + '';
+                    var processor = mapOfModulesToLinks[attrs['module']];
+                    var url = processor.urlForCodeReference(val),
+                            label = processor.labelForCodeReference(val);
+                    console.log('the url is ' + url)
+                    node.html('<A href="' + url + '">' + label + '</A>');
+                } catch (e) {
+                    console.log('ERROR! ' + e)  //  console.log('hit an error ' + e)
+                }
+            });
+
+        });
+
+    </script>
 </head>
-<body><h1> Embracing the Web with Spring MVC </h1>
+<body>
+
+<h1> Building Web Applications with Spring MVC </h1>
+
+<h2>Welcome</h2>
+
+<P>
+
+    Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
+    Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
+    records. We already have Hibernate-based backend services that manage user (<span module="services"
+                                                                                      class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
+    and customer (<span module="services" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
+    data for us. We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes
+    in our web application. <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework, or how to use Apache Maven, please see our introduction tutorial.</SPAN>
+</p>
+
+<P> TODO we need to show them how to setup the database and the sample application
+    Check out the data tutorial for details on data access with SPring. For a complete step by step introduction
+    opn how to setup the sample application please refer to the <CODE>README</CODE>.
+</P>
+
+<P> In this tutorial we will show you how to do these things with Spring MVC: </p>
+<uL>
+    <LI> Create a working web application</LI>
+    <LI> Handle form submissions</LI>
+    <LI> Build a screen to handle data</LI>
+    <LI> Learn how to expose your data as RESTful webservices</LI>
+    <LI> Learn how to work with Spring Security for login and logout support</LI>
+    <LI> Learn how to work with OAuth and Spring Security OAuth</LI>
+</uL>
+
+<h3> Setting Up the Tool Chain </h3>
+
+<P>
+    TODO show how to import the code and where to get it and how to use STS File &gt; Import and how Maven helps us.
+
+    Our tutorial is tool agnostic, but we recommend the free STS edition which comes wiht all sorts
+</P>
+
+
+<h2> Building Web Applications with MVC</h2>
 
 <p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span
         module="spring-web" class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that
@@ -38,7 +172,8 @@
     framework. While Spring MVC evolved on its own merits, Spring did everything possible to ease the lives of
     developers using other web frameworks, like Struts. The Spring-Struts integration support in the core Spring web
     modules made Struts a much nicer proposition for developers who were stuck using Struts, but wanted a cleaner,
-    POJO-centric component model. Indeed, Springs JSF integration for 1.0 and 2.0, as well as the JSF-centric Spring Web
+    POJO-centric component model. <!--todo link to what Spring Web Flow is; assume the n00bs don't know -->Indeed,
+    Springs JSF integration for 1.0 and 2.0, as well as the JSF-centric Spring Web
     Flow, offer drastically improved user experiences for developers stuck on those web frameworks. While Struts is
     largely a distant memory, and JSF is fast-becoming one, Spring MVC has emerged as, and remained, the most popular
     Java web framework in the world. </p>
@@ -73,16 +208,9 @@
     itself and then renders as HTML. The response might also be something constructed in code in the controller, like
     file data or the binary data for a PDF or spreadsheet. </P>
 
-<h2> Working with Servlet Applications </h2>
 
-<P> Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
-    Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
-    records. We already have Hibernate-based backend services that manage user (<span module="services"
-                                                                                      class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
-    and customer (<span module="services" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
-    data for us. We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes
-    in our web application. <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework, or how to use Apache Maven, please see our introduction tutorial.</SPAN>
-</P>
+<h2>
+    Configuring a Servlet 3.0 Container About Our Application</h2>
 
 <p> Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like the market
     and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier! Our initial Java
@@ -91,7 +219,9 @@
     and <span module="web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and
     several artifacts to generate the HTML views. Let's look at these classes. </p>
 
-<P> To work with any web framework, like Spring MVC, you need to install the various Servlet components using a
+<P>
+    <!-- todo rewrite this to reflect -->
+    To work with any web framework, like Spring MVC, you need to install the various Servlet components using a
     deployment descriptor (<code>web.xml</code>) or, alternatively, in Servlet 3 environments, a Java initializer class.
     Ours will be a Java Servlet 3.0-compatible web application. Servlet 3.0 applications run in any web container that
     supports Servlet 3.0, including Apache Tomcat 7. You can use Spring in containers that support earlier versions of
@@ -136,7 +266,7 @@
         construct the various Spring MVC framework components.</P>
 
         <P> This code does two things. It registers a <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
-            that in turn instantaites our Spring <CODE class="class-reference" module="spring-module">org.springframework.context.ApplicationContext</CODE>
+            that in turn instantaites our Spring <CODE class="class-reference" module="spring-context">org.springframework.context.ApplicationContext</CODE>
             implementation (<code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
             and makes it available to the entire application and all the Servlet components we register. </p>
 
@@ -157,14 +287,20 @@
             <EM>maps</EM> all components to <CODE>/*</CODE> where possible. This means that <EM>all</EM> requests will
             be handled by Spring MVC. We can later specialize our routing from within Spring MVC, of course. </P></div>
 </div>
-<h2> Configuring our Spring Application </h2>
+<h2> Configuring our Spring MVC Web Application </h2>
 
 <P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
     and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
     MVC, you simply need to add <CODE module="spring-webmvc" class="class-reference">org.springframework.web.servlet.config.annotation.EnableWebMvc</CODE>
-    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. By default,
+    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports.
+</p>
+<span class="gist" gist="4726096"><script src="https://gist.github.com/joshlong/4726096.js"></script></span>
+
+<P>
+    By default,
     this will activate many things based on conventions and the availability of certain libraries on the class path.
     Some of the things supported out of the box: </P>
+
 <uL>
     <LI> The Spring MVC <CODE class="class-reference"
                               module="spring-context">org.springframework.stereotype.Controller</CODE>-annotation based
