@@ -1,36 +1,19 @@
 $(function () {
 
+    var mapOfModulesToLinks = {};
 
     //// global functions
 
     //
     // module supporting resolution of SpringSource JavaDoc URLs
 
-    var StringUtils = {
-        a: function (label, url) {
-            return '<a href="' + url + '">' + label + '</a>';
-        },
-        encodeFullyQualifiedPath: function (ref) {
-            var url = ref;//
-            while (url.indexOf('.') != -1) {
-                url = url.replace('.', '/');
-            }
-            return    url ;
-        },
-        classForFullyQualifiedClass: function (ref) {
-            var lastPeriod = ref.lastIndexOf('.');
-            if (lastPeriod == -1)
-                return ref;
-            return  ref.substring(lastPeriod + 1);
-        }
-    };
 
     // todo handle gists http://developer.github.com/v3/gists/#list-gists
 
     function GenericModule(self, bu) {
         self.baseUrl = bu;
         self.urlForCodeReference = function (ref, attrs) {
-            return self.baseUrl + StringUtils.encodeFullyQualifiedPath(ref) +'.html';
+            return self.baseUrl + StringUtils.encodeFullyQualifiedPath(ref) + '.html';
         };
         self.labelForCodeReference = function (ref, attrs) {
             return StringUtils.classForFullyQualifiedClass(ref);
@@ -43,8 +26,7 @@ $(function () {
         console.log('the github url is ' + ghUrl);
         self.urlForCodeReference = function (ref, attrs) {
             var q = attrs['q'];
-            var u = ghUrl.replace('_Q_',q) +   StringUtils.encodeFullyQualifiedPath(ref) +'.java';
-            console.log('url=' + u);
+            var u = ghUrl.replace('_Q_', q) + StringUtils.encodeFullyQualifiedPath(ref) + '.java';
             return u;
         };
         self.labelForCodeReference = function (ref, attrs) {
@@ -77,7 +59,7 @@ $(function () {
     }
 
     // todo class-reference && module
-    var mapOfModulesToLinks = {};
+
 
     // first lets bootstrap
     visitElements('.class-reference', ['module'], function (node, val, attrs) {
@@ -97,6 +79,25 @@ $(function () {
         mapOfModulesToLinks[m] = new GitHubProjectModule(m);
     }
 
+    visitElements('.git-code', ['q', 'extension', 'module'], function (node, val, attrs) {
+        var q = attrs['q'],
+            mod = attrs['module'],
+            ext = attrs['extension'],
+            fn = val;
+        $.getGithubFqnFile(mod, q, fn, ext, function (data) {
+            console.log('data=' + data);
+            node.html(StringUtils.code(data));
+        });
+    });
+
+    visitElements('.git-gist', ['q' , 'module', 'gist'], function (node, val, attrs) {
+        var q = attrs['q'], gist = attrs['gist'], mod = attrs['module'];
+        $.getGithubGist(gist, null, function (data) {
+            node.html(StringUtils.code(data));
+        });
+    });
+
+
     // then we handle .class-reference elements including links to SpringSource and Java (TM) JavaDocs
     visitElements('.class-reference', ['module', 'q'], function (node, val, attrs) {
         try {
@@ -104,13 +105,10 @@ $(function () {
             var processor = mapOfModulesToLinks[attrs['module']];
             var url = processor.urlForCodeReference(val, attrs),
                 label = processor.labelForCodeReference(val, attrs);
-            console.log('the url is ' + url);
-            if (attrs['q']) {
-                console.log('q=' + attrs['q'])
-            }
+
             node.html(StringUtils.a(label, url));
         } catch (e) {
-            console.log('ERROR! ' + e + ' in processing module ' + attrs['module'])  //  console.log('hit an error ' + e)
+            console.log('ERROR! ' + e + ' in processing module ' + attrs['module']);  //  console.log('hit an error ' + e)
         }
     });
 
