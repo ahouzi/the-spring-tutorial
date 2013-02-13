@@ -35,10 +35,19 @@
         };
 
 
-    $.getGithubFqnFile = function (mod, q, fn, ext,cb, startLineNum, endLineNum) {
-        var filePath = '_X1_/src/main/java/_X2_'
-            .replace('_X1_', mod)
-            .replace('_X2_', StringUtils.encodeFullyQualifiedPath(fn) + '.' + ext);
+    $.getGithubFqnFile = function (mod, q, fn, ext, cb, startLineNum, endLineNum) {
+
+        ext = (ext && ext != null ) ? (ext + '').toLowerCase() : ext;
+
+        console.log('fn='+fn)
+
+        var isJava = ext === 'java'  ;
+
+        var filePath = (isJava ? '_X1_/src/main/java/_X2_' : '_X1_/_X2_')
+                        .replace('_X1_', mod)
+                        .replace('_X2_',  isJava ? StringUtils.encodeFullyQualifiedPath(fn) + '.' + ext : fn );
+
+        console.log('filepath='+ filePath);
 
         var url = 'http://githubproxy.cloudfoundry.com/joshlong/the-spring-tutorial/_B_/_M_?file=_F_'
             .replace('_M_', mod)
@@ -52,7 +61,7 @@
             url: url,
             dataType: 'jsonp',
             success: function (content) {
-                console.log('content=' + content); // fnSuccess(content, '', +startLineNum || 1, +endLineNum || 0, cb);
+               // console.log('content=' + content); // fnSuccess(content, '', +startLineNum || 1, +endLineNum || 0, cb);
                 cb(content);
             }
         });

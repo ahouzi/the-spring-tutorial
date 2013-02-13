@@ -85,7 +85,7 @@ $(function () {
             ext = attrs['extension'],
             fn = val;
         $.getGithubFqnFile(mod, q, fn, ext, function (data) {
-            console.log('data=' + data);
+            console.log(StringUtils.code(data))
             node.html(StringUtils.code(data));
         });
     });
