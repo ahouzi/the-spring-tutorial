@@ -4,6 +4,5 @@
 
 <tiles-definitions>
     <definition name="page" templateExpression="/WEB-INF/layouts/template.jsp">
-        <put-attribute name="ng-app-name" value="crm"/>
     </definition>
 </tiles-definitions>
