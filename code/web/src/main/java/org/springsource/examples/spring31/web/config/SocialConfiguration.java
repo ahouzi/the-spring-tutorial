@@ -2,9 +2,9 @@ package org.springsource.examples.spring31.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.EnableJdbcConnectionRepository;
-import org.springframework.social.config.xml.SpringSecurityAuthenticationNameUserIdSource;
-import org.springframework.social.config.xml.UserIdSource;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -13,6 +13,7 @@ import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.config.annotation.EnableFacebook;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springsource.examples.spring31.web.security.UserSignInUtilities;
+import sun.plugin.liveconnect.SecurityContextHelper;
 
 /**
  * Configuration for Spring Social so that users may sign in
@@ -27,7 +28,12 @@ public class SocialConfiguration {
 
     @Bean
     public UserIdSource userIdSource() {
-        return new SpringSecurityAuthenticationNameUserIdSource();
+        return new UserIdSource() {
+            @Override
+            public String getUserId() {
+               return SecurityContextHolder.getContext().getAuthentication().getName() ;
+            }
+        };
     }
 
     @Bean
