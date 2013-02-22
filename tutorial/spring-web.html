@@ -24,37 +24,31 @@
     }
 
     code, .git-code, .git-gist, .class-reference {
-        font-family: courier, monospace; /* background-color: #dcdcdc;*/
+        font-family: courier, monospace;
+        font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript">
-        var StringUtils = {
-            a:function (label, url) {
-                return '<a href="' + url + '">' + label + '</a>';
-            },
-            code:function (inp) {
-                var lt = '<', gt = '>';
-                while (inp.indexOf(lt) != -1) {
-                    inp = inp.replace(lt, '&lt;');
-                }
-                while (inp.indexOf(gt) != -1) {
-                    inp = inp.replace(gt, '&gt;');
-                }
-                return "<PRE><CODE>" + inp + "</CODE></PRE>";
-            },
-            encodeFullyQualifiedPath:function (ref) {
-                var url = ref;
-                while (url.indexOf('.') != -1) {
-                    url = url.replace('.', '/');
-                }
-                return url;
-            },
-            classForFullyQualifiedClass:function (ref) {
-                var lastPeriod = ref.lastIndexOf('.');
-                if (lastPeriod == -1) return ref;
-                return ref.substring(lastPeriod + 1);
-            }
-        };
-    </script>
+    <script type="text/javascript" lang="javascript"> var StringUtils = { a:function (label, url) {
+        return '<a href="' + url + '">' + label + '</a>';
+    }, code:function (inp) {
+        var lt = '<', gt = '>';
+        while (inp.indexOf(lt) != -1) {
+            inp = inp.replace(lt, '&lt;');
+        }
+        while (inp.indexOf(gt) != -1) {
+            inp = inp.replace(gt, '&gt;');
+        }
+        return "<PRE><CODE>" + inp + "</CODE></PRE>";
+    }, encodeFullyQualifiedPath:function (ref) {
+        var url = ref;
+        while (url.indexOf('.') != -1) {
+            url = url.replace('.', '/');
+        }
+        return url;
+    }, classForFullyQualifiedClass:function (ref) {
+        var lastPeriod = ref.lastIndexOf('.');
+        if (lastPeriod == -1) return ref;
+        return ref.substring(lastPeriod + 1);
+    }}; </script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/github-files.js"></script>
     <script src="js/tutorial.js"></script>
@@ -176,7 +170,7 @@
         or <CODE module="servlets" class="class-reference">javax.servlet.http.HttpSessionAttributeListener</CODE>. These
         classes are notified of various events in the web application such as the creation of data stored in memory, the
         changes in the Servlet container itself, or changes in one of the Servlets managed by a web application
-        container. .
+        container.
     </LI>
     <LI><B>Filters</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Filter</CODE>
         that are given a chance to act on, or possibly change, incoming HTTP requests before they are routed to the
@@ -198,7 +192,7 @@
         which provides a callback method <CODE>void onStartup(ServletContext servletContext) throws
             ServletException</CODE>. This method is called as the application is started by the application container,
         providing a reference to the current <CODE>ServletContext</CODE> which in turn can be used to programmatically
-        construct the various Spring MVC framework components.</P>
+        construct the various Spring MVC framework components. </P>
 
         <P> This code does two things. It registers a <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
             that in turn instantaites our Spring <CODE class="class-reference" module="spring-context">org.springframework.context.ApplicationContext</CODE>
@@ -216,7 +210,7 @@
             the application, and they could share beans in the <EM>parent</EM> <CODE>ApplicationContext</CODE> managed
             by the <CODE>ContextLoaderListener</CODE>. </p>
 
-        <P> As we're running in a Servlet 3 environment, and want to take advanage of <EM>asynchronous</EM> Spring MVC
+        <P> As we're running in a Servlet 3 environment, and want to take advantage of <EM>asynchronous</EM> Spring MVC
             controllers, this code activates <EM>async</EM> support on all components where appropriate by calling
             <CODE>setAsync(true)</CODE>. Since we want Spring MVC to have control over the entire application, this code
             <EM>maps</EM> all components to <CODE>/*</CODE> where possible. This means that <EM>all</EM> requests will
@@ -227,9 +221,9 @@
 <P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
     and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
     MVC, you simply need to add <CODE module="spring-webmvc" class="class-reference">org.springframework.web.servlet.config.annotation.EnableWebMvc</CODE>
-    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. </p> <span
-        class="git-gist" gist="4726096"> @Configuration @EnableWebMvc public class WebMvcConfiguration {} </span>
+    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. </p>
 
+<div class="git-gist" gist="4726096"> @Configuration @EnableWebMvc public class WebMvcConfiguration {}</div>
 <P> By default, this will activate many things based on conventions and the availability of certain libraries on the
     class path. Some of the things supported out of the box: </P>
 <uL>
@@ -240,10 +234,10 @@
         controllers are supported as well.
     </LI>
     <LI> File upload support through the Apache Commons FileUpload library (if detected on the class path) or via the
-        Servlet 3 <CODE class="class-reference" module="servlets"> javax.servlet.http.Part </CODE> API.
+        Servlet 3 <CODE class="class-reference" module="servlets">javax.servlet.http.Part</CODE> API.
     </LI>
     <LI><CODE>.jsp</CODE> resource rendering, rendering views at the root of the application.</LI>
-    <LI>REST and JSON and XML marshaling support if the Jackson JSON-Object marshaling library or a JAXB implementation
+    <LI> REST and JSON and XML marshaling support if the Jackson JSON-Object marshaling library or a JAXB implementation
         is on the class path.
     </LI>
     <LI>Bean and form validation if a JSR 303 implementation like Hibernate Validator is on the classpath.</LI>
@@ -272,9 +266,7 @@
         <TD><img width="300" src="images/signup.png"/></TD>
         <td> users should be able to sign up for a new account and potentially register via FaceBook</td>
     </tr>
-    <!-- <tr> <td><b> oops </b></td> <TD><img width="300" src="images/oops.png"/></TD> <td> this is the page
-    to show when ever there is an error in the system. Maybe the user accesses the wrong page and needs to be given a 404, or
-    perhaps the system throws some sort of awful as-yet-uknown error. Handling this gracefully is a sign of polis. </td> </tr>-->
+    <!-- <tr> <td><b> oops </b></td> <TD><img width="300" src="images/oops.png"/></TD> <td> this is the page to show when ever there is an error in the system. Maybe the user accesses the wrong page and needs to be given a 404, or perhaps the system throws some sort of awful as-yet-uknown error. Handling this gracefully is a mark of polish. </td> </tr>-->
     <tr>
         <td><b> profile </b></td>
         <TD><img width="300" src="images/profile.png"/></TD>
@@ -291,53 +283,46 @@
 <h3>Templating with Apache Tiles</h3>
 
 <P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
-    We will use the <A href="http://tiles.apache.org/">Apache Tiles</a> template engine for our views. Our views are the
-    last line before we actually render content to the browser. In our case, we're rendering HTML, so we need to use a
-    view engine that makes working with HTML easy. We can use many different types of views. All of these objects can be
-    plugged in. Spring MVC works with objects of type <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.View</CODE>.
-    There are many implementations that you can use available out of the box, including one to support Apache Tiles.
-    Apache Tiles satisfies a very important requirement - we need to be able to reuse fragments of our pages in a
-    consistent way. Apache Tiles makes it easy to break a layout apart into its constituent parts and then assemble them
-    as needed to create complete, consistent user interfaces. Below, I've taken a screen from our application and drawn
-    grey rectangles over the parts of the application that will remain visually the same from page to page. The top
-    right rectangle contains the <EM>navigation bar</EM> that in turn changes based on whether the user is logged in.
-    The rectangle on the bottom is purely formulaic, typical footer text common to most websites. Either way, we don't
-    need to recreate either of these fragments for each page. Better to extract them into little regions and reuse them.
-    The content in the blue box <EM>is</EM> expected to change from page to page. An HTML page often contains a lot of
-    style sheets and JavaScript, as well, and a template is a nice convenient place to stash all of that, too. So,
-    basically, our application only has one region that will change. We can simply create one template and then override
-    the base template from page to page. </p>
+    Building individual web pages is easy. Simply slap together some HTML and then you're set. Building web applications
+    well, on the other hand, is an entirely different thing. Well built web applications are visually consistent, often
+    sharing consistent styling and theme and layout cues across all pages in the application. To facilitate this, it is
+    common to use a <EM>template</EM> engine like <A href="http://tiles.apache.org/">Apache Tiles</a>. Apache Tiles lets
+    you extract <EM>the things that stay the same from the things that change</EM>, in other words: it lets you define a
+    consistent template and then - on a page by page basis - change or override the definition for individual parts (or
+    <EM>tile</eM>s) of the template without re-specifying the template over and over. </p>
 
-<div class="diagram"><IMG src="images/signin-tiles.png"/>
-    <span class="caption"> A typical layout divided into its constituent "tiles" </span>
+<P> If you look at the swath of screen shots above, it's not hard to identify the common elements in our page layouts.
+    In the diagram below, I've drawn gray boxes over the content that is basically the same on every page, and a blue
+    box over the content that changes. </P>
+
+<div class="diagram"><IMG src="images/signin-tiles.png"/> <span class="caption"> A typical layout divided into its constituent "tiles" </span>
 </div>
+<P> To enable Apache Tiles for your application, you simply add the following two <CODE>@Bean</CODE> definitions to your
+    <CODE>@Configuration</CODE> class above. </P> <Code class="git-gist" gist="4948952"> @Bean UrlBasedViewResolver
+    @Bean TilesConfigurer </Code>
+
+<P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you with
+    the <CODE class="class-reference"
+              module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>. We need to tell
+    Spring MVC about Apache Tiles, too. We'll register a custom <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
+    which can in turn correctly take strings like "home" and resolve them to the appropriate Tiles definition named
+    "home." </P>
 
 <P> Apache Tiles expects information about the templates to be provided in the form of an XML file, called <CODE>tiles.xml</code>.
     Apache Tiles supports template inheritance. For example, you might specify the basic template in a file like this
     (I've placed this at <CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
 
 <div module="web" q="tut_web" extension="xml" class="git-code"> src/main/webapp/WEB-INF/layouts/tiles.xml</div>
+<P> This specifies a <CODE>&lt;definition&gt;</CODE> element that in turn specifies a template to render (the file
+    <CODE>/WEB-INF/layouts/template.jsp</CODE>). The template has regions that are to be substituted for actual content
+    or values at render time. </P> <code class="git-gist" gist="4948600"> html html [tiles:.. ] ... </code>
 
-<P>
-
-
-    This specifies a <CODE>&lt;definition&gt;</CODE> element that in turn specifies a template to render (the file
-    <CODE>/WEB-INF/layouts/template.jsp</CODE>).
-
-    </p>
-<div module="web" q="tut_web" extension="jsp" class="git-code"> src/main/webapp/WEB-INF/layouts/</div>
-
-<P>
-    The template has regions that are to be substituted for actual content or values
-    at render time. We provide the default value for one of these regions - the one named <CODE>ng-app-name</CODE> -
-    by using the <CODE>&lt;put-attribute&gt;</CODE> element in the <CODE>&lt;definition&gt;</CODE> element.
-
-
-
-
-
-
-</P>
+<P> I've omitted most of the content from this page including the JavaScript and CSS declarations and left only the
+    skeletal structure in the example above. In particular, you'll note that we've specified a <CODE>&lt;tiles:insertAttribute&gt;</CODE>
+    tag that will attempt to substitute whatever template or value is provided for the region named <EM>content</EM>. If
+    you're looking at the <CODE>template.xml</CODE> declaration above, you may be wondering where we specify which
+    content is to be substituted into the <EM>content</EM> region. We specify this in each <CODE>tiles.xml</CODE>
+    definition that <EM>extends</EM> this root <CODE>tiles.xml</CODE> for each screen. </P>
 
 <h1> The Changing Face of the Web </h1>
 
