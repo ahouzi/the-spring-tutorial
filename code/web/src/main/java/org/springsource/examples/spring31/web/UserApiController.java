@@ -2,9 +2,6 @@ package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.springframework.social.connect.ConnectionRepository;
-import org.springframework.social.connect.ConnectionSignUp;
-import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +12,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
 
 /**
  * Simple Spring MVC controller that can be used to adminster information about the users
@@ -76,23 +72,16 @@ public class UserApiController {
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
-    public Callable<Long> uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
-        Callable<Long> callable = new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                try {
-                    assert userId != null : "you must specify a userId when uploading!";
-                    assert file != null : "you must specify a file object when uploading!";
-                    byte[] bytesForImage = file.getBytes();
-                    userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
-                    return userId;
-                } catch (Throwable th) {
-                    throw new RuntimeException("Something happened while uploading the managed upload", th);
-                }
-            }
-        };
-        return callable;
-
+    public Long uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
+        try {
+            assert userId != null : "you must specify a userId when uploading!";
+            assert file != null : "you must specify a file object when uploading!";
+            byte[] bytesForImage = file.getBytes();
+            userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
+        return userId;
     }
 
 

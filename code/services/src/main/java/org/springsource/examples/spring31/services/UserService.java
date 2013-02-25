@@ -4,7 +4,6 @@ package org.springsource.examples.spring31.services;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.mongodb.gridfs.GridFSDBFile;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +28,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -178,10 +179,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
     public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, InputStream inputStream) throws Throwable {
         writeUserProfilePhoto(userId, ogFileName, inputStream);
-      //  String ext = deriveFileExtension(ogFileName);
-        //convertAndResizeUserProfilePhoto(userId, ext);
-     //   if (logger.isDebugEnabled())
-         //   logger.debug("sent a request to process the userId[" + userId + "] and extension [" + ext + "]");
     }
 
 
@@ -366,7 +363,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
      */      // todo
     @Deprecated
     protected long convertAndResizeUserProfilePhoto(Long userId, String fileExtension) throws Throwable {
-        return userId ;
+        return userId;
         /*
         InputStream profilePhotoBytesFromGridFs = null, fileInputStream = null;
         OutputStream outputStream = null;
