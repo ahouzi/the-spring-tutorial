@@ -4,7 +4,6 @@ package org.springsource.examples.spring31.services;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.mongodb.gridfs.GridFSDBFile;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +28,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -119,9 +120,9 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     /**
      * todo optimize this with a faster query that simply does a COUNT(*) or something
      */
-    public boolean isUserNameAlreadyTaken (String username){
-        User u = this.loginByUsername( username ) ;
-        return u != null ;
+    public boolean isUserNameAlreadyTaken(String username) {
+        User u = this.loginByUsername(username);
+        return u != null;
     }
 
     public User createOrGet(String user, String pw, String fn, String ln, boolean importedFromServiceProvider) {
@@ -178,10 +179,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
     public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, InputStream inputStream) throws Throwable {
         writeUserProfilePhoto(userId, ogFileName, inputStream);
-        String ext = deriveFileExtension(ogFileName);
-        convertAndResizeUserProfilePhoto(userId, ext);
-        if (logger.isDebugEnabled())
-            logger.debug("sent a request to process the userId[" + userId + "] and extension [" + ext + "]");
     }
 
 
@@ -359,13 +356,15 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return null != file && (!file.exists() || file.delete());
     }
 
-
     /**
      * method takes the user id, loads the bytes from gridfs, stages the file in a temporary folder
      * so that the file path can be passed to the 'convert' command, and then invokes convert on it, resizing the file
      * the resulting file is then copied back into gridfs
-     */
+     */      // todo
+    @Deprecated
     protected long convertAndResizeUserProfilePhoto(Long userId, String fileExtension) throws Throwable {
+        return userId;
+        /*
         InputStream profilePhotoBytesFromGridFs = null, fileInputStream = null;
         OutputStream outputStream = null;
         File tmpStagingFile = null, convertedFile = null;
@@ -413,8 +412,8 @@ public class UserService implements ClientDetailsService, UserDetailsService {
             assert tmpStagingFileRemoved : "the file " + (convertedFile == null ? "null" : convertedFile.getAbsolutePath()) + " must be either deleted or not exist.";
         }
 
+*/
 
-        return userId;
     }
 
 }
