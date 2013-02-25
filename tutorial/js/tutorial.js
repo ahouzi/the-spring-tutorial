@@ -92,7 +92,7 @@ $(function () {
 
     visitElements('.git-gist', ['q' , 'module', 'gist'], function (node, val, attrs) {
         var q = attrs['q'], gist = attrs['gist'], mod = attrs['module'];
-        $.getGithubGist(gist, null, function (data) {
+        $.getGithubGist( 'joshlong', gist,  function (data) {
             node.html(StringUtils.code(data));
         });
     });

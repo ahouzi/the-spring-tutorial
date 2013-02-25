@@ -27,28 +27,30 @@
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript"> var StringUtils = { a:function (label, url) {
-        return '<a href="' + url + '">' + label + '</a>';
-    }, code:function (inp) {
-        var lt = '<', gt = '>';
-        while (inp.indexOf(lt) != -1) {
-            inp = inp.replace(lt, '&lt;');
-        }
-        while (inp.indexOf(gt) != -1) {
-            inp = inp.replace(gt, '&gt;');
-        }
-        return "<PRE><CODE>" + inp + "</CODE></PRE>";
-    }, encodeFullyQualifiedPath:function (ref) {
-        var url = ref;
-        while (url.indexOf('.') != -1) {
-            url = url.replace('.', '/');
-        }
-        return url;
-    }, classForFullyQualifiedClass:function (ref) {
-        var lastPeriod = ref.lastIndexOf('.');
-        if (lastPeriod == -1) return ref;
-        return ref.substring(lastPeriod + 1);
-    }}; </script>
+    <script type="text/javascript" lang="javascript">
+
+        var StringUtils = { a: function (label, url) {
+            return '<a href="' + url + '">' + label + '</a>';
+        }, code: function (inp) {
+            var lt = '<', gt = '>';
+            while (inp.indexOf(lt) != -1) {
+                inp = inp.replace(lt, '&lt;');
+            }
+            while (inp.indexOf(gt) != -1) {
+                inp = inp.replace(gt, '&gt;');
+            }
+            return "<PRE><CODE>" + inp + "</CODE></PRE>";
+        }, encodeFullyQualifiedPath: function (ref) {
+            var url = ref;
+            while (url.indexOf('.') != -1) {
+                url = url.replace('.', '/');
+            }
+            return url;
+        }, classForFullyQualifiedClass: function (ref) {
+            var lastPeriod = ref.lastIndexOf('.');
+            if (lastPeriod == -1) return ref;
+            return ref.substring(lastPeriod + 1);
+        }}; </script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/github-files.js"></script>
     <script src="js/tutorial.js"></script>

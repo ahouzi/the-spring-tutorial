@@ -17,16 +17,16 @@
             callback(contentArray.slice(startLineNum - 1, endLineNum).join("\n"));
         };
 
-    // todo  $.getGithubFileByFilePathAndBranch
-    //       https://api.github.com/repos/joshlong/the-spring-tutorial/branches
-
     $.getGithubFileByFilePath =
         function (user, repo, filePath, callback, startLineNum, endLineNum) {
             if (githubCacheFilePath[filePath]) {
                 $.getGithubFile(user, repo, githubCacheFilePath[filePath], callback, startLineNum, endLineNum)
             } else {
                 $.ajax({
-                    type: "GET", url: "https://api.github.com/repos/" + user + "/" + repo + "/contents/" + filePath, dataType: "jsonp", success: function (data) {
+                    type: "GET",
+                    url: "https://api.github.com/repos/" + user + "/" + repo + "/contents/" + filePath,
+                    dataType: "jsonp",
+                    success: function (data) {
                         githubCacheFilePath[filePath] = data.data.sha;
                         $.getGithubFile(user, repo, githubCacheFilePath[filePath], callback, startLineNum, endLineNum)
                     }
@@ -39,7 +39,7 @@
 
         ext = (ext && ext != null ) ? (ext + '').toLowerCase() : ext;
 
-        console.log('fn='+fn)
+        console.log('fn='+fn)  ;
 
         var isJava = ext === 'java'  ;
 
@@ -67,6 +67,7 @@
         });
     };
 
+/*
 
     $.getGithubGist =
         function (id, fileName, callback, startLineNum, endLineNum) {
@@ -84,6 +85,22 @@
                             }
                         }
                         fnSuccess(content, '', +startLineNum || 1, +endLineNum || 0, callback);
+                    }
+                }
+            );
+        };
+*/
+
+    $.getGithubGist =
+        function (  user, gist, cb ) {
+
+            var nurl =  'http://githubproxy.cloudfoundry.com/gist/_U_/_GIST_'.replace('_U_',user).replace('_GIST_', gist);
+            $.ajax({
+                    type: "GET",
+                    url: nurl,
+                    dataType: 'jsonp',
+                    success: function (data) {
+                       cb(data);
                     }
                 }
             );
