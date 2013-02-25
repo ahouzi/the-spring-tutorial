@@ -75,7 +75,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         String jpg = "jpg", gif = "gif", png = "png";
 
         // build up base variants collection
-
         for (String e : new String[]{jpg, gif, png})
             multiMapOfExtensionsToVariants.put(e, new ConcurrentSkipListSet<String>());
 
@@ -355,65 +354,4 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     private boolean ensureRemovalOfFile(File file) {
         return null != file && (!file.exists() || file.delete());
     }
-
-    /**
-     * method takes the user id, loads the bytes from gridfs, stages the file in a temporary folder
-     * so that the file path can be passed to the 'convert' command, and then invokes convert on it, resizing the file
-     * the resulting file is then copied back into gridfs
-     */      // todo
-    @Deprecated
-    protected long convertAndResizeUserProfilePhoto(Long userId, String fileExtension) throws Throwable {
-        return userId;
-        /*
-        InputStream profilePhotoBytesFromGridFs = null, fileInputStream = null;
-        OutputStream outputStream = null;
-        File tmpStagingFile = null, convertedFile = null;
-
-        try {
-            User user = getUserById(userId);
-            assert user != null : "the user reference should still be valid!";
-            tmpStagingFile = File.createTempFile("profilePhoto" + userId, "." + fileExtension);
-            convertedFile = File.createTempFile("profilePhotoConvertedAndResized" + userId, ".jpg");
-            profilePhotoBytesFromGridFs = readUserProfilePhoto(userId);
-            outputStream = new FileOutputStream(tmpStagingFile);
-            assert null != profilePhotoBytesFromGridFs : "the input stream can't be null";
-            assert null != outputStream : "the output stream can't be null";
-            try {
-                IOUtils.copy(profilePhotoBytesFromGridFs, outputStream);
-            } finally {
-                IOUtils.closeQuietly(profilePhotoBytesFromGridFs);
-                IOUtils.closeQuietly(outputStream);
-            }
-
-            List<String> listOfString = Arrays.asList(convertCommandPath, tmpStagingFile.getAbsolutePath(), "-resize " + this.imageWidth + "x", convertedFile.getAbsolutePath());
-
-            String totalCommand = org.apache.commons.lang.StringUtils.join(listOfString, " ");
-
-            Process process = Runtime.getRuntime().exec(totalCommand);
-            int retCode = process.waitFor();
-            assert retCode == 0 && convertedFile.exists() :
-                    "Something went wrong with running the 'convert'" +
-                            " command. The return / exit code is " + retCode +
-                            " and the full output is:" + IOUtils.toString(process.getErrorStream()) +
-                            ". There should be a file at " + convertedFile.getAbsolutePath();
-
-            fileInputStream = new FileInputStream(convertedFile);
-            writeUserProfilePhoto(userId, convertedFile.getName(), fileInputStream);
-            logger.debug("wrote converted image for " + userId + ". The temporary staging file is " + convertedFile.getAbsolutePath());
-        } finally {
-            IOUtils.closeQuietly(fileInputStream);
-            IOUtils.closeQuietly(profilePhotoBytesFromGridFs);
-            IOUtils.closeQuietly(outputStream);
-
-            boolean convertedFileRemoved = ensureRemovalOfFile(convertedFile);
-            boolean tmpStagingFileRemoved = ensureRemovalOfFile(tmpStagingFile);
-
-            assert convertedFileRemoved : "the file " + (convertedFile == null ? "null" : convertedFile.getAbsolutePath()) + " must be either be deleted or not exist.";
-            assert tmpStagingFileRemoved : "the file " + (convertedFile == null ? "null" : convertedFile.getAbsolutePath()) + " must be either deleted or not exist.";
-        }
-
-*/
-
-    }
-
 }
