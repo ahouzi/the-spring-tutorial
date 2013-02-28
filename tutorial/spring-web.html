@@ -1,4 +1,5 @@
 <html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
@@ -27,30 +28,28 @@
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript">
-
-        var StringUtils = { a: function (label, url) {
-            return '<a href="' + url + '">' + label + '</a>';
-        }, code: function (inp) {
-            var lt = '<', gt = '>';
-            while (inp.indexOf(lt) != -1) {
-                inp = inp.replace(lt, '&lt;');
-            }
-            while (inp.indexOf(gt) != -1) {
-                inp = inp.replace(gt, '&gt;');
-            }
-            return "<PRE><CODE>" + inp + "</CODE></PRE>";
-        }, encodeFullyQualifiedPath: function (ref) {
-            var url = ref;
-            while (url.indexOf('.') != -1) {
-                url = url.replace('.', '/');
-            }
-            return url;
-        }, classForFullyQualifiedClass: function (ref) {
-            var lastPeriod = ref.lastIndexOf('.');
-            if (lastPeriod == -1) return ref;
-            return ref.substring(lastPeriod + 1);
-        }}; </script>
+    <script type="text/javascript" lang="javascript"> var StringUtils = { a: function (label, url) {
+        return '<a href="' + url + '">' + label + '</a>';
+    }, code: function (inp) {
+        var lt = '<', gt = '>';
+        while (inp.indexOf(lt) != -1) {
+            inp = inp.replace(lt, '&lt;');
+        }
+        while (inp.indexOf(gt) != -1) {
+            inp = inp.replace(gt, '&gt;');
+        }
+        return "<PRE><CODE>" + inp + "</CODE></PRE>";
+    }, encodeFullyQualifiedPath: function (ref) {
+        var url = ref;
+        while (url.indexOf('.') != -1) {
+            url = url.replace('.', '/');
+        }
+        return url;
+    }, classForFullyQualifiedClass: function (ref) {
+        var lastPeriod = ref.lastIndexOf('.');
+        if (lastPeriod == -1) return ref;
+        return ref.substring(lastPeriod + 1);
+    }}; </script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/github-files.js"></script>
     <script src="js/tutorial.js"></script>
@@ -218,7 +217,9 @@
             <EM>maps</EM> all components to <CODE>/*</CODE> where possible. This means that <EM>all</EM> requests will
             be handled by Spring MVC. We can later specialize our routing from within Spring MVC, of course. </P></div>
 </div>
-<h2> Configuring our Spring MVC Web Application </h2>
+<h2> Configuring Spring MVC </h2>
+
+<h3> Convention over Configuration, Mostly </h3>
 
 <P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
     and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
@@ -282,49 +283,94 @@
         <td>there should of course be a screen to work with data related to customers.</td>
     </tr>
 </TABLE>
-<h3>Templating with Apache Tiles</h3>
-
-<P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
+<h3>Templating with Apache Tiles</h3> <!--what is a templating engine--> <P><img
+        src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
     Building individual web pages is easy. Simply slap together some HTML and then you're set. Building web applications
     well, on the other hand, is an entirely different thing. Well built web applications are visually consistent, often
-    sharing consistent styling and theme and layout cues across all pages in the application. To facilitate this, it is
-    common to use a <EM>template</EM> engine like <A href="http://tiles.apache.org/">Apache Tiles</a>. Apache Tiles lets
-    you extract <EM>the things that stay the same from the things that change</EM>, in other words: it lets you define a
-    consistent template and then - on a page by page basis - change or override the definition for individual parts (or
+    sharing consistent styling and theme and layout cues across all pages in the application. <A
+            href="http://tiles.apache.org/">Apache Tiles</a> is a very common templating engine. Apache Tiles lets you
+    extract <EM>the things that stay the same from the things that change</EM>, in other words: it lets you define a
+    template and then - on a page by page basis - change or override the definition for individual parts (or
     <EM>tile</eM>s) of the template without re-specifying the template over and over. </p>
+<!--install tiles in Spring --> <P> To enable Apache Tiles for your application, you simply add the following two <CODE>@Bean</CODE>
+    definitions to your <CODE>@Configuration</CODE> class above. </P>
 
-<P> If you look at the swath of screen shots above, it's not hard to identify the common elements in our page layouts.
-    In the diagram below, I've drawn gray boxes over the content that is basically the same on every page, and a blue
-    box over the content that changes. </P>
+<div class="git-gist" gist="5059411"> @Bean UrlBasedViewResolver @Bean TilesConfigurer</div>
+</p> <P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you
+    with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>.
+    Recall that Spring MVC delegates to <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
+    instances to translate strings like <CODE>home</CODE> to an appropriate view template. The <code
+            module="spring-webmvc"
+            class="class-reference">org.springframework.web.servlet.view.tiles2.TilesViewResolver</code> resolves the
+    appropriate Tiles definitions. </P> <!-- then look at a page --> <P> If you look at the swath of screen shots above,
+    it's not hard to identify the common elements in our page layouts. In the diagram below, I've drawn colored boxes
+    over the parts of the page that could be expected to change. </P>
 
 <div class="diagram"><IMG src="images/signin-tiles.png"/> <span class="caption"> A typical layout divided into its constituent "tiles" </span>
 </div>
-<P> To enable Apache Tiles for your application, you simply add the following two <CODE>@Bean</CODE> definitions to your
-    <CODE>@Configuration</CODE> class above. </P> <Code class="git-gist" gist="4948952"> @Bean UrlBasedViewResolver
-    @Bean TilesConfigurer </Code>
-
-<P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you with
-    the <CODE class="class-reference"
-              module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>. We need to tell
-    Spring MVC about Apache Tiles, too. We'll register a custom <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
-    which can in turn correctly take strings like "home" and resolve them to the appropriate Tiles definition named
-    "home." </P>
-
-<P> Apache Tiles expects information about the templates to be provided in the form of an XML file, called <CODE>tiles.xml</code>.
-    Apache Tiles supports template inheritance. For example, you might specify the basic template in a file like this
-    (I've placed this at <CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
+<P> The page has a header - the band in yellow, a body - the band in green, and a footer - the band in blue. The header
+    and footer might have slightly dynamic behavior based on whether someone is logged in or not, but we can expect that
+    they'll always be there, so they can be put in the base template definition - the one shared with <EM>all</EM>
+    pages. The only thing that will change on a page-by-page basis is the <code>body</code>. Let's look at the
+    definition of the base template in Tiles' configuration format. Apache Tiles expects information about the templates
+    to be provided in the form of an XML file, called <CODE>tiles.xml</code>. Apache Tiles supports template
+    inheritance. You might specify a base definition to be shared as the basis for other templates like this: (I've
+    placed this at <CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
 
 <div module="web" q="tut_web" extension="xml" class="git-code"> src/main/webapp/WEB-INF/layouts/tiles.xml</div>
-<P> This specifies a <CODE>&lt;definition&gt;</CODE> element that in turn specifies a template to render (the file
-    <CODE>/WEB-INF/layouts/template.jsp</CODE>). The template has regions that are to be substituted for actual content
-    or values at render time. </P> <code class="git-gist" gist="4948600"> html html [tiles:.. ] ... </code>
+<P> This specifies a <CODE>&lt;definition&gt;</CODE> (named <strong><CODE>page</code></strong>) that in turn specifies a
+    template to render (the file <CODE>/WEB-INF/layouts/template.jsp</CODE>). The template has regions that are to be
+    substituted for actual content or values at render time. </P>
 
+<div class="git-gist" gist="4948600"> html html [tiles:.. ] ...</div>
 <P> I've omitted most of the content from this page including the JavaScript and CSS declarations and left only the
     skeletal structure in the example above. In particular, you'll note that we've specified a <CODE>&lt;tiles:insertAttribute&gt;</CODE>
     tag that will attempt to substitute whatever template or value is provided for the region named <EM>content</EM>. If
     you're looking at the <CODE>template.xml</CODE> declaration above, you may be wondering where we specify which
     content is to be substituted into the <EM>content</EM> region. We specify this in each <CODE>tiles.xml</CODE>
     definition that <EM>extends</EM> this root <CODE>tiles.xml</CODE> for each screen. </P>
+
+<p> With this structure in place, it's easy to iterate on new pages as we only have to concern ourselves with the UI
+    elements unique to the page in question. For each page, we need to specify a <CODE>tiles.xml</CODE> file that <EM>extends</EM>
+    the base <code>tiles.xml</code>. Let's look at the configuration for the <CODE>tiles.xml</CODE> for our signin page,
+    <CODE>src/main/webapp/WEB-INF/views/signin/signin.jsp </CODE>. </p>
+
+<div module="web" q="tut_web" extension="jsp" class="git-code"> src/main/webapp/WEB-INF/views/signin/tiles.xml</div>
+<P> This definition (named <strong><code>signin</code></strong>) extends <CODE>page</CODE>, defined above. It specifies
+    the content to be placed in the <CODE>content</CODE> tile from the base definition. The structure of our views looks
+    like this: </P>
+
+<div class="diagram"><IMG src="images/tiles-hierarchy.png"/> <span class="caption"> The <EM>root</EM> Tiles definition lives in <CODE>WEB-INF/layouts/tiles.xml</CODE>, but the individual pages live in <CODE>WEB-INF/views/*/tiles.xml</CODE>. This organizational structure is reflected in the configuration for Apache Tiles in the <CODE
+        class="class-reference"
+        module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
+<h3> Resources, Views and the Default Servlet </h3>
+
+<P> Our application already has a lot going for it, but you'll recall from our configuration in <span module="web"
+                                                                                                      q="tut_web"
+                                                                                                      class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    we <EM>mapped</EM> the Spring <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</CODE>
+    to <CODE>/*</CODE>. <EM>All</EM> requests going to this application will be routed to the Spring MVC <CODE>DispatcherServlet</CODE>
+    in this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
+    to handle the request. If none of the beans are configured to handle the request, it will fail. One effect of this
+    configuration is that the servlet container has been shut out. If we'd specified that we wanted our requests to go
+    to <CODE>/app/*</CODE>, then only URLs prefixed with <CODE>/app/</CODE> would be handed to the <CODE>DispatcherServlet</CODE>
+    for processing. Other requests - for example to assets in the root of the web application like the JavaScript and
+    CSS assets (<CODE>/web/assets/jquery.js</CODE>) - would be served by the Servlet container because no other Servlet
+    is configured to handle those requests. This is a good thing: these are static assets and the Servlet container has
+    a very efficient Servlet that can handle requests to files pre-built. This means there's one less thing for us to
+    write!
+
+    There would seem to be something of a conflict here: the <CODE>DispatcherServlet</CODE> will receive all requests, even those for
+    assets like JavaScript and CSS under the current configuration, but the <EM>default</EM> servlet can do a better job.
+    Spring MVC can help us here, as well. Spring MVC is very configurable.  You simply need to provide implementations  of
+    the various SPIs to override the default configured behavior. We overrode the definition of the
+    <CODE>ViewResolver</CODE> by contributing <CODE>@Bean</CODE> definitions to the configuration context.
+    For more granular configuration, Spring MVC exposes callbacks that we can hook into. These callbacks give us an opportunity to
+    change or extend the defaults. Let's change our class <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>
+     to extend
+    <CODE  class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>, which provides empty implementations of
+    the  interface <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
+</P>
 
 <h1> The Changing Face of the Web </h1>
 
