@@ -345,32 +345,55 @@
         module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
 <h3> Resources, Views and the Default Servlet </h3>
 
-<P> Our application already has a lot going for it, but you'll recall from our configuration in <span module="web"
-                                                                                                      q="tut_web"
-                                                                                                      class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+<P> Our application already has a lot going for it, but we're not done.
+    You'll recall from our configuration in <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    that
     we <EM>mapped</EM> the Spring <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</CODE>
     to <CODE>/*</CODE>. <EM>All</EM> requests going to this application will be routed to the Spring MVC <CODE>DispatcherServlet</CODE>
-    in this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
-    to handle the request. If none of the beans are configured to handle the request, it will fail. One effect of this
-    configuration is that the servlet container has been shut out. If we'd specified that we wanted our requests to go
-    to <CODE>/app/*</CODE>, then only URLs prefixed with <CODE>/app/</CODE> would be handed to the <CODE>DispatcherServlet</CODE>
-    for processing. Other requests - for example to assets in the root of the web application like the JavaScript and
-    CSS assets (<CODE>/web/assets/jquery.js</CODE>) - would be served by the Servlet container because no other Servlet
-    is configured to handle those requests. This is a good thing: these are static assets and the Servlet container has
-    a very efficient Servlet that can handle requests to files pre-built. This means there's one less thing for us to
-    write!
+    with this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
+    to handle the request. What happens if the request isn't handled by a <CODE>@Controller</CODE>-annotated bean? What
+    then? Who, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources?
+</p>
 
-    There would seem to be something of a conflict here: the <CODE>DispatcherServlet</CODE> will receive all requests, even those for
-    assets like JavaScript and CSS under the current configuration, but the <EM>default</EM> servlet can do a better job.
-    Spring MVC can help us here, as well. Spring MVC is very configurable.  You simply need to provide implementations  of
-    the various SPIs to override the default configured behavior. We overrode the definition of the
-    <CODE>ViewResolver</CODE> by contributing <CODE>@Bean</CODE> definitions to the configuration context.
-    For more granular configuration, Spring MVC exposes callbacks that we can hook into. These callbacks give us an opportunity to
-    change or extend the defaults. Let's change our class <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>
-     to extend
-    <CODE  class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>, which provides empty implementations of
-    the  interface <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
+<P> Normally, if no Servlet was mapped to handle a request, the <EM>default</EM> or <EM>file</EM> Servlet provided
+    by the Servlet container handles it. This <EM>default</EM> Servlet's pre-built, usually optimized for rendering
+    resources out of the web application, and very fast.
+
+    As we configured Spring MVC to handle <EM>all</EM> requests, however, we lose the services of this <EM>default</EM> Servlet.
+     Fortunately, with Spring MVC we can have our cake and eat it too!
+
+    </p><P>
+
+    Spring MVC has a lot of functionality that you can override, or enable/disable, by  implementing
+    the interface <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
+     There are a <EM>lot</EM> of callback methods in this class that you can implement that  give you the opportunity to specify
+    a lot of Spring MVC's behavior. To keep our code cleaner and avoid implementing a lot of methods we don't care about,
+    <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code> will extend
+    <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>,
+    which implements <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>
+    providing empty no-op methods.
 </P>
+
+<P>
+    First, let's need to <EM>enable</EM> the default servlet. The default servlet is unique to each web container,
+    and not specified by any standard. Spring MVC can not rely on the availability of this functionality, so
+    it does not, by default. It supports a wide range of deployment targets, though - so chances are it will work for you
+    if you're running this application in Tomcat, Jetty, JBoss, and GlassFish,  Google App Engine, Resin, WebLogic or WebSphere.
+    Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet.
+</P>
+
+<div class="git-gist" gist="5060799">
+     defaultServlet.enable()
+</div>
+<P>
+Once we have the  <EM>default</EM> servlet in place, we can put it to work,  letting it render a few
+     resources we don't want to write handlers for ourselves.
+    This will automatically employ the <EM>default</EM> servlet to render all requests to <code>/web/*</code> and render the appropriate resource
+    in the <CODE>/web/</CODE> directory in  the web application.
+</P>
+ <Div class="git-gist" gist="5060815">
+     addResourceHandlers()...
+ </Div>
 
 <h1> The Changing Face of the Web </h1>
 
