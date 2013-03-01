@@ -271,7 +271,7 @@
 <div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to whatever you like to change the name printed. If it's not present, the code will simply default to printing "World." </span>
 </div>
 <h3>
-     Better Views
+    Better Views
 </h3>
 
 <P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
@@ -321,7 +321,9 @@
     template and then - on a page by page basis - change or override the definition for individual parts (or
     <EM>tile</eM>s) of the template without re-specifying the template over and over. </p>
 <!--install tiles in Spring --> <P> To enable Apache Tiles for your application, you simply add the following two <CODE>@Bean</CODE>
-    definitions to your <CODE>@Configuration</CODE> class above. </P>
+    definitions to your <CODE>@Configuration</CODE> class above. (Be sure to remove the existing <span
+            class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
+</P>
 
 <div class="git-gist" gist="5059411"> @Bean UrlBasedViewResolver @Bean TilesConfigurer</div>
 </p> <P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you
@@ -371,6 +373,10 @@
 <div class="diagram"><IMG src="images/tiles-hierarchy.png"/> <span class="caption"> The <EM>root</EM> Tiles definition lives in <CODE>WEB-INF/layouts/tiles.xml</CODE>, but the individual pages live in <CODE>WEB-INF/views/*/tiles.xml</CODE>. This organizational structure is reflected in the configuration for Apache Tiles in the <CODE
         class="class-reference"
         module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
+<P> Now, when a Spring MVC controller returns <CODE>"signin"</CODE>, the Tiles view definition named <CODE>signin</CODE>
+    will be loaded and rendered.
+</P>
+
 <h3> Resources, Views and the Default Servlet </h3>
 
 <P> Our application already has a lot going for it, but we're not done. You'll recall from our configuration in <span
@@ -379,7 +385,7 @@
     to <CODE>/*</CODE>. <EM>All</EM> requests going to this application will be routed to the Spring MVC <CODE>DispatcherServlet</CODE>
     with this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
     to handle the request. What happens if the request isn't handled by a <CODE>@Controller</CODE>-annotated bean? What
-    then? Who, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources? </p>
+    then? What, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources? </p>
 
 <P> Normally, if no Servlet was mapped to handle a request, the <EM>default</EM> or <EM>file</EM> Servlet provided by
     the Servlet container handles it. This <EM>default</EM> Servlet's pre-built, usually optimized for rendering
@@ -410,7 +416,25 @@
 
 <Div class="git-gist" gist="5060815"> addResourceHandlers()...</Div>
 <!-- now we need to introduce how to handle view controllers. but the things is, theyve not yet seen the full controllerl ifecycle. so perhaps i can introduce that above? -->
-<p></p>
+
+<P>
+    Some pages in an application are read-only - they don't require any functionality or processing logic. It would seem
+    silly to implement
+    a controller and a request handler just to render a view. Spring MVC can handle this eventuality easily: simply
+    declare
+    <EM>view controllers</EM> in the configuration class, like this:
+
+</P>
+
+<div class="git-gist" gist="5067566">
+    addViewControllers()
+</div>
+<P>
+    Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
+    to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
+    anyone sees is the signin form.
+    We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views - in this case, <CODE>signin</CODE>.
+</P>
 
 <h1> The Changing Face of the Web </h1>
 
