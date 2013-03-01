@@ -32,7 +32,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         TilesConfigurer tilesConfigurer = new TilesConfigurer();
         tilesConfigurer.setDefinitions(new String[]{
                 "/WEB-INF/layouts/tiles.xml",
-                "/WEB-INF/viewstiles.xml"
+                "/WEB-INF/views/**/tiles.xml"
         });
         tilesConfigurer.setCheckRefresh(true);
         return tilesConfigurer;
@@ -44,7 +44,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("signin");
-        for (String p : new String[]{"signin", "profile", "customers", "home", "oops"})
+        for (String p : new String[]{ "profile", "customers", "home", "oops"})
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 

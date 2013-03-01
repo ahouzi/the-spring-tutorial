@@ -183,7 +183,8 @@
 <P> Unfortunately, the Servlet environment itself is devoid of most of the basics that any modern web application will
     need. Fortunately, Spring provides these building blocks, letting you assemble them as you like, and letting you
     focus on the task at hand: the business of your application. Here is our Java-based application initializer which
-    installs Spring's Servlet infrastructure classes to support our application. </P>
+    installs Spring's Servlet infrastructure classes to support our application. If you're familiar with Java Servlets, then you'll recognize this
+as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based deployment descriptor. </P>
 
 <div class="walkthrough">
     <div module="web" q="tut_web" extension="java" class="git-code">
@@ -250,7 +251,19 @@
     </LI>
 </uL>
 <p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
-    views in a useful way. As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
+    views in a useful way and it doesn't know about your controllers.
+                               You can use the standard <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
+    annotation to tell Spring to automatically register your data services  (Spring beans that handle our data-access logic)
+    and your Spring MVC controllers (beans annotated with the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation)
+     by scanning all the beans in or below a package, or packages specified. You can specify these packages either as a String or by specifying a
+    class that lives in the package you want to scan. The latter approach is more refactor-friendly: if you change the package structure of your code, your
+    tooling will update references to classes, but might not necessarily refactor Strings that contain a package path.
+
+
+
+
+    </p><P>
+    As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
     some heuristic prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
     Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
     that will render local <CODE>.jsp</code> pages. </p>
@@ -422,7 +435,7 @@
     silly to implement
     a controller and a request handler just to render a view. Spring MVC can handle this eventuality easily: simply
     declare
-    <EM>view controllers</EM> in the configuration class, like this:
+    <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE> method, like this:
 
 </P>
 
@@ -434,6 +447,28 @@
     to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
     anyone sees is the signin form.
     We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views - in this case, <CODE>signin</CODE>.
+</P>
+<P>                     While we're taking care of these sorts of things, let's configure an error handling page.
+    If a component in our web application throws an exception, Spring MVC can redirect to an error page and optionally return
+    an error code for us. For now, we'll install a catch-all error page view by overriding the <CODE>configureHandlerExceptionResolvers</code> method.
+    Here, we've specified that the view named <CODE>oops</CODE> (which we defined above as a <EM>view controller</EM>) is to be rendered wheneverthere's an error, and a
+    <span class="wikipedia">HTTP_404</span>   code is to be returned.
+
+
+
+</P>
+
+<div class="git-gist" gist="5067711">
+    configureHandlerExceptionResolvers
+</div>
+
+<P> With all these changes in place, our final class looks like this: </P>
+<div module="web" q="tut_web" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.config.WebMvcConfiguration
+</div>
+
+
+<P>         Now we can look at a full example
 </P>
 
 <h1> The Changing Face of the Web </h1>
