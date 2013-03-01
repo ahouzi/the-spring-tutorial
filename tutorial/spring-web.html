@@ -236,17 +236,46 @@
         processed and exported as HTTP handlers. If your application is running in a Servlet 3 environment, then <EM>asynchronous</EM>
         controllers are supported as well.
     </LI>
-    <LI> File upload support through the Apache Commons FileUpload library (if detected on the class path) or via the
-        Servlet 3 <CODE class="class-reference" module="servlets">javax.servlet.http.Part</CODE> API.
+    <LI> File upload support through the <A href="http://commons.apache.org/proper/commons-fileupload//">Apache Commons
+        FileUpload library </A> (if detected on the class path) or via the Servlet 3 <CODE class="class-reference"
+                                                                                           module="servlets">javax.servlet.http.Part</CODE>
+        API.
     </LI>
-    <LI><CODE>.jsp</CODE> resource rendering, rendering views at the root of the application.</LI>
-    <LI> REST and JSON and XML marshaling support if the Jackson JSON-Object marshaling library or a JAXB implementation
-        is on the class path.
+    <LI> REST and JSON and XML marshaling support if the <A href="http://jackson.codehaus.org/"> Jackson JSON-Object
+        marshaling library</A> or <A href="http://jaxb.java.net/tutorial/">a JAXB implementation</A> is on the class
+        path.
     </LI>
-    <LI>Bean and form validation if a JSR 303 implementation like Hibernate Validator is on the classpath.</LI>
+    <LI>Bean and form validation if <A href="http://beanvalidation.org/1.0/spec/">a JSR 303</A> implementation <a
+            href="http://www.hibernate.org/subprojects/validator.html">like Hibernate Validator</a> is on the classpath.
+    </LI>
 </uL>
-<P> So, while the default configuration gives you a lot out of the box, we will tailor the code a little bit to support
-    our application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
+<p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
+    views in a useful way. As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
+    some heuristic prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
+    Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
+    that will render local <CODE>.jsp</code> pages. </p>
+
+<div class="git-gist" gist="5067119"> @Bean public InternalResourveViewResolver(){ ... }</div>
+<P> With this in place, Spring MVC will take a view String (say, <CODE>"hi"</CODE>) and resolve it to <CODE>WEB-INF/hi.jsp</CODE>,
+    which it will then render. Let's pause, do a sanity check, and take a moment to deploy a Spring MVC controller
+    complete with a working view. First, add your <CODE>.jsp</CODE> page (<CODE>WEB-INF/hi.jsp</CODE>): </p>
+
+<DIV class="git-gist" gist="5067085"> some jsp content</DIV>
+<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later. Let's
+    just verify everything's working. Add the following class: </p>
+
+<div class="git-gist" gist="5067155"> @Controller HelloWorldController</div>
+<P> Then simply build this and deploy to your application server. You should be able to bring up the page like
+    this: </P>
+
+<div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to whatever you like to change the name printed. If it's not present, the code will simply default to printing "World." </span>
+</div>
+<h3>
+     Better Views
+</h3>
+
+<P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
+    application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
     Spring MVC renders templates for pages. to understand these use cases better, let's look at the pages and screens we
     know we will need to support. </P>
 <TABLE width="600">
@@ -283,8 +312,7 @@
         <td>there should of course be a screen to work with data related to customers.</td>
     </tr>
 </TABLE>
-<h3>Templating with Apache Tiles</h3> <!--what is a templating engine--> <P><img
-        src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
+<P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
     Building individual web pages is easy. Simply slap together some HTML and then you're set. Building web applications
     well, on the other hand, is an entirely different thing. Well built web applications are visually consistent, often
     sharing consistent styling and theme and layout cues across all pages in the application. <A
@@ -345,59 +373,48 @@
         module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
 <h3> Resources, Views and the Default Servlet </h3>
 
-<P> Our application already has a lot going for it, but we're not done.
-    You'll recall from our configuration in <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
-    that
-    we <EM>mapped</EM> the Spring <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</CODE>
+<P> Our application already has a lot going for it, but we're not done. You'll recall from our configuration in <span
+        module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    that we <EM>mapped</EM> the Spring <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</CODE>
     to <CODE>/*</CODE>. <EM>All</EM> requests going to this application will be routed to the Spring MVC <CODE>DispatcherServlet</CODE>
     with this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
     to handle the request. What happens if the request isn't handled by a <CODE>@Controller</CODE>-annotated bean? What
-    then? Who, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources?
-</p>
+    then? Who, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources? </p>
 
-<P> Normally, if no Servlet was mapped to handle a request, the <EM>default</EM> or <EM>file</EM> Servlet provided
-    by the Servlet container handles it. This <EM>default</EM> Servlet's pre-built, usually optimized for rendering
-    resources out of the web application, and very fast.
+<P> Normally, if no Servlet was mapped to handle a request, the <EM>default</EM> or <EM>file</EM> Servlet provided by
+    the Servlet container handles it. This <EM>default</EM> Servlet's pre-built, usually optimized for rendering
+    resources out of the web application, and very fast. As we configured Spring MVC to handle <EM>all</EM> requests,
+    however, we lose the services of this <EM>default</EM> Servlet. Fortunately, with Spring MVC we can have our cake
+    and eat it too! </p>
 
-    As we configured Spring MVC to handle <EM>all</EM> requests, however, we lose the services of this <EM>default</EM> Servlet.
-     Fortunately, with Spring MVC we can have our cake and eat it too!
-
-    </p><P>
-
-    Spring MVC has a lot of functionality that you can override, or enable/disable, by  implementing
-    the interface <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
-     There are a <EM>lot</EM> of callback methods in this class that you can implement that  give you the opportunity to specify
-    a lot of Spring MVC's behavior. To keep our code cleaner and avoid implementing a lot of methods we don't care about,
-    <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code> will extend
-    <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>,
+<P> Spring MVC has a lot of functionality that you can override, or enable/disable, by implementing the interface <CODE
+        class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
+    There are a <EM>lot</EM> of callback methods in this class that you can implement that give you the opportunity to
+    specify a lot of Spring MVC's behavior. To keep our code cleaner and avoid implementing a lot of methods we don't
+    care about, <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>
+    will extend <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>,
     which implements <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>
-    providing empty no-op methods.
-</P>
+    with empty no-op methods. </P>
 
-<P>
-    First, let's need to <EM>enable</EM> the default servlet. The default servlet is unique to each web container,
-    and not specified by any standard. Spring MVC can not rely on the availability of this functionality, so
-    it does not, by default. It supports a wide range of deployment targets, though - so chances are it will work for you
-    if you're running this application in Tomcat, Jetty, JBoss, and GlassFish,  Google App Engine, Resin, WebLogic or WebSphere.
-    Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet.
-</P>
+<P> First, let's need to <EM>enable</EM> the default servlet. The default servlet is unique to each web container, and
+    not specified by any standard. Spring MVC can not rely on the availability of this functionality, so it does not, by
+    default. It supports a wide range of deployment targets, though - so chances are it will work for you if you're
+    running this application in Tomcat, Jetty, JBoss, and GlassFish, Google App Engine, Resin, WebLogic or WebSphere.
+    Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet. </P>
 
-<div class="git-gist" gist="5060799">
-     defaultServlet.enable()
-</div>
-<P>
-Once we have the  <EM>default</EM> servlet in place, we can put it to work,  letting it render a few
-     resources we don't want to write handlers for ourselves.
-    This will automatically employ the <EM>default</EM> servlet to render all requests to <code>/web/*</code> and render the appropriate resource
-    in the <CODE>/web/</CODE> directory in  the web application.
-</P>
- <Div class="git-gist" gist="5060815">
-     addResourceHandlers()...
- </Div>
+<div class="git-gist" gist="5060799"> defaultServlet.enable()</div>
+<P> Once we have the <EM>default</EM> servlet in place, we can put it to work, letting it render a few resources we
+    don't want to write handlers for ourselves. This will automatically employ the <EM>default</EM> servlet to render
+    all requests to <code>/web/*</code> and render the appropriate resource in the <CODE>/web/</CODE> directory in the
+    web application. </P>
+
+<Div class="git-gist" gist="5060815"> addResourceHandlers()...</Div>
+<!-- now we need to introduce how to handle view controllers. but the things is, theyve not yet seen the full controllerl ifecycle. so perhaps i can introduce that above? -->
+<p></p>
 
 <h1> The Changing Face of the Web </h1>
 
-<P> While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
+<P> While individual resources, such as CSS and images and JavaScript are served up by the web server, and while initial
     HTML pages are sent down from the server, much of the interaction that happens between the user and the user
     interface happens these days entirely on the client. The server doesn't really need to get involved too much in
     rendering HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a

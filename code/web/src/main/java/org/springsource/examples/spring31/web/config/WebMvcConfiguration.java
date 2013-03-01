@@ -10,15 +10,15 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
+import org.springsource.examples.spring31.web.ViewController;
 
 import java.util.List;
 
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackageClasses = {CustomerService.class, WebMvcConfiguration.class})
+@ComponentScan(basePackageClasses = {ViewController.class, CustomerService.class})
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
-
 
     @Bean
     public UrlBasedViewResolver viewResolver() {
@@ -32,14 +32,14 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         TilesConfigurer tilesConfigurer = new TilesConfigurer();
         tilesConfigurer.setDefinitions(new String[]{
                 "/WEB-INF/layouts/tiles.xml",
-                "/WEB-INF/views/**/tiles.xml"
+                "/WEB-INF/viewstiles.xml"
         });
         tilesConfigurer.setCheckRefresh(true);
         return tilesConfigurer;
     }
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/web/**").addResourceLocations("/web/");
+        registry.addResourceHandler("/web*").addResourceLocations("/web/");
     }
 
     public void addViewControllers(ViewControllerRegistry registry) {
