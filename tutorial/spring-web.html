@@ -1,4 +1,6 @@
-<html xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .wikipedia {
@@ -6,6 +8,10 @@
 
     .diagram {
         width: 500px;
+    }
+
+    table, th, td, th {
+        vertical-align: top;
     }
 
     .diagram img {
@@ -18,26 +24,93 @@
         display: block;
     }
 
-    code, .class-reference {
+    code, .git-code, .git-gist, .class-reference {
         font-family: courier, monospace;
-        background-color: #dcdcdc;
+        font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript"></script>
+    <script type="text/javascript" lang="javascript"> var StringUtils = { a: function (label, url) {
+        return '<a href="' + url + '">' + label + '</a>';
+    }, code: function (inp) {
+        var lt = '<', gt = '>';
+        while (inp.indexOf(lt) != -1) {
+            inp = inp.replace(lt, '&lt;');
+        }
+        while (inp.indexOf(gt) != -1) {
+            inp = inp.replace(gt, '&gt;');
+        }
+        return "<PRE><CODE>" + inp + "</CODE></PRE>";
+    }, encodeFullyQualifiedPath: function (ref) {
+        var url = ref;
+        while (url.indexOf('.') != -1) {
+            url = url.replace('.', '/');
+        }
+        return url;
+    }, classForFullyQualifiedClass: function (ref) {
+        var lastPeriod = ref.lastIndexOf('.');
+        if (lastPeriod == -1) return ref;
+        return ref.substring(lastPeriod + 1);
+    }}; </script>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/github-files.js"></script>
+    <script src="js/tutorial.js"></script>
 </head>
-<body><h1> Embracing the Web with Spring MVC </h1>
+<body><h1> Building Web Applications with Spring MVC </h1>
+
+<h2>Welcome</h2>
+
+<P> Let's build a simple web application to see how the moving parts fit together. Our application will be a simple
+    Customer Relationship manager (CRM) of sorts. Users can create an account, login and then manage simple customer
+    records. We already have Hibernate-based backend services that manage user (<span module="services" q="tut_web"
+                                                                                      class="class-reference">org.springsource.examples.spring31.services.UserService</span>)
+    and customer (<span module="services" q="tut_web" class="class-reference">org.springsource.examples.spring31.services.CustomerService</span>)
+    data for us.</p>
+
+<P> We're using <A href="http://maven.apache.org">the Apache Maven</A> build tool to include those classes in our web
+    application. <SPAN class="todo">To learn more about how to assemble basic service objects with the Spring framework please see our introduction tutorial.</SPAN>
+    To learn more about working <A
+            href="http://blog.springsource.org/2011/01/17/green-beans-getting-started-with-maven-and-spring/">with
+        Apache Maven and Spring, see this blog post</a>. Maven requires a basic directory structure for all modules in a
+    given Maven project. The structure looks like this: </p> <span class="git-gist" gist="4947010">https://gist.github.com/joshlong/4947010</span>
+
+<P> Our project has two modules, <CODE>services</CODE> and <CODE>web</CODE>. <CODE>services</CODE> exports a services
+    API. The services API is your basic service tier using PostgreSQL and Spring's support for JPA. We won't say much
+    more about it beyond that except that it handles manipulating data in terms of the <CODE></CODE></P>
+
+<P> TODO we need to show them how to setup the database and the sample application Check out the data tutorial for
+    details on data access with Spring. For a complete step by step introduction opn how to setup the sample application
+    please refer to the <CODE>README</CODE>. </P>
+
+<P> In this tutorial we will show you how to do these things with Spring MVC: </p>
+<uL>
+    <LI> Create a working web application</LI>
+    <LI> Handle form submissions</LI>
+    <LI> Build a screen to handle data</LI>
+    <LI> Learn how to expose your data as RESTful web services</LI>
+    <LI> Learn how to work with Spring Security for login and logout support</LI>
+    <LI> Learn how to work with OAuth and Spring Security OAuth</LI>
+</uL>
+<h3> Setting Up the Tool Chain </h3>
+
+<P> TODO show how to import the code and where to get it and how to use STS File &gt; Import and how Maven helps us. Our
+    tutorial is tool agnostic, but we recommend the free STS edition which comes wiht all sorts nice utilities </P>
+
+<P> Also: maven has a certain build structure. </P>
+
+<h2> Building Web Applications with MVC</h2>
 
 <p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span
-        module="spring-web" class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that
-    Spring founder Rod Johnson wrote in his study in England in 2001 were to support Java-based web applications
-    environments. Spring's always had a great support for the web. From the beginning, Spring has featured an MVC
-    framework, called Spring MVC. Spring MVC at the time looked conceptually very similar to the then entrenched Struts
-    framework. While Spring MVC evolved on its own merits, Spring did everything possible to ease the lives of
-    developers using other web frameworks, like Struts. The Spring-Struts integration support in the core Spring web
-    modules made Struts a much nicer proposition for developers who were stuck using Struts, but wanted a cleaner,
-    POJO-centric component model. Indeed, Springs JSF integration for 1.0 and 2.0, as well as the JSF-centric Spring Web
-    Flow, offer drastically improved user experiences for developers stuck on those web frameworks. While Struts is
-    largely a distant memory, and JSF is fast-becoming one, Spring MVC has emerged as, and remained, the most popular
-    Java web framework in the world. </p>
+        module="spring-web" q="tut_web"
+        class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that Spring founder Rod
+    Johnson wrote in his study in England in 2001 were to support Java-based web applications environments. Spring's
+    always had a great support for the web. From the beginning, Spring has featured an MVC framework, called Spring MVC.
+    Spring MVC at the time looked conceptually very similar to the then entrenched Struts framework. While Spring MVC
+    evolved on its own merits, Spring did everything possible to ease the lives of developers using other web
+    frameworks, like Struts. The Spring-Struts integration support in the core Spring web modules made Struts a much
+    nicer proposition for developers who were stuck using Struts, but wanted a cleaner, POJO-centric component model.
+    <!--todo link to what Spring Web Flow is; assume the n00bs don't know -->Indeed, Springs JSF integration for 1.0 and
+    2.0, as well as the JSF-centric Spring Web Flow, offer drastically improved user experiences for developers stuck on
+    those web frameworks. While Struts is largely a distant memory, and JSF is fast-becoming one, Spring MVC has emerged
+    as, and remained, the most popular Java web framework in the world. </p>
 
 <P> There are a lot of reasons for this, but I think it's because Spring MVC has <EM>embraced</EM> the web, not
     attempted to hide developers from it. Indeed, if Spring MVC can be said to <EM>hide</EM> anything, it is the
@@ -53,46 +126,446 @@
     rendering rich interactive user interfaces - is often necessary. This way, programmers can work on the part that
     matters most to them - the business logic - and the Adobe Dreamweaver-toting designers can focus on the styling and
     design of the user interface. To keep programming applications that behave in this way simpler, programmers have
-    adopted a variant of the popular <span class="wikipedia">MVC</span> pattern called
-    <span id="model2mvc" class="wikipedia">Model-2 MVC</span>. This pattern is best visually described like this: </P>
+    adopted a variant of the popular <span class="wikipedia">model-view-controller</span> (MVC) pattern called <span
+            id="model2mvc" class="wikipedia">Model_2</span> MVC. This pattern is best visually described like this: </P>
 
 <div class="diagram"><img src="images/model 2 mvc.png"/> <span class="caption"> The Model-2 MVC pattern </span></div>
-<P> As HTTP requests come in, they're routed to the <EM>front controller</EM> - the <span class="class-reference">org.springframework.web.servlet.DispatcherServlet</span>
+<P> As HTTP requests come in, they're routed to the <EM>front controller</EM> - the <span module="spring-web"
+                                                                                          class="class-reference">org.springframework.web.servlet.DispatcherServlet</span>
     in Spring MVC - which then selects from among the registered <EM>controller</EM> classes and chooses the right one
     to handle the HTTP request. There needs to be some stipulation between the <EM>front controller</EM> and the
     registered controllers as to which controller should handle which request. When the controller is activated, it is
     given access to all the data about the request and it can react accordingly. Once the request is handled, the
-    controller must somehow signal that a response should be rendered. Typically, this means telling the framework
-    which <EM>view</EM>, or <EM>response</EM>, to render. A view might be a designer-provided template that merges data
-    into itself and then renders as HTML. The response might also be something constructed in code in the
-    controller, like file data or the binary data for a PDF or spreadsheet. </P>
+    controller must somehow signal that a response should be rendered. Typically, this means telling the framework which
+    <EM>view</EM>, or <EM>response</EM>, to render. A view might be a designer-provided template that merges data into
+    itself and then renders as HTML. The response might also be something constructed in code in the controller, like
+    file data or the binary data for a PDF or spreadsheet. </P>
 
-<p>
-    Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like
-    the market and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier!
+<h2> Configuring a Servlet 3.0 Container About Our Application</h2>
+
+<p> Working with Spring MVC is <EM>very</EM> straightforward! If you're using a Servlet 3.0 container like the market
+    and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier! Our initial Java
+    web application consists of three classes - <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.WebMvcConfiguration</span>,
+    and <span module="web" q="tut_web"
+              class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and several
+    artifacts to generate the HTML views. Let's look at these classes. </p>
+
+<P> <!-- todo rewrite this to reflect --> To work with any web framework, like Spring MVC, you need to install the
+    various Servlet components using a deployment descriptor (<code>web.xml</code>) or, alternatively, in Servlet 3
+    environments, a Java initializer class. Ours will be a Java Servlet 3.0-compatible web application. Servlet 3.0
+    applications run in any web container that supports Servlet 3.0, including Apache Tomcat 7. You can use Spring in
+    containers that support earlier versions of the Servlet specification, however some Servlet 3.0-specific
+    capabilities - such as Java-based initializer classes and features designed to support asynchronous responses won't
+    work in those environments. We'll mention the Servlet 3.0 specific bits as we encounter them. </p>
+
+<P> The Servlet environment provides a few low level class types that can be used in building web applications. Here are
+    some of the types of classes that we need to be aware of. </P>
+<OL>
+    <LI><B>Servlets</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Servlet</code>
+        that are given a chance to act on incoming HTTP requests and produce replies. This is the most common type of
+        component. <CODE>Servlet</CODE>s are mapped to the URLs that they will respond to by a type of pattern.
+    </LI>
+    <LI><B>Listener</B> - objects of type <CODE module="servlets" class="class-reference">java.util.EventListener</CODE>
+        - typically of a Servlet-speciifc subclass like <CODE module="servlets" class="class-reference">javax.servlet.ServletContextListener</CODE>
+        or <CODE module="servlets" class="class-reference">javax.servlet.http.HttpSessionAttributeListener</CODE>. These
+        classes are notified of various events in the web application such as the creation of data stored in memory, the
+        changes in the Servlet container itself, or changes in one of the Servlets managed by a web application
+        container.
+    </LI>
+    <LI><B>Filters</B> - objects of type <CODE module="servlets" class="class-reference">javax.servlet.Filter</CODE>
+        that are given a chance to act on, or possibly change, incoming HTTP requests before they are routed to the
+        <CODE module="servlets" class="class-reference">javax.servlet.Servlet</CODE>s to which they've been routed and
+        all outbound HTTP replies produced by those <CODE>Servlets</CODE>. This is useful in many scenarios - such as
+        processing security on all requests, or handling things like GZip compression.
+    </LI>
+</OL>
+<P> Unfortunately, the Servlet environment itself is devoid of most of the basics that any modern web application will
+    need. Fortunately, Spring provides these building blocks, letting you assemble them as you like, and letting you
+    focus on the task at hand: the business of your application. Here is our Java-based application initializer which
+    installs Spring's Servlet infrastructure classes to support our application. If you're familiar with Java Servlets,
+    then you'll recognize this
+    as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based deployment descriptor. </P>
+
+<div class="walkthrough">
+    <div module="web" q="tut_web" extension="java" class="git-code">
+        org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer
+    </div>
+    <div><P> The class implements the Spring interface, <span class="class-reference" module="spring-web">org.springframework.web.WebApplicationInitializer</span>.
+        which provides a callback method <CODE>void onStartup(ServletContext servletContext) throws
+            ServletException</CODE>. This method is called as the application is started by the application container,
+        providing a reference to the current <CODE>ServletContext</CODE> which in turn can be used to programmatically
+        construct the various Spring MVC framework components. </P>
+
+        <P> This code does two things. It registers a <CODE module="spring-web" class="class-reference">org.springframework.web.context.ContextLoaderListener</code>
+            that in turn instantaites our Spring <CODE class="class-reference" module="spring-context">org.springframework.context.ApplicationContext</CODE>
+            implementation (<code class="class-reference" q="tut_web" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>)
+            and makes it available to the entire application and all the Servlet components we register. </p>
+
+        <P> Next, we register the <code class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</code>.
+            This is the class that Spring provides to handle all incoming HTTP requests (the aforementioned <EM>front
+                controller</EM>), routing them to the correct <EM>controllers</EM> and working with the other parts of
+            the framework to handle common use cases for us. The <CODE>DispatcherServlet</CODE> can manage its own
+            <CODE>ApplicationContext</CODE> as well as see and work with the <COde>ApplicationContext</COde> instances
+            that the <CODE>ContextLoaderListener</CODE> creates. The <CODE>DispatcherServlet</CODE>'s <CODE>ApplicationContext</CODE>
+            is said to be <EM>parented</EM> by the <CODE>ContextLoaderListener</CODE> <CODE>ApplicationContext</CODE>.
+            You could, for example, register different <CODE>DispatcherServlet</CODE> instances for different parts of
+            the application, and they could share beans in the <EM>parent</EM> <CODE>ApplicationContext</CODE> managed
+            by the <CODE>ContextLoaderListener</CODE>. </p>
+
+        <P> As we're running in a Servlet 3 environment, and want to take advantage of <EM>asynchronous</EM> Spring MVC
+            controllers, this code activates <EM>async</EM> support on all components where appropriate by calling
+            <CODE>setAsync(true)</CODE>. Since we want Spring MVC to have control over the entire application, this code
+            <EM>maps</EM> all components to <CODE>/*</CODE> where possible. This means that <EM>all</EM> requests will
+            be handled by Spring MVC. We can later specialize our routing from within Spring MVC, of course. </P></div>
+</div>
+<h2> Configuring Spring MVC </h2>
+
+<h3> Convention over Configuration, Mostly </h3>
+
+<P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
+    and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
+    MVC, you simply need to add <CODE module="spring-webmvc" class="class-reference">org.springframework.web.servlet.config.annotation.EnableWebMvc</CODE>
+    to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. </p>
+
+<div class="git-gist" gist="4726096"> @Configuration @EnableWebMvc public class WebMvcConfiguration {}</div>
+<P> By default, this will activate many things based on conventions and the availability of certain libraries on the
+    class path. Some of the things supported out of the box: </P>
+<uL>
+    <LI> The Spring MVC <CODE class="class-reference"
+                              module="spring-context">org.springframework.stereotype.Controller</CODE>-annotation based
+        component model is turned on. All Spring beans annotated with this stereotype annotation will automatically be
+        processed and exported as HTTP handlers. If your application is running in a Servlet 3 environment, then <EM>asynchronous</EM>
+        controllers are supported as well.
+    </LI>
+    <LI> File upload support through the <A href="http://commons.apache.org/proper/commons-fileupload//">Apache Commons
+        FileUpload library </A> (if detected on the class path) or via the Servlet 3 <CODE class="class-reference"
+                                                                                           module="servlets">javax.servlet.http.Part</CODE>
+        API.
+    </LI>
+    <LI> REST and JSON and XML marshaling support if the <A href="http://jackson.codehaus.org/"> Jackson JSON-Object
+        marshaling library</A> or <A href="http://jaxb.java.net/tutorial/">a JAXB implementation</A> is on the class
+        path.
+    </LI>
+    <LI>Bean and form validation if <A href="http://beanvalidation.org/1.0/spec/">a JSR 303</A> implementation <a
+            href="http://www.hibernate.org/subprojects/validator.html">like Hibernate Validator</a> is on the classpath.
+    </LI>
+</uL>
+<p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
+    views in a useful way and it doesn't know about your controllers.
+    You can use the standard <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
+    annotation to tell Spring to automatically register your data services (Spring beans that handle our data-access
+    logic)
+    and your Spring MVC controllers (beans annotated with the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE>
+    annotation)
+    by scanning all the beans in or below a package, or packages specified. You can specify these packages either as a
+    String or by specifying a
+    class that lives in the package you want to scan. The latter approach is more refactor-friendly: if you change the
+    package structure of your code, your
+    tooling will update references to classes, but might not necessarily refactor Strings that contain a package path.
 
 
 </p>
-<!-- todo code showing hwo to setup the simplest possible spring MVC application and configuration!  -->
-<h1>
-    The Changing Face of the Web
-</h1>
 
 <P>
-    While individual resources, such as CSS and images and JavaScript are served up the web server, and while initial
-    HTML pagses are sent down from the server, much of the interaction that happens between the user and the user
-    interface
-    happens these days entirely on the cleint. The server doesn't really need to get involved too much in rendering
-    HTML,
-    besides serving the initial page load and the resources to support it. Nowadays, the client can do a <EM>lot</EM>
-    of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all the
-    server has to do is keep <EM>business</EM> state, and make that available to the client.
-    <!-- it does this thorugh REST ... -->
-</p>
+    As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
+    some heuristic prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
+    Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
+    that will render local <CODE>.jsp</code> pages. </p>
 
-<P> It does through REST, which was introduced by Roy Fielding in his <a href="">2000 doctoral dissertation
-    <!--todo link to roy fieldings paper--></a>.
-</p>
+<div class="git-gist" gist="5067119"> @Bean public InternalResourveViewResolver(){ ... }</div>
+<P> With this in place, Spring MVC will take a view String (say, <CODE>"hi"</CODE>) and resolve it to <CODE>WEB-INF/hi.jsp</CODE>,
+    which it will then render. Let's pause, do a sanity check, and take a moment to deploy a Spring MVC controller
+    complete with a working view. First, add your <CODE>.jsp</CODE> page (<CODE>WEB-INF/hi.jsp</CODE>): </p>
 
-</body>
+<DIV class="git-gist" gist="5067085"> some jsp content</DIV>
+<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later. Let's
+    just verify everything's working. Add the following class: </p>
+
+<div class="git-gist" gist="5067155"> @Controller HelloWorldController</div>
+<P> Then simply build this and deploy to your application server. You should be able to bring up the page like
+    this: </P>
+
+<div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to
+    whatever you like to change the name printed. If the name query  parameter is  not present, the code will simply default to printing "World." </span>
+</div>
+<h3>
+    Better Views
+</h3>
+
+<P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
+    application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
+    Spring MVC renders templates for pages. to understand these use cases better, let's look at the pages and screens we
+    know we will need to support. </P>
+<TABLE width="600">
+    <thead>
+    <TR>
+        <th> Page</th>
+        <th> Preview of Page</th>
+        <th> Description</th>
+    </TR>
+    </thead>
+    <tr>
+        <td><b> signin</b></td>
+        <TD><img width="300" src="images/signin.png"/></TD>
+        <td> a page where users can sign in. This should be the home page users are greeted with when they visit the
+            application for the first time (under <CODE>/*</CODE>).
+        </td>
+    </tr>
+    <tr>
+        <td><b>signup</b></td>
+        <TD><img width="300" src="images/signup.png"/></TD>
+        <td> users should be able to sign up for a new account and potentially register via FaceBook</td>
+    </tr>
+    <!-- <tr> <td><b> oops </b></td> <TD><img width="300" src="images/oops.png"/></TD> <td> this is the page to show when ever there is an error in the system. Maybe the user accesses the wrong page and needs to be given a 404, or perhaps the system throws some sort of awful as-yet-uknown error. Handling this gracefully is a mark of polish. </td> </tr>-->
+    <tr>
+        <td><b> profile </b></td>
+        <TD><img width="300" src="images/profile.png"/></TD>
+        <td> there needs to be some place where users can update their profile information like their password and other
+            features (like a profile photo?).
+        </td>
+    </tr>
+    <tr>
+        <td><b>customers </b></td>
+        <TD><img width="300" src="images/customers.png"/></TD>
+        <td>there should of course be a screen to work with data related to customers.</td>
+    </tr>
+</TABLE>
+<P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
+    Building individual web pages is easy. Simply slap together some HTML and then you're set. Building web applications
+    well, on the other hand, is an entirely different thing. Well built web applications are visually consistent, often
+    sharing consistent styling and theme and layout cues across all pages in the application. <A
+            href="http://tiles.apache.org/">Apache Tiles</a> is a very common templating engine. Apache Tiles lets you
+    extract <EM>the things that stay the same from the things that change</EM>, in other words: it lets you define a
+    template and then - on a page by page basis - change or override the definition for individual parts (or
+    <EM>tile</eM>s) of the template without re-specifying the template over and over. </p>
+<!--install tiles in Spring --> <P> To enable Apache Tiles for your application, you simply add the following two <CODE>@Bean</CODE>
+    definitions to your <CODE>@Configuration</CODE> class above. (Be sure to remove the existing <span
+            class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
+</P>
+
+<div class="git-gist" gist="5059411"> @Bean UrlBasedViewResolver @Bean TilesConfigurer</div>
+</p> <P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you
+    with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>.
+    Recall that Spring MVC delegates to <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
+    instances to translate strings like <CODE>home</CODE> to an appropriate view template. The <code
+            module="spring-webmvc"
+            class="class-reference">org.springframework.web.servlet.view.tiles2.TilesViewResolver</code> resolves the
+    appropriate Tiles definitions. </P> <!-- then look at a page --> <P> If you look at the swath of screen shots above,
+    it's not hard to identify the common elements in our page layouts. In the diagram below, I've drawn colored boxes
+    over the parts of the page that could be expected to change. </P>
+
+<div class="diagram"><IMG src="images/signin-tiles.png"/> <span class="caption"> A typical layout divided into its constituent "tiles" </span>
+</div>
+<P> The page has a header - the band in yellow, a body - the band in green, and a footer - the band in blue. The header
+    and footer might have slightly dynamic behavior based on whether someone is logged in or not, but we can expect that
+    they'll always be there, so they can be put in the base template definition - the one shared with <EM>all</EM>
+    pages. The only thing that will change on a page-by-page basis is the <code>body</code>. Let's look at the
+    definition of the base template in Tiles' configuration format. Apache Tiles expects information about the templates
+    to be provided in the form of an XML file, called <CODE>tiles.xml</code>. Apache Tiles supports template
+    inheritance. You might specify a base definition to be shared as the basis for other templates like this: (I've
+    placed this at <CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
+
+<div module="web" q="tut_web" extension="xml" class="git-code"> src/main/webapp/WEB-INF/layouts/tiles.xml</div>
+<P> This specifies a <CODE>&lt;definition&gt;</CODE> (named <strong><CODE>page</code></strong>) that in turn specifies a
+    template to render (the file <CODE>/WEB-INF/layouts/template.jsp</CODE>). The template has regions that are to be
+    substituted for actual content or values at render time. </P>
+
+<div class="git-gist" gist="4948600"> html html [tiles:.. ] ...</div>
+<P> I've omitted most of the content from this page including the JavaScript and CSS declarations and left only the
+    skeletal structure in the example above. In particular, you'll note that we've specified a <CODE>&lt;tiles:insertAttribute&gt;</CODE>
+    tag that will attempt to substitute whatever template or value is provided for the region named <EM>content</EM>. If
+    you're looking at the <CODE>template.xml</CODE> declaration above, you may be wondering where we specify which
+    content is to be substituted into the <EM>content</EM> region. We specify this in each <CODE>tiles.xml</CODE>
+    definition that <EM>extends</EM> this root <CODE>tiles.xml</CODE> for each screen. </P>
+
+<p> With this structure in place, it's easy to iterate on new pages as we only have to concern ourselves with the UI
+    elements unique to the page in question. For each page, we need to specify a <CODE>tiles.xml</CODE> file that <EM>extends</EM>
+    the base <code>tiles.xml</code>. Let's look at the configuration for the <CODE>tiles.xml</CODE> for our signin page,
+    <CODE>src/main/webapp/WEB-INF/views/signin/signin.jsp </CODE>. </p>
+
+<div module="web" q="tut_web" extension="jsp" class="git-code"> src/main/webapp/WEB-INF/views/signin/tiles.xml</div>
+<P> This definition (named <strong><code>signin</code></strong>) extends <CODE>page</CODE>, defined above. It specifies
+    the content to be placed in the <CODE>content</CODE> tile from the base definition. The structure of our views looks
+    like this: </P>
+
+<div class="diagram"><IMG src="images/tiles-hierarchy.png"/> <span class="caption"> The <EM>root</EM> Tiles definition lives in <CODE>WEB-INF/layouts/tiles.xml</CODE>, but the individual pages live in <CODE>WEB-INF/views/*/tiles.xml</CODE>. This organizational structure is reflected in the configuration for Apache Tiles in the <CODE
+        class="class-reference"
+        module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
+<P> Now, when a Spring MVC controller returns <CODE>"signin"</CODE>, the Tiles view definition named <CODE>signin</CODE>
+    will be loaded and rendered.
+</P>
+
+<h3> Resources, Views and the Default Servlet </h3>
+
+<P> Our application already has a lot going for it, but we're not done. You'll recall from our configuration in <span
+        module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
+    that we <EM>mapped</EM> the Spring <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.DispatcherServlet</CODE>
+    to <CODE>/*</CODE>. <EM>All</EM> requests going to this application will be routed to the Spring MVC <CODE>DispatcherServlet</CODE>
+    with this configuration. There, the <CODE>DispatcherServlet</CODE> will look for a Spring bean annotated with <COde>@Configuration</COde>
+    to handle the request. What happens if the request isn't handled by a <CODE>@Controller</CODE>-annotated bean? What
+    then? What, for example, handles requests for <CODE>*.js</CODE> and <CODE>*.css</CODE> resources? </p>
+
+<P> Normally, if no Servlet was mapped to handle a request, the <EM>default</EM> or <EM>file</EM> Servlet provided by
+    the Servlet container handles it. This <EM>default</EM> Servlet's pre-built, usually optimized for rendering
+    resources out of the web application, and very fast. As we configured Spring MVC to handle <EM>all</EM> requests,
+    however, we lose the services of this <EM>default</EM> Servlet. Fortunately, with Spring MVC we can have our cake
+    and eat it too! </p>
+
+<P> Spring MVC has a lot of functionality that you can override, or enable/disable, by implementing the interface <CODE
+        class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>.
+    There are a <EM>lot</EM> of callback methods in this class that you can implement that give you the opportunity to
+    specify a lot of Spring MVC's behavior. To keep our code cleaner and avoid implementing a lot of methods we don't
+    care about, <code class="class-reference" module="web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</code>
+    will extend <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter</CODE>,
+    which implements <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>
+    with empty no-op methods. </P>
+
+<P> First, let's need to <EM>enable</EM> the default servlet. The default servlet is unique to each web container, and
+    not specified by any standard. Spring MVC can not rely on the availability of this functionality, so it does not, by
+    default. It supports a wide range of deployment targets, though - so chances are it will work for you if you're
+    running this application in Tomcat, Jetty, JBoss, and GlassFish, Google App Engine, Resin, WebLogic or WebSphere.
+    Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet. </P>
+
+<div class="git-gist" gist="5060799"> defaultServlet.enable()</div>
+<P> Once we have the <EM>default</EM> servlet in place, we can put it to work, letting it render a few resources we
+    don't want to write handlers for ourselves. This will automatically employ the <EM>default</EM> servlet to render
+    all requests to <code>/web/*</code> and render the appropriate resource in the <CODE>/web/</CODE> directory in the
+    web application. </P>
+
+<Div class="git-gist" gist="5060815"> addResourceHandlers()...</Div>
+<!-- now we need to introduce how to handle view controllers. but the things is, theyve not yet seen the full controllerl ifecycle. so perhaps i can introduce that above? -->
+
+<P>
+    Some pages in an application are read-only - they don't require any functionality or processing logic. It would seem
+    silly to implement
+    a controller and a request handler just to render a view. Spring MVC can handle this eventuality easily: simply
+    declare
+    <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE> method, like
+    this:
+
+</P>
+
+<div class="git-gist" gist="5067566">
+    addViewControllers()
+</div>
+<P>
+    Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
+    to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
+    anyone sees is the signin form.
+    We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views - in this case, <CODE>signin</CODE>.
+</P>
+
+<P> While we're taking care of these sorts of things, let's configure an error handling page.
+    If a component in our web application throws an exception, Spring MVC can redirect to an error page and optionally
+    return
+    an error code for us. For now, we'll install a catch-all error page view by overriding the <CODE>configureHandlerExceptionResolvers</code>
+    method.
+    Here, we've specified that the view named <CODE>oops</CODE> (which we defined above as a <EM>view controller</EM>)
+    is to be rendered wheneverthere's an error, and a
+    <span class="wikipedia">HTTP_404</span> code is to be returned.
+</P>
+
+<div class="git-gist" gist="5067711">
+    configureHandlerExceptionResolvers
+</div>
+
+<P> With all these changes in place, our final class looks like this: </P>
+
+<div module="web" q="tut_web" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.config.WebMvcConfiguration
+</div>
+
+
+<P>
+    With all of this in place, we can now serve complex pages using Apache Tiles, JSP, and we can easily stream
+    resources like
+    JavaScript and CSS files.
+
+    There's a <EM>lot</EM> more that we could look at, but this is a good start.
+
+</P>
+
+
+<h1>
+    The Changing Face of the Web: Working with Business State using REST
+</h1>
+<!--
+  outline :
+   - servers are good at serving resources
+   - but the client is where the real UI ahppens
+   - the clients really smart. VERY smart. witness the jslinux
+   - so, what dio we need the server for? Business state!
+   - what's the easiest way to access it? Via REST
+   - what is REST? Roy Fielding
+   - how do we use it fronm Spring? There are 2 stories: client and server
+
+-->
+  <h2> The Smarter Client
+  </h2>
+
+<P>
+
+<div style="float:left;margin-right:10px; width: 520px;">
+    <div style="margin-bottom: 10px" class="diagram"><img src="images/green-screen-dinosaur.jpg"/> <span class="caption">
+
+    Computer monitors used to come in three colors: green, white, and amber, always on a black background.
+
+</span></div>
+    <div  style="margin-bottom: 10px"  class="diagram"><img src="images/tim-berners-lee-NextCube.jpg"/> <span class="caption">
+      Tim Berners-Lee's NextStep Cube. I love the warning on the machine - "This machine is a server. DO NOT POWER DOWN!!"
+    Imagine the implications!  Imagine <EM>powering down</EM> <B>the web</B>! Eeery.
+
+
+</span> </div></div>
+
+
+
+    Before the 'web, we had mainframes and thin clients. These clients were remarkably stupid. No client side state at
+    all. The server would send down the updates to the clients and the clients would render them. Every time.
+    <a href="http://www.w3.org/People/Berners-Lee/">Tim Berners-Lee</a>
+    invented the World Wide Web while at CERN, the European Particle Physics Laboratory, in 1989.
+    He wrote the first web client and server in 1990. His specifications of URIs, HTTP and HTML were refined as Web technology spread.
+    The initial makeup of the web was fairly underwhelming. The first several years were uneventful  because  the clients - HTTP browsers -
+    were no more impressive than the
+    green-screen clients they replaced. They were dumb. <EM>Very</EM> dumb.
+    Slowly, functionality was added to make the browsers smarter.
+     As time progressed, the community devised of stopgap solutions to make the web a nicer place to build web applications.
+    These were, on the whole, hacks. As time progressed, these hacks were baked into the browsers
+    and into the standards driving HTTP, HTML and the web in general.
+
+    </P><P>
+    To keep pace, the  client-side browsers have taken a quantum leap in the last decade! Now, we have <EM>really</EM> smart clients.
+    JavaScript, the language that runs within the browsers, has grown by leaps and bounds and can do <EM>almost </EM> anything.
+    Witness, for example, <a href="http://bellard.org/jslinux/">this JavaScript PC emulator by Fabrice Bellard </a>. It boots Linux.
+    Seriously. When you run it,  it dumps you into a shell where you can  use <code>vi</code> to edit the file
+    <CODE>hello.c</CODE>. Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in JavaScript.
+
+
+</P>
+ <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I  invite you to consult our tutorial
+    <span style="color: red"> (TODO!!!) on  building better client applications with Spring</span>.
+
+     <!-- TODO link to our tutorial for client side JavaScript and s2js-->
+
+</P>
+<P>  What role does the server play here?
+
+  While individual resources, such as CSS and images and JavaScript,
+    are served up by the web server, and while initial HTML pages are sent down from the server,
+    much of the interaction that happens between the user and the user
+    interface happens these days entirely on the client. The server doesn't really need to get involved too much in
+    rendering HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a
+    <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all
+    the server has to do is keep <EM>business</EM> state, and make that available to the client.
+  </p>
+<P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is
+    the  most common     way to expose server side business state to clients.  REST builds upon the principles of HTTP, so
+    doesn't require any new infrastructure or any specialized types of middleware.  </p>
+
+<P> Spring  MVC supports REST naturally. </P>
+
+
+
+<A name="eof"/></body>
 </html>
