@@ -183,8 +183,9 @@
 <P> Unfortunately, the Servlet environment itself is devoid of most of the basics that any modern web application will
     need. Fortunately, Spring provides these building blocks, letting you assemble them as you like, and letting you
     focus on the task at hand: the business of your application. Here is our Java-based application initializer which
-    installs Spring's Servlet infrastructure classes to support our application. If you're familiar with Java Servlets, then you'll recognize this
-as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based deployment descriptor. </P>
+    installs Spring's Servlet infrastructure classes to support our application. If you're familiar with Java Servlets,
+    then you'll recognize this
+    as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based deployment descriptor. </P>
 
 <div class="walkthrough">
     <div module="web" q="tut_web" extension="java" class="git-code">
@@ -252,17 +253,21 @@ as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-b
 </uL>
 <p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
     views in a useful way and it doesn't know about your controllers.
-                               You can use the standard <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
-    annotation to tell Spring to automatically register your data services  (Spring beans that handle our data-access logic)
-    and your Spring MVC controllers (beans annotated with the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation)
-     by scanning all the beans in or below a package, or packages specified. You can specify these packages either as a String or by specifying a
-    class that lives in the package you want to scan. The latter approach is more refactor-friendly: if you change the package structure of your code, your
+    You can use the standard <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
+    annotation to tell Spring to automatically register your data services (Spring beans that handle our data-access
+    logic)
+    and your Spring MVC controllers (beans annotated with the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE>
+    annotation)
+    by scanning all the beans in or below a package, or packages specified. You can specify these packages either as a
+    String or by specifying a
+    class that lives in the package you want to scan. The latter approach is more refactor-friendly: if you change the
+    package structure of your code, your
     tooling will update references to classes, but might not necessarily refactor Strings that contain a package path.
 
 
+</p>
 
-
-    </p><P>
+<P>
     As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
     some heuristic prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
     Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
@@ -436,7 +441,8 @@ as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-b
     silly to implement
     a controller and a request handler just to render a view. Spring MVC can handle this eventuality easily: simply
     declare
-    <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE> method, like this:
+    <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE> method, like
+    this:
 
 </P>
 
@@ -449,11 +455,15 @@ as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-b
     anyone sees is the signin form.
     We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views - in this case, <CODE>signin</CODE>.
 </P>
-<P>                     While we're taking care of these sorts of things, let's configure an error handling page.
-    If a component in our web application throws an exception, Spring MVC can redirect to an error page and optionally return
-    an error code for us. For now, we'll install a catch-all error page view by overriding the <CODE>configureHandlerExceptionResolvers</code> method.
-    Here, we've specified that the view named <CODE>oops</CODE> (which we defined above as a <EM>view controller</EM>) is to be rendered wheneverthere's an error, and a
-    <span class="wikipedia">HTTP_404</span>   code is to be returned.
+
+<P> While we're taking care of these sorts of things, let's configure an error handling page.
+    If a component in our web application throws an exception, Spring MVC can redirect to an error page and optionally
+    return
+    an error code for us. For now, we'll install a catch-all error page view by overriding the <CODE>configureHandlerExceptionResolvers</code>
+    method.
+    Here, we've specified that the view named <CODE>oops</CODE> (which we defined above as a <EM>view controller</EM>)
+    is to be rendered wheneverthere's an error, and a
+    <span class="wikipedia">HTTP_404</span> code is to be returned.
 </P>
 
 <div class="git-gist" gist="5067711">
@@ -461,26 +471,101 @@ as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-b
 </div>
 
 <P> With all these changes in place, our final class looks like this: </P>
+
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
 </div>
 
 
 <P>
-Now we can look at a full example
+    With all of this in place, we can now serve complex pages using Apache Tiles, JSP, and we can easily stream
+    resources like
+    JavaScript and CSS files.
+
+    There's a <EM>lot</EM> more that we could look at, but this is a good start.
+
 </P>
 
 
-<h1> The Changing Face of the Web </h1>
+<h1>
+    The Changing Face of the Web: Working with Business State using REST
+</h1>
+<!--
+  outline :
+   - servers are good at serving resources
+   - but the client is where the real UI ahppens
+   - the clients really smart. VERY smart. witness the jslinux
+   - so, what dio we need the server for? Business state!
+   - what's the easiest way to access it? Via REST
+   - what is REST? Roy Fielding
+   - how do we use it fronm Spring? There are 2 stories: client and server
 
-<P> While individual resources, such as CSS and images and JavaScript are served up by the web server, and while initial
-    HTML pages are sent down from the server, much of the interaction that happens between the user and the user
+-->
+  <h2> The Smarter Client
+  </h2>
+
+<P>
+
+<div style="float:left;margin-right:10px; width: 520px;">
+    <div style="margin-bottom: 10px" class="diagram"><img src="images/green-screen-dinosaur.jpg"/> <span class="caption">
+
+    Computer monitors used to come in three colors: green, white, and amber, always on a black background.
+
+</span></div>
+    <div  style="margin-bottom: 10px"  class="diagram"><img src="images/tim-berners-lee-NextCube.jpg"/> <span class="caption">
+      Tim Berners-Lee's NextStep Cube. I love the warning on the machine - "This machine is a server. DO NOT POWER DOWN!!"
+    Imagine the implications!  Imagine <EM>powering down</EM> <B>the web</B>! Eeery.
+
+
+</span> </div></div>
+
+
+
+    Before the 'web, we had mainframes and thin clients. These clients were remarkably stupid. No client side state at
+    all. The server would send down the updates to the clients and the clients would render them. Every time.
+    <a href="http://www.w3.org/People/Berners-Lee/">Tim Berners-Lee</a>
+    invented the World Wide Web while at CERN, the European Particle Physics Laboratory, in 1989.
+    He wrote the first web client and server in 1990. His specifications of URIs, HTTP and HTML were refined as Web technology spread.
+    The initial makeup of the web was fairly underwhelming. The first several years were uneventful  because  the clients - HTTP browsers -
+    were no more impressive than the
+    green-screen clients they replaced. They were dumb. <EM>Very</EM> dumb.
+    Slowly, functionality was added to make the browsers smarter.
+     As time progressed, the community devised of stopgap solutions to make the web a nicer place to build web applications.
+    These were, on the whole, hacks. As time progressed, these hacks were baked into the browsers
+    and into the standards driving HTTP, HTML and the web in general.
+
+    </P><P>
+    To keep pace, the  client-side browsers have taken a quantum leap in the last decade! Now, we have <EM>really</EM> smart clients.
+    JavaScript, the language that runs within the browsers, has grown by leaps and bounds and can do <EM>almost </EM> anything.
+    Witness, for example, <a href="http://bellard.org/jslinux/">this JavaScript PC emulator by Fabrice Bellard </a>. It boots Linux.
+    Seriously. When you run it,  it dumps you into a shell where you can  use <code>vi</code> to edit the file
+    <CODE>hello.c</CODE>. Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in JavaScript.
+
+
+</P>
+ <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I  invite you to consult our tutorial
+    <span style="color: red"> (TODO!!!) on  building better client applications with Spring</span>.
+
+     <!-- TODO link to our tutorial for client side JavaScript and s2js-->
+
+</P>
+<P>  What role does the server play here?
+
+  While individual resources, such as CSS and images and JavaScript,
+    are served up by the web server, and while initial HTML pages are sent down from the server,
+    much of the interaction that happens between the user and the user
     interface happens these days entirely on the client. The server doesn't really need to get involved too much in
     rendering HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a
     <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all
     the server has to do is keep <EM>business</EM> state, and make that available to the client.
-    <!-- it does this thorugh REST ... --> </p>
+  </p>
+<P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is
+    the  most common
+</P>
 
 <P> It does through REST, which was introduced by Roy Fielding in his <a href="">2000 doctoral dissertation
-    <!--todo link to roy fieldings paper--></a>. </p> <A name="eof"/></body>
+    <!--todo link to roy fieldings paper--></a>. </p>
+
+
+<A name="eof"/></body>
 </html>

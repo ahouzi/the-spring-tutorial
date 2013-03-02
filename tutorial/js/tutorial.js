@@ -92,8 +92,16 @@ $(function () {
 
     visitElements('.git-gist', ['q' , 'module', 'gist'], function (node, val, attrs) {
         var q = attrs['q'], gist = attrs['gist'], mod = attrs['module'];
-        $.getGithubGist( 'joshlong', gist,  function (data) {
-            node.html(StringUtils.code(data));
+        var user='joshlong'
+        $.getGithubGist( user , gist,  function (data) {
+            var html =StringUtils.code(data)
+            var url = 'https://gist.github.com/' + user+ '/'+ gist +'/edit' ;
+
+            html += '<div style="font-family:sans-serif;font-size:smaller;"><a target="_blank" href="' +url + '">GIST # ' + gist+ '</a></div>' ;
+            node.html( html );
+
+            // maybe we can append something so that i can see where the gist came from ?
+
         });
     });
 
