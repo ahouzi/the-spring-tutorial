@@ -23,8 +23,8 @@ import java.util.List;
 @Controller
 public class CustomerApiController {
 
-    static public final String CUSTOMER_COLLECTION_URL = "/api/crm/{userId}/customers";
     static public final String CUSTOMER_SEARCH = "/api/crm/search";
+    static public final String CUSTOMER_COLLECTION_URL = "/api/crm/{userId}/customers";
     static public final String CUSTOMER_COLLECTION_ENTRY_URL = CUSTOMER_COLLECTION_URL + "/{customerId}";
 
     private Logger log = Logger.getLogger(getClass());
