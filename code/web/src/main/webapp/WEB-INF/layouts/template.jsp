@@ -67,7 +67,7 @@
 
             <A href="${pageContext.request.contextPath}/crm/signin.html">Sign In</a>
 
-            Welcome  ${signedInUser.username}.
+            Welcome  ${username}.
 
             <span>
                 <a href="${pageContext.request.contextPath}/crm/profile.html">My Profile</a> |

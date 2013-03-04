@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
 import org.springsource.examples.spring31.web.CustomerApiController;
+import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import java.util.Arrays;
@@ -76,7 +77,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return commonsMultipartResolver;
     }
 
-
     // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -84,5 +84,10 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
         mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
         converters.add(mappingJacksonHttpMessageConverter);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
     }
 }

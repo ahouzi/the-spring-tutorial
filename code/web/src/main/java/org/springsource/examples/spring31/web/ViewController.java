@@ -16,6 +16,8 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class ViewController {
 
+    public static final String CRM_SIGNIN_PAGE = "/crm/signin.html";
+
     public static final String USER_OBJECT_KEY = "signedInUser";
 
     private UserService userService;
@@ -25,13 +27,21 @@ public class ViewController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/crm/users/signin", method = RequestMethod.POST)
+    @RequestMapping(value = CRM_SIGNIN_PAGE, method = RequestMethod.GET)
+    public String showSignInPage() throws Throwable {
+        return "signin";
+    }
+
+
+    @RequestMapping(value = CRM_SIGNIN_PAGE, method = RequestMethod.POST)
     public String signin(@RequestParam("username") String user,
                          @RequestParam("pw") String pw,
                          HttpSession httpSession) throws Throwable {
         User u = this.userService.login(user, pw);
         assert u != null : "the user can't be null";
         httpSession.setAttribute(USER_OBJECT_KEY, u);
-        return "profile";
+        return "redirect:/crm/profile.html";
     }
+
+
 }

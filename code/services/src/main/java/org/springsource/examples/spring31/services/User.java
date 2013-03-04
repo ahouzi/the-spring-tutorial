@@ -2,6 +2,7 @@ package org.springsource.examples.spring31.services;
 
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
  * @author Josh Long
  */
 @Entity(name = "UserAccount")
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
