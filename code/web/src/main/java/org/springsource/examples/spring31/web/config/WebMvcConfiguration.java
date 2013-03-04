@@ -1,10 +1,8 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
@@ -16,10 +14,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.services.UserService;
 import org.springsource.examples.spring31.web.CustomerApiController;
-import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
-import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import java.util.Arrays;
@@ -32,28 +27,6 @@ import java.util.List;
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
-
-    @Bean(name = "filterMultipartResolver")
-    public CommonsMultipartResolver filterMultipartResolver() {
-        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-        commonsMultipartResolver.setMaxUploadSize(maxUploadSizeInMb);
-        return commonsMultipartResolver;
-    }
-
-    @Bean
-    public UserSignInUtilities userSignInUtilities(UserService userService) {
-        return new UserSignInUtilities(userService);
-    }
-
-
-    // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-        mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-        converters.add(mappingJacksonHttpMessageConverter);
-    }
 
 
     @Bean
@@ -74,23 +47,14 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return tilesConfigurer;
     }
 
-    // todo show and teach i18n
-    @Bean
-    public MessageSource messageSource() {
-        String[] baseNames = "messages".split(",");
-        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
-        resourceBundleMessageSource.setBasenames(baseNames);
-        return resourceBundleMessageSource;
-    }
-
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/web/**").addResourceLocations("/web/");
+        registry.addResourceHandler("/web*").addResourceLocations("/web/");
     }
 
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("signin");
-        for (String p : "signin,profile,customers,home,oops".split(","))
+        for (String p : new String[]{"signup", "profile", "customers", "home", "oops"})
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 
@@ -98,7 +62,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         configurer.enable();
     }
 
-    // configures an error page
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         SimpleMappingExceptionResolver simpleMappingExceptionResolver = new SimpleMappingExceptionResolver();
         simpleMappingExceptionResolver.setDefaultErrorView("oops");
@@ -106,10 +69,20 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         exceptionResolvers.add(simpleMappingExceptionResolver);
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
+    @Bean(name = "filterMultipartResolver")
+    public CommonsMultipartResolver filterMultipartResolver() {
+        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
+        commonsMultipartResolver.setMaxUploadSize(maxUploadSizeInMb);
+        return commonsMultipartResolver;
     }
 
 
+    // todo show how to contribute custom HttpMessageConverters and why, in this case, to handle Hibernate's lazy collections over json
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
+        mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
+        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
+        converters.add(mappingJacksonHttpMessageConverter);
+    }
 }
