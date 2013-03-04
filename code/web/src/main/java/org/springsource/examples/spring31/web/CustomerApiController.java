@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * <p/>
  * A {@link Controller controller} implementation that exposes a RESTful API to clients
  * of the system.
  * <p/>

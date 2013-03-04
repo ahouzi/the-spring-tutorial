@@ -591,11 +591,24 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     one type of request for an HTML resource is really not very different than the handling of a request for a RESTful
     resource. </P>
 
-<h3> Use Cases for Our RESTful Services </h3>
+<P>
+   Our application deals with two different types of entities, <CODE class="class-reference"  q="tut_rest" module  ="services"> org.springsource.examples.spring31.services.User </CODE>
+    and <CODE class="class-reference"  q="tut_rest" module  ="services"> org.springsource.examples.spring31.services.Customer</CODE>.
+
+     We need to expose RESTful endpoints to deal with the various things a user is likely to want to do with data represented by these entities.   Let's add a controller -
+      <CODE class="class-reference" q="tut_rest" module="web">org.springsource.examples.spring31.web.UserApiController</CODE> -  which will manage the <COde>User</COde>
+    information.  Remember: a <CODE>User</CODE> will login, manage her profile, and manage  <CODE>Customer</CODE> data. We'll focus on the <CODE>UserApiController</CODE> in this tutorial.
+    Here are  some of the things that I can imagine doing with the  users: </P>
+  <ul>
+   <LI> <B>Register a new user</B> - of course you're going to need a way to create  a new user.
+    So, we'll expose an HTTP endpoint at
+   </LI>
+  </ul>
+<!--<h3> Use Cases for Our RESTful Services </h3>
 
 <P>
     Let's revisit our existing application and the screens involved. What what data do we need access to?
-</P>
+</P>-->
 
 <p>
 </p>
