@@ -487,20 +487,14 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
     Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
     JavaScript. </P>
-<!--
-
-<P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to
-    consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>.
-    &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt; </P>
--->
-
-<P> What role does the server play here? While individual resources, such as CSS and images and JavaScript, are served
-    up by the web server, and while initial HTML pages are sent down from the server, much of the interaction that
-    happens between the user and the user interface happens these days entirely on the client. The server doesn't really
-    need to get involved too much in rendering HTML, besides serving the initial page load and the resources to support
-    it. Nowadays, the client can do a <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep
-    user-interface state. Indeed all the server has to do is keep <EM>business</EM> state, and make that available to
-    the client. </p>
+<!-- <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
+ </P> --> <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
+    are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
+    that happens between the user and the user interface happens these days entirely on the client. The server doesn't
+    really need to get involved too much in rendering HTML, besides serving the initial page load and the resources to
+    support it. Nowadays, the client can do a <EM>lot</EM> of interesting things, and doesn't need to rely on the server
+    to keep user-interface state. Indeed all the server has to do is keep <EM>business</EM> state, and make that
+    available to the client. </p>
 
 <P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is the most common way to
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
@@ -571,46 +565,68 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <code>RestTemplate</code> reduces common HTTP access operations to one-liners. It is very pluggable. The <CODE>RestTemplate</CODE>
     can handle mapping results from requests to more useful types (through the <CODE class="class-reference"
                                                                                      module="spring-webmvc">
-        org.springframework.http.converter.HttpMessageConverter </CODE>
-    SPI) and aspect-like concerns like security authorization transmission (through the <CODE class="class-reference"
-                                                                                              module="spring-webmvc">
-        org.springframework.http.client.ClientHttpRequestInterceptor </CODE>
-    SPI). We'll cover the <CODE>RestTemplate</CODE> a bit more when we look at <A
-            href="http://www.springsource.org/spring-social">Spring Social</a>, but for a really detailed look at this
-    class, and the peer class provided as part of the <A href="http://www.springsource.org/spring-android">Spring
-        Android</a> project to enable secure RESTful access from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span>
-    . </P>
+        org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security
+    authorization transmission (through the <CODE class="class-reference" module="spring-webmvc">
+        org.springframework.http.client.ClientHttpRequestInterceptor </CODE> SPI). We'll cover the
+    <CODE>RestTemplate</CODE> a bit more when we look at <A href="http://www.springsource.org/spring-social">Spring
+        Social</a>, but for a really detailed look at this class, and the peer class provided as part of the <A
+            href="http://www.springsource.org/spring-android">Spring Android</a> project to enable secure RESTful access
+    from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span> .
+</P>
 
 <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to
     Spring MVC's component model and the API it uses to standup HTTP endpoits.
-    <!--
-    Spring MVC is request/response oriented - it lets you deal with the appliction logic
-    at the level of an HTTP request, the same granularity at which REST calls should be handled.
-     -->
+    <!-- Spring MVC is request/response oriented - it lets you deal with the appliction logic at the level of an HTTP request, the same granularity at which REST calls should be handled. -->
     We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of
     one type of request for an HTML resource is really not very different than the handling of a request for a RESTful
     resource. </P>
 
+<P> Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
+                                                                      module="services">
+    org.springsource.examples.spring31.services.User </CODE> and <CODE class="class-reference" q="tut_rest"
+                                                                       module="services">
+    org.springsource.examples.spring31.services.Customer</CODE>. We need to expose RESTful endpoints to deal with the
+    various things a user is likely to want to do with data represented by these entities. Let's add a controller -
+    <CODE class="class-reference" q="tut_rest"
+          module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
+    information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
+    We'll focus on the <CODE>UserApiController</CODE> in this tutorial. Let's look at how we implement some of these. </P>
+
+
+
+<div module="web" q="tut_web" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.UserApiController
+</div>
 <P>
-   Our application deals with two different types of entities, <CODE class="class-reference"  q="tut_rest" module  ="services"> org.springsource.examples.spring31.services.User </CODE>
-    and <CODE class="class-reference"  q="tut_rest" module  ="services"> org.springsource.examples.spring31.services.Customer</CODE>.
+  The first thing we'll want to do is retrieve user details by common criteria.  It's a common requirement to look up a user
+    by its ID.
 
-     We need to expose RESTful endpoints to deal with the various things a user is likely to want to do with data represented by these entities.   Let's add a controller -
-      <CODE class="class-reference" q="tut_rest" module="web">org.springsource.examples.spring31.web.UserApiController</CODE> -  which will manage the <COde>User</COde>
-    information.  Remember: a <CODE>User</CODE> will login, manage her profile, and manage  <CODE>Customer</CODE> data. We'll focus on the <CODE>UserApiController</CODE> in this tutorial.
-    Here are  some of the things that I can imagine doing with the  users: </P>
-  <ul>
-   <LI> <B>Register a new user</B> - of course you're going to need a way to create  a new user.
-    So, we'll expose an HTTP endpoint at
-   </LI>
-  </ul>
-<!--<h3> Use Cases for Our RESTful Services </h3>
+</P>
+<ul>
 
-<P>
-    Let's revisit our existing application and the screens involved. What what data do we need access to?
-</P>-->
+    <LI><B>Retrieve user details by criteria</B> - different kinds of criterias, but we can imagine wanting to retrieve
+        their information by IDs, at least.
+    </LI>
+    <LI><B>Create a new user</B> - of course you're going to need a way to create a new user. So, we'll expose an HTTP
+        endpoint at
+    </LI>
+    <LI><B>Update an existing user</B> - you want to be able to update a user's profile.
+        The <code>User</code> object contains a lot of things, including basic information like the first name, and last
+        name, and email.
 
+    </LI>
+    <LI>
+
+        <B> Establish a profile photo</B> - you need some endpoint to render the bytes to the images foir each users
+        profiles.
+    </LI>
+    <LI><B>Update a profile photo</B> - you need some endpoint that takes <CODE>POST</CODE> file transmissions and
+        updates a user's profile photo accordingly.
+    </LI>
+</ul>
+<!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 <p>
+
 </p>
 <script type="text/javascript" language="JavaScript"> $(function () {
     setTimeout(function () {
