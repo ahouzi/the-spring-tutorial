@@ -1,9 +1,13 @@
-<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+<html xmlns="http://www.w3.org/1999/html" xmlns="http: //www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
-    <style type="text/css"> .wikipedia {
+    <style type="text/css"> .todo {
+        color: red;
+    }
+
+    .wikipedia {
     }
 
     .diagram {
@@ -91,8 +95,8 @@
 </uL>
 <h3> Setting Up the Tool Chain </h3>
 
-<P> TODO show how to import the code and where to get it and how to use STS File &gt; Import and how Maven helps us. Our
-    tutorial is tool agnostic, but we recommend the free STS edition which comes wiht all sorts nice utilities </P>
+<P><SPAN class="todo"> show how to import the code and where to get it and how to use STS File &gt; Import and how Maven helps us. Our tutorial is tool agnostic, but we recommend the free STS edition which comes wiht all sorts nice utilities </SPAN>
+</P>
 
 <P> Also: maven has a certain build structure. </P>
 
@@ -184,8 +188,8 @@
     need. Fortunately, Spring provides these building blocks, letting you assemble them as you like, and letting you
     focus on the task at hand: the business of your application. Here is our Java-based application initializer which
     installs Spring's Servlet infrastructure classes to support our application. If you're familiar with Java Servlets,
-    then you'll recognize this
-    as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based deployment descriptor. </P>
+    then you'll recognize this as a Java code-only replacement or substitute for <CODE>web.xml</CODE>, an XML-based
+    deployment descriptor. </P>
 
 <div class="walkthrough">
     <div module="web" q="tut_web" extension="java" class="git-code">
@@ -252,24 +256,18 @@
     </LI>
 </uL>
 <p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
-    views in a useful way and it doesn't know about your controllers.
-    You can use the standard <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
+    views in a useful way and it doesn't know about your controllers. You can use the standard <CODE
+            class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
     annotation to tell Spring to automatically register your data services (Spring beans that handle our data-access
-    logic)
-    and your Spring MVC controllers (beans annotated with the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE>
-    annotation)
-    by scanning all the beans in or below a package, or packages specified. You can specify these packages either as a
-    String or by specifying a
-    class that lives in the package you want to scan. The latter approach is more refactor-friendly: if you change the
-    package structure of your code, your
-    tooling will update references to classes, but might not necessarily refactor Strings that contain a package path.
+    logic) and your Spring MVC controllers (beans annotated with the <CODE class="class-reference"
+                                                                           module="spring-context">org.springframework.stereotype.Controller</CODE>
+    annotation) by scanning all the beans in or below a package, or packages specified. You can specify these packages
+    either as a String or by specifying a class that lives in the package you want to scan. The latter approach is more
+    refactor-friendly: if you change the package structure of your code, your tooling will update references to classes,
+    but might not necessarily refactor Strings that contain a package path. </p>
 
-
-</p>
-
-<P>
-    As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on
-    some heuristic prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
+<P> As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on some heuristic
+    prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
     Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
     that will render local <CODE>.jsp</code> pages. </p>
 
@@ -286,12 +284,9 @@
 <P> Then simply build this and deploy to your application server. You should be able to bring up the page like
     this: </P>
 
-<div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to
-    whatever you like to change the name printed. If the name query  parameter is  not present, the code will simply default to printing "World." </span>
+<div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to whatever you like to change the name printed. If the name query parameter is not present, the code will simply default to printing "World." </span>
 </div>
-<h3>
-    Better Views
-</h3>
+<h3> Better Views </h3>
 
 <P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
     application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
@@ -393,8 +388,7 @@
         class="class-reference"
         module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE> above. </span></div>
 <P> Now, when a Spring MVC controller returns <CODE>"signin"</CODE>, the Tiles view definition named <CODE>signin</CODE>
-    will be loaded and rendered.
-</P>
+    will be loaded and rendered. </P>
 
 <h3> Resources, Views and the Default Servlet </h3>
 
@@ -435,137 +429,203 @@
 
 <Div class="git-gist" gist="5060815"> addResourceHandlers()...</Div>
 <!-- now we need to introduce how to handle view controllers. but the things is, theyve not yet seen the full controllerl ifecycle. so perhaps i can introduce that above? -->
+<P> Some pages in an application are read-only - they don't require any functionality or processing logic. It would seem
+    silly to implement a controller and a request handler just to render a view. Spring MVC can handle this eventuality
+    easily: simply declare <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE>
+    method, like this: </P>
 
-<P>
-    Some pages in an application are read-only - they don't require any functionality or processing logic. It would seem
-    silly to implement
-    a controller and a request handler just to render a view. Spring MVC can handle this eventuality easily: simply
-    declare
-    <EM>view controllers</EM> in the configuration class by overriding the <CODE>addViewControllers</CODE> method, like
-    this:
-
-</P>
-
-<div class="git-gist" gist="5067566">
-    addViewControllers()
-</div>
-<P>
-    Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
+<div class="git-gist" gist="5067566"> addViewControllers()</div>
+<P> Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
     to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
-    anyone sees is the signin form.
-    We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views - in this case, <CODE>signin</CODE>.
-</P>
+    anyone sees is the signin form. We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views -
+    in this case, <CODE>signin</CODE>. </P>
 
-<P> While we're taking care of these sorts of things, let's configure an error handling page.
-    If a component in our web application throws an exception, Spring MVC can redirect to an error page and optionally
-    return
-    an error code for us. For now, we'll install a catch-all error page view by overriding the <CODE>configureHandlerExceptionResolvers</code>
-    method.
-    Here, we've specified that the view named <CODE>oops</CODE> (which we defined above as a <EM>view controller</EM>)
-    is to be rendered wheneverthere's an error, and a
-    <span class="wikipedia">HTTP_404</span> code is to be returned.
-</P>
+<P> While we're taking care of these sorts of things, let's configure an error handling page. If a component in our web
+    application throws an exception, Spring MVC can redirect to an error page and optionally return an error code for
+    us. For now, we'll install a catch-all error page view by overriding the
+    <CODE>configureHandlerExceptionResolvers</code> method. Here, we've specified that the view named <CODE>oops</CODE>
+    (which we defined above as a <EM>view controller</EM>) is to be rendered wheneverthere's an error, and a <span
+            class="wikipedia">HTTP_404</span> code is to be returned. </P>
 
-<div class="git-gist" gist="5067711">
-    configureHandlerExceptionResolvers
-</div>
-
+<div class="git-gist" gist="5067711"> configureHandlerExceptionResolvers</div>
 <P> With all these changes in place, our final class looks like this: </P>
 
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
 </div>
+<P> With all of this in place, we can now serve complex pages using Apache Tiles, JSP, and we can easily stream
+    resources like JavaScript and CSS files. There's a <EM>lot</EM> more that we could look at, but this is a good
+    start. </P>
 
-
-<P>
-    With all of this in place, we can now serve complex pages using Apache Tiles, JSP, and we can easily stream
-    resources like
-    JavaScript and CSS files.
-
-    There's a <EM>lot</EM> more that we could look at, but this is a good start.
-
-</P>
-
-
-<h1>
-    The Changing Face of the Web: Working with Business State using REST
-</h1>
-<!--
-  outline :
-   - servers are good at serving resources
-   - but the client is where the real UI ahppens
-   - the clients really smart. VERY smart. witness the jslinux
-   - so, what dio we need the server for? Business state!
-   - what's the easiest way to access it? Via REST
-   - what is REST? Roy Fielding
-   - how do we use it fronm Spring? There are 2 stories: client and server
-
--->
-  <h2> The Smarter Client
-  </h2>
+<h1> The Changing Face of the Web: Working with Business State using REST </h1>
+<!-- outline : - servers are good at serving resources - but the client is where the real UI ahppens - the clients really smart. VERY smart. witness the jslinux - so, what dio we need the server for? Business state! - what's the easiest way to access it? Via REST - what is REST? Roy Fielding - how do we use it fronm Spring? There are 2 stories: client and server -->
+<h2> The Smarter Client </h2>
 
 <P>
 
 <div style="float:left;margin-right:10px; width: 520px;">
-    <div style="margin-bottom: 10px" class="diagram"><img src="images/green-screen-dinosaur.jpg"/> <span class="caption">
+    <div style="margin-bottom: 10px" class="diagram"><img src="images/green-screen-dinosaur.jpg"/> <span
+            class="caption"> Computer monitors used to come in three colors: green, white, and amber, always on a black background. </span>
+    </div>
+    <div style="margin-bottom: 10px" class="diagram"><img src="images/tim-berners-lee-NextCube.jpg"/> <span
+            class="caption"> Tim Berners-Lee's NextStep Cube. I love the warning on the machine - "This machine is a server. DO NOT POWER DOWN!!" Imagine the implications! Imagine <EM>powering
+        down</EM> <B>the web</B>! Eeery. </span></div>
+</div>
+Before the 'web, we had mainframes and thin clients. These clients were remarkably stupid. No client side state at all.
+The server would send down the updates to the clients and the clients would render them. Every time. <a
+        href="http://www.w3.org/People/Berners-Lee/">Tim Berners-Lee</a> invented the World Wide Web while at CERN, the
+European Particle Physics Laboratory, in 1989. He wrote the first web client and server in 1990. His specifications of
+URIs, HTTP and HTML were refined as Web technology spread. The initial makeup of the web was fairly underwhelming. The
+first several years were uneventful because the clients - HTTP browsers - were no more impressive than the green-screen
+clients they replaced. They were dumb. <EM>Very</EM> dumb. Slowly, functionality was added to make the browsers smarter.
+As time progressed, the community devised of stopgap solutions to make the web a nicer place to build web applications.
+These were, on the whole, hacks. As time progressed, these hacks were baked into the browsers and into the standards
+driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side browsers have taken a quantum leap in
+    the last decade! Now, we have <EM>really</EM> smart clients. JavaScript, the language that runs within the browsers,
+    has grown by leaps and bounds and can do <EM>almost </EM> anything. Witness, for example, <a
+            href="http://bellard.org/jslinux/">this JavaScript PC emulator by Fabrice Bellard </a>. It boots Linux.
+    Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
+    Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
+    JavaScript. </P>
+<!-- <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
+ </P> --> <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
+    are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
+    that happens between the user and the user interface happens these days entirely on the client. The server doesn't
+    really need to get involved too much in rendering HTML, besides serving the initial page load and the resources to
+    support it. Nowadays, the client can do a <EM>lot</EM> of interesting things, and doesn't need to rely on the server
+    to keep user-interface state. Indeed all the server has to do is keep <EM>business</EM> state, and make that
+    available to the client. </p>
 
-    Computer monitors used to come in three colors: green, white, and amber, always on a black background.
+<P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is the most common way to
+    expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
+    infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-</span></div>
-    <div  style="margin-bottom: 10px"  class="diagram"><img src="images/tim-berners-lee-NextCube.jpg"/> <span class="caption">
-      Tim Berners-Lee's NextStep Cube. I love the warning on the machine - "This machine is a server. DO NOT POWER DOWN!!"
-    Imagine the implications!  Imagine <EM>powering down</EM> <B>the web</B>! Eeery.
+<H2> The Principles of REST</H2>
+<!--Resources Expose directory structure-like URIs URI’s should be easily understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped to these existing methods Stateless State dependencies limit or restrict scalability -->
+<p> HTTP resources (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way.
+    Suppose, for example, that you want to map customer data from a CRM-style application (like ours!) to HTTP
+    endpoints. You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers. You
+    might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose information specifically about a customer
+    whose ID is <CODE>42</CODE>. You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE> to expose
+    information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>. </p>
+
+<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
+    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
+    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
+    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
+    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
+    encode data this way then it should. </p>
+
+<p> HTTP methods should be used explicitly. HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
+    <CODE>GET</CODE> map nicely to the transformations () our enterprise data typically goes through. </p>
+<ul>
+    <LI><CODE>GET</CODE>, for example, can be used to retrieve information. It must be safe, and idempotent. It can have
+        side effects, but since the user doesn't expect them, they shouldn't be critical to the operation of the system.
+        GET can be conditional or partial based on the presence of the HTTP headers <CODE>If-Modified-Since</CODE> or
+        <COde>Range</COde>. A HTTP <CODE>GET</CODE> request looks like this: <CODE>GET /api/crm/42/customers/242</CODE>.
+        This would be expected the entity identified by 242 holding customer data.
+    </LI>
+    <LI><CODE>DELETE</CODE>s can be used to delete information identified by a URL. A <CODE>DELETE</CODE> request looks
+        like this: <CODE>DELETE /api/crm/42/customers/242</CODE></LI>
+    <LI><CODE>PUT</CODE> requests that the entity passed be stored at the URI. It can be used to create a new entity or
+        modify an existing one. The creation of new entities is uncommon as it allows the client to select the id of the
+        new entity. A HTTP <CODE>PUT</CODE> looks like this: <CODE> PUT /toppings/1 </CODE> and can return a payload,
+        like this <CODE> { "name" : "Cheese" }</CODE>.
+    </LI>
+    <LI><CODE>POST</CODE> requests that the resource at a URI do something with the enclosed entity. The major
+        difference between <CODE>POST</CODE> and <CODE>PUT</CODE> are what resource the request URI identifies. For
+        example, use <CODE>PUT</code> to create and <CODE>POST</CODE> to modify. A HTTP <CODE>POST</CODE> looks like
+        this: <CODE>POST /toppings/1</CODE> and can return a payload, like this <CODE> { "name" : "Cheese" }</CODE>.
+    </LI>
+</ul>
+<P> HTTP supports status codes to convey system state to clients in a consistent way. These take the place of things
+    like exceptions in programming languages. Status codes are an indicator the result of the server's attempt to
+    satisfy the request. These status codes are returned in the response from the server. Status codes are broadly
+    divided in categories: </P>
+<ul>
+    <LI><b>1XX</b>: Informational</LI>
+    <LI><b>2XX</b>: Success</LI>
+    <LI><b>3XX</b>: Redirection</LI>
+    <LI><b>4XX</b>: Client Error</LI>
+    <LI><b> 5XX</b>: Server Error</LI>
+</ul>
+<P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as
+    possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There
+    are some, useful, exceptions such as when we introduce OAuth sessions which require minimal state and can't be
+    arbitrarily bound to. There are a lot of benefits to this, though. For example, if you want to scale your
+    application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of
+    context. </P>
+
+<h2> Using REST with Spring </h2>
+
+<P> There are two aspects to Spring's support story for REST, the client side perspective and the server side
+    perspective. </P>
+
+<P> From the client side, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>.
+    <code>RestTemplate</code> reduces common HTTP access operations to one-liners. It is very pluggable. The <CODE>RestTemplate</CODE>
+    can handle mapping results from requests to more useful types (through the <CODE class="class-reference"
+                                                                                     module="spring-webmvc">
+        org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security
+    authorization transmission (through the <CODE class="class-reference" module="spring-webmvc">
+        org.springframework.http.client.ClientHttpRequestInterceptor </CODE> SPI). We'll cover the
+    <CODE>RestTemplate</CODE> a bit more when we look at <A href="http://www.springsource.org/spring-social">Spring
+        Social</a>, but for a really detailed look at this class, and the peer class provided as part of the <A
+            href="http://www.springsource.org/spring-android">Spring Android</a> project to enable secure RESTful access
+    from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span> .
+</P>
+
+<P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to
+    Spring MVC's component model and the API it uses to standup HTTP endpoits.
+    <!-- Spring MVC is request/response oriented - it lets you deal with the appliction logic at the level of an HTTP request, the same granularity at which REST calls should be handled. -->
+    We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of
+    one type of request for an HTML resource is really not very different than the handling of a request for a RESTful
+    resource. </P>
+
+<P> Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
+                                                                      module="services">
+    org.springsource.examples.spring31.services.User </CODE> and <CODE class="class-reference" q="tut_rest"
+                                                                       module="services">
+    org.springsource.examples.spring31.services.Customer</CODE>. We need to expose RESTful endpoints to deal with the
+    various things a user is likely to want to do with data represented by these entities. Let's add a controller -
+    <CODE class="class-reference" q="tut_rest"
+          module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
+    information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
+    We'll focus on the <CODE>UserApiController</CODE> in this tutorial, which is just another Spring bean annotated with    the
+    <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation.
+
+    We'll walk through the implementations of these methods step by step, but let's first look at the code:
+</P>
 
 
-</span> </div></div>
+
+<div module="web" q="tut_rest" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.UserApiController
+</div>
+
+
+<P>
+    We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve their information by IDS, at least.
 
 
 
-    Before the 'web, we had mainframes and thin clients. These clients were remarkably stupid. No client side state at
-    all. The server would send down the updates to the clients and the clients would render them. Every time.
-    <a href="http://www.w3.org/People/Berners-Lee/">Tim Berners-Lee</a>
-    invented the World Wide Web while at CERN, the European Particle Physics Laboratory, in 1989.
-    He wrote the first web client and server in 1990. His specifications of URIs, HTTP and HTML were refined as Web technology spread.
-    The initial makeup of the web was fairly underwhelming. The first several years were uneventful  because  the clients - HTTP browsers -
-    were no more impressive than the
-    green-screen clients they replaced. They were dumb. <EM>Very</EM> dumb.
-    Slowly, functionality was added to make the browsers smarter.
-     As time progressed, the community devised of stopgap solutions to make the web a nicer place to build web applications.
-    These were, on the whole, hacks. As time progressed, these hacks were baked into the browsers
-    and into the standards driving HTTP, HTML and the web in general.
-
-    </P><P>
-    To keep pace, the  client-side browsers have taken a quantum leap in the last decade! Now, we have <EM>really</EM> smart clients.
-    JavaScript, the language that runs within the browsers, has grown by leaps and bounds and can do <EM>almost </EM> anything.
-    Witness, for example, <a href="http://bellard.org/jslinux/">this JavaScript PC emulator by Fabrice Bellard </a>. It boots Linux.
-    Seriously. When you run it,  it dumps you into a shell where you can  use <code>vi</code> to edit the file
-    <CODE>hello.c</CODE>. Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in JavaScript.
 
 
 </P>
- <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I  invite you to consult our tutorial
-    <span style="color: red"> (TODO!!!) on  building better client applications with Spring</span>.
-
-     <!-- TODO link to our tutorial for client side JavaScript and s2js-->
-
+<P>
+    You'll want to be able to create new  users.
 </P>
-<P>  What role does the server play here?
+<P> You'll need to be able to update a users details. </P>
+<p> You'll need an endpoint to handle file uploads for the profile's photo image </p>
+<p> You'll need an endpoint to render the files  uploaded for the profile's photo image </p>
 
-  While individual resources, such as CSS and images and JavaScript,
-    are served up by the web server, and while initial HTML pages are sent down from the server,
-    much of the interaction that happens between the user and the user
-    interface happens these days entirely on the client. The server doesn't really need to get involved too much in
-    rendering HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a
-    <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all
-    the server has to do is keep <EM>business</EM> state, and make that available to the client.
-  </p>
-<P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is
-    the  most common     way to expose server side business state to clients.  REST builds upon the principles of HTTP, so
-    doesn't require any new infrastructure or any specialized types of middleware.  </p>
+<!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
+<p>
 
-<P> Spring  MVC supports REST naturally. </P>
-
-
-
+</p>
+<script type="text/javascript" language="JavaScript"> $(function () {
+    setTimeout(function () {
+        window.scrollTo(0, document.body.scrollHeight);
+    }, 1000);
+}) </script>
 <A name="eof"/></body>
 </html>
