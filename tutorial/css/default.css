@@ -125,3 +125,7 @@ pre .diff .change {
 pre .chunk {
   color: #aaa
 }
+
+.todo {
+    color: red ;
+}
