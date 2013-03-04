@@ -64,18 +64,18 @@
       menu items based on whether there's an authenticated principal or not.
     --%>
     <div ng-controller="NavigationController">
-        <security:authorize access="isAnonymous()">
+
             <A href="${pageContext.request.contextPath}/crm/signin.html">Sign In</a>
-        </security:authorize>
-        <security:authorize access="isAuthenticated()">
-            <c:url value="/j_spring_security_logout" var="logoutUrl"/>
-            Welcome <strong><security:authentication property="principal.username"/></strong> |
+
+            Welcome  ${signedInUser.username}.
+
             <span>
                 <a href="${pageContext.request.contextPath}/crm/profile.html">My Profile</a> |
                 <a href="${pageContext.request.contextPath}/crm/customers.html">My Customers</a> |
-                <a ng-click="startLogoutFlow( '${logoutUrl}' )" href="${logoutUrl}">Sign Out</a>
+                <A href="#">Sign out</A>
+                <%--<a ng-click="startLogoutFlow( '${logoutUrl}' )" href="${logoutUrl}">Sign Out</a>--%>
             </span>
-        </security:authorize>
+
     </div>
 </div>
 <div id="content">

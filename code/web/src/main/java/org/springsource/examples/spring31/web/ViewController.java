@@ -1,11 +1,14 @@
 package org.springsource.examples.spring31.web;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springsource.examples.spring31.services.User;
+import org.springsource.examples.spring31.services.UserService;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Josh Long
@@ -13,18 +16,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ViewController {
 
-    @RequestMapping(value = "/crm/signin.html", method = RequestMethod.GET)
-    public String showSignInPage(Model model, @RequestParam(value = "error", required = false, defaultValue = "false") String err) {
+    public static final String USER_OBJECT_KEY = "signedInUser";
 
-        boolean isInError = !(StringUtils.hasText(err) &&
-                (err.toLowerCase().contains("false") || err.toLowerCase().contains("true"))) ||
-                Boolean.parseBoolean(err.toLowerCase());
+    private UserService userService;
 
-        model.addAttribute("cgClass", isInError ? "error" : "");
-        model.addAttribute("error", isInError);
-        model.addAttribute("errorMessage", err);
-        return "signin";
+    @Inject
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
-
+    @RequestMapping(value = "/crm/users/signin", method = RequestMethod.POST)
+    public String signin(@RequestParam("username") String user,
+                         @RequestParam("pw") String pw,
+                         HttpSession httpSession) throws Throwable {
+        User u = this.userService.login(user, pw);
+        assert u != null : "the user can't be null";
+        httpSession.setAttribute(USER_OBJECT_KEY, u);
+        return "profile";
+    }
 }

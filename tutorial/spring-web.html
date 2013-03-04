@@ -590,40 +590,34 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <CODE class="class-reference" q="tut_rest"
           module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
     information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
-    We'll focus on the <CODE>UserApiController</CODE> in this tutorial. Let's look at how we these methods. First, here's the code: </P>
+    We'll focus on the <CODE>UserApiController</CODE> in this tutorial, which is just another Spring bean annotated with    the
+    <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation.
+
+     We'll walk through the implementations of these methods step by step, but let's first look at the code:
+      </P>
 
 
 
 <div module="web" q="tut_rest" extension="java" class="git-code">
     org.springsource.examples.spring31.web.UserApiController
 </div>
+
+
 <P>
-  The first thing we'll want to do is retrieve user details by common criteria.  It's a common requirement to look up a user
-    by its ID.
+  We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve their information by IDS, at least.
+
+
+
+
 
 </P>
-<ul>
+<P>
+  You'll want to be able to create new  users.
+</P>
+<P> You'll need to be able to update a users details. </P>
+<p> You'll need an endpoint to handle file uploads for the profile's photo image </p>
+<p> You'll need an endpoint to render the files  uploaded for the profile's photo image </p>
 
-    <LI><B>Retrieve user details by criteria</B> - different kinds of criterias, but we can imagine wanting to retrieve
-        their information by IDs, at least.
-    </LI>
-    <LI><B>Create a new user</B> - of course you're going to need a way to create a new user. So, we'll expose an HTTP
-        endpoint at
-    </LI>
-    <LI><B>Update an existing user</B> - you want to be able to update a user's profile.
-        The <code>User</code> object contains a lot of things, including basic information like the first name, and last
-        name, and email.
-
-    </LI>
-    <LI>
-
-        <B> Establish a profile photo</B> - you need some endpoint to render the bytes to the images foir each users
-        profiles.
-    </LI>
-    <LI><B>Update a profile photo</B> - you need some endpoint that takes <CODE>POST</CODE> file transmissions and
-        updates a user's profile photo accordingly.
-    </LI>
-</ul>
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 <p>
 
