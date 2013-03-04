@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
 import org.springsource.examples.spring31.web.CustomerApiController;
+import org.springsource.examples.spring31.web.ViewController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackageClasses = {CustomerService.class, CustomerApiController.class, WebMvcConfiguration.class})
+@ComponentScan(basePackageClasses = {ViewController.class, CustomerService.class})
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
