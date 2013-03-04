@@ -3,12 +3,11 @@ package org.springsource.examples.spring31.web.config.servlet;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springsource.examples.spring31.web.config.WebMvcConfiguration;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
 
 /**
  * Simple replacement for <CODE>web.xml</CODE> that is constructed entirely in Java code.

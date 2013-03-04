@@ -1,9 +1,8 @@
 /***
  *
- * controllers that make up the client-side business logic of the application.
- *
- * handles all the pages through OAuth secured services,
+ * controllers that make up the client-side business logic of the application. Handles all the pages through REST services,
  * which - while not obscured - require multi-factor authentication to do anything useful.
+ *
  */
 
 
@@ -30,35 +29,10 @@ module.value('ui.config', {
 module.factory('ajaxUtils', function () {
     var contentType = 'application/json; charset=utf-8' ,
         dataType = 'json',
-        oauthResource = appName,
         errorCallback = function (e) {
             alert('error trying to connect to ');
         };
 
-    var scopes = ['read', 'write'];
-    var resources = {};
-    resources[oauthResource] = {
-        client_id:crmSession.getUserId() + '',
-        isDefault:true,
-        redirect_uri:window.location.href + '',
-        authorization:'/oauth/authorize',
-        scopes:scopes
-    };
-
-
-    if (crmSession.isLoggedIn()) {
-
-        // hack, but this clears out any existing tokens
-        for (k in resources)
-            localStorage.removeItem("tokens-" + k);
-
-        jso_configure(resources, { debug:true });
-
-
-        var toEnsure = {};
-        toEnsure[oauthResource] = scopes;
-        jso_ensureTokens(toEnsure);
-    }
 
 
     var baseUrl = (function () {
@@ -100,48 +74,20 @@ module.factory('ajaxUtils', function () {
     var noopArgsProcessor = function (e) {
         return e;
     };
-    var oauthArgsProcessor = function (args) {
-        var a = args || {};
-        a['jso_provider'] = oauthResource;
-        a['jso_scopes'] = scopes;
-        a['jso_allowia'] = false;
-        return a;
-    };
 
     return {
-        accessToken:function () {
-            return jso_getToken(oauthResource, scopes);
-        },
+
         url:function (u) {
             return baseUrl + u;
         },
-        enrichRequestArguments:oauthArgsProcessor,
+        enrichRequestArguments:noopArgsProcessor,
         put:function (url, data, cb) {
             sendDataFunction($.ajax, noopArgsProcessor, url, 'PUT', data, cb);
         },
         post:function (url, data, cb) {
             sendDataFunction($.ajax, noopArgsProcessor, url, 'POST', data, cb);
         },
-        oauthPut:function (url, data, cb) {
-            sendDataFunction($.oajax, oauthArgsProcessor, url, 'PUT', data, cb);
-        },
-        oauthPost:function (url, data, cb) {
-            sendDataFunction($.oajax, oauthArgsProcessor, url, 'POST', data, cb);
-        },
-        oauthDelete:function (url, data, cb) {
-            sendDataFunction($.oajax, oauthArgsProcessor, url, 'DELETE', data, cb);
-        },
-        oauthGet:function (url, data, cb) {
-            $.oajax(this.enrichRequestArguments({
-                type:'GET',
-                url:url,
-                cache:false,
-                dataType:dataType,
-                contentType:contentType,
-                success:cb,
-                error:errorCallback
-            }));
-        },
+
         get:function (url, data, cb) {
             $.ajax({
                 type:'GET',
@@ -171,7 +117,7 @@ module.factory('customerService', function (ajaxUtils) {
         loadCustomers:function (userId, cb) {
             var u = this.buildBaseUserCustomerApiUrl(userId)
             console.log('loadCustomers url ' + u)
-            ajaxUtils.oauthGet(u, {}, function (customers) {
+            ajaxUtils.get(u, {}, function (customers) {
                 customers.sort(function (a, b) {
                     return a.id - b.id;
                 });
@@ -180,22 +126,22 @@ module.factory('customerService', function (ajaxUtils) {
         },
         getCustomerById:function (userId, customerId, cb) {
             var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
-            ajaxUtils.oauthGet(urlForCustomer, {}, cb);
+            ajaxUtils.get(urlForCustomer, {}, cb);
         },
         deleteCustomerById:function (userId, customerId, callback) {
             var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
-            ajaxUtils.oauthDelete(urlForCustomer, {}, callback);
+            ajaxUtils.delete(urlForCustomer, {}, callback);
 
         },
         updateCustomerById:function (userId, customerId, fn, ln, callback) {
             var urlForCustomer = this.buildBaseCustomerApiUrl(userId, customerId);
             console.log('called updateCustomerById, the URL is: ' + urlForCustomer);
-            ajaxUtils.oauthPut(urlForCustomer, { firstName:fn, lastName:ln}, callback);
+            ajaxUtils.put(urlForCustomer, { firstName:fn, lastName:ln}, callback);
         },
         addNewCustomer:function (userId, fn, ln, callback) {
             var user = {  firstName:fn, lastName:ln };
             var url = this.buildBaseUserCustomerApiUrl(userId);
-            ajaxUtils.oauthPost(url, user, callback);
+            ajaxUtils.post(url, user, callback);
         }
 
     };
@@ -215,10 +161,10 @@ module.factory('userService', function (ajaxUtils) {
         },
         updateUserById:function (userId, username, pw, fn, ln, callback) {
             var user = {username:username, password:pw, firstname:fn, lastname:ln, id:userId };
-            ajaxUtils.oauthPut(this.buildBaseUserApiUrl(userId), user, callback);
+            ajaxUtils.put(this.buildBaseUserApiUrl(userId), user, callback);
         },
         getUserById:function (userId, callback) {
-            ajaxUtils.oauthGet(this.buildBaseUserApiUrl(userId), {}, callback);
+            ajaxUtils.get(this.buildBaseUserApiUrl(userId), {}, callback);
         },
         registerNewUser:function (username, pw, fn, ln, imported, callback) {
             var user = {username:username, password:pw, firstname:fn, lastname:ln, imported:imported};
@@ -246,19 +192,15 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
 
         var photoUrl = ajaxUtils.url('/api/users/' + userId + '/photo');// well use the endpoint that takes the <CODE>userId</CODE> as a request param
 
-        console.log('using request URL ' + photoUrl + ', which should require OAuth credentials to work.');
 
         profilePhotoNode.filedrop({
             dataType:'json',
             maxfilesize:20, /* in MB */
             url:photoUrl,
             paramname:'file',
-            headers:{
-                'Authorization':"Bearer " + ajaxUtils.accessToken()
-            },
+
 
             data:{
-                // todo how come this works? we should be required to send along the OAuth headers and so on
                 userId:function () {
                     return $scope.user.id;
                 },
@@ -391,7 +333,7 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     };
 
 
-    $scope.loadUser(crmSession.getUserId());
+  //  $scope.loadUser(crmSession.getUserId());
 
 
 }
@@ -416,7 +358,7 @@ function SignInController($scope, $location) {
     jso_wipe();
 
     // 'u' is the username request parameter that we'll expect to preload the username
-    // typically after someone's successfully finished the signup flow
+    // typically after some one's successfully finished the signup flow
     var u = crmSession.getUsername();
     if (u != null) {
         $scope.user = { username:u };
@@ -446,7 +388,6 @@ function CustomerController($scope, customerService, ajaxUtils) {
     // the user id of the currently logged in user
     var userId = crmSession.getUserId();
 
-    console.log('inside CustomerController, the userId is ' + userId + ' and the acess token is ' + ajaxUtils.accessToken());
 
     $scope.customers = [];
 
@@ -467,7 +408,7 @@ function CustomerController($scope, customerService, ajaxUtils) {
 
             customerService.deleteCustomerById(userId, customer.id, function () {
                 $scope.refreshCustomers()
-            })
+            });
             //$scope.customers[arrIndx].remove();
         });
         console.log('deleteCustomer() does not currently actually delete a resource on the server...');
@@ -492,7 +433,6 @@ function CustomerController($scope, customerService, ajaxUtils) {
 
     $scope.addCustomer = function () {
         var fn = $scope.firstName, ln = $scope.lastName;
-        console.log("trying to add fn = " + fn + ", ln =" + ln + ", and accessToken = " + ajaxUtils.accessToken())
 
         customerService.addNewCustomer(userId, $scope.firstName, $scope.lastName, function () {
             $scope.refreshCustomers();
@@ -500,7 +440,7 @@ function CustomerController($scope, customerService, ajaxUtils) {
         });
     };
     resetNewCustomerForm();
-    $scope.refreshCustomers();
+ //   $scope.refreshCustomers();
 }
 
 

@@ -11,6 +11,7 @@ import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
 import org.springsource.examples.spring31.web.ViewController;
+import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("signin");
-        for (String p : new String[]{ "signup","profile", "customers", "home", "oops"})
+        for (String p : new String[]{"signup", "profile", "customers", "home", "oops"})
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 
@@ -60,4 +61,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
 
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
+    }
 }

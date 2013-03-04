@@ -4,25 +4,25 @@
 <div ng-controller="SignInController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form name="form" class="form-horizontal" method="POST" action="j_spring_security_check">
+            <form name="form" class="form-horizontal" method="POST" action="${pageContext.request.contextPath}/crm/signin.html">
                 <div class="panel">
                     <fieldset>
 
                         <legend><h2>Sign In</h2></legend>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="j_username">E-Mail:</label>
+                            <label class="control-label" for="username">E-Mail:</label>
 
-                            <div class="controls"><input class="input-xlarge" id="j_username" name="j_username"
+                            <div class="controls"><input class="input-xlarge" id="username" name="username"
                                                          type="text" ng-model="user.username" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the e-mail. </span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="j_password">Password:</label>
+                            <label class="control-label" for="pw">Password:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="j_password" name="j_password" type="password"
+                                <input class="input-xlarge" id="pw" name="pw" type="password"
                                        ng-model="user.password" required="required"/>
                                 <span ng-show="${error}" class="help-inline"> Please provide a valid value for the password. </span>
                             </div>
@@ -35,11 +35,7 @@
                             </button>
 
                             <span>
-                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/signup.html">Register
-                                now!</a>  or
-
-
-                                    <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign in with Facebook</a>
+                                Don't have an account? <a href="${pageContext.request.contextPath}/crm/signup.html">Register now!</a>
 
                             </span>
 
