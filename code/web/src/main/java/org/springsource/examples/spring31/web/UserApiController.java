@@ -72,32 +72,24 @@ public class UserApiController {
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) {
-        try {
-            assert userId != null : "you must specify a userId when uploading!";
-            assert file != null : "you must specify a file object when uploading!";
-            byte[] bytesForImage = file.getBytes();
-            userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
+    public Long uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) throws Throwable {
+        assert userId != null : "you must specify a userId when uploading!";
+        assert file != null : "you must specify a file object when uploading!";
+        byte[] bytesForImage = file.getBytes();
+        userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
         return userId;
     }
 
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.GET)
-    public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) {
+    public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) throws Throwable {
         InputStream is = userService.readUserProfilePhoto(userId);
         httpServletResponse.setContentType("image/jpg");
-        if (null == is && log.isInfoEnabled()) {
-            log.info("couldn't read the byte[]s for user #" + userId + " 's profile photo.");
+        if (null == is) {
             return;
         }
         try {
             IOUtils.copyLarge(is, os);
-        } catch (Exception e1) {
-            if (log.isInfoEnabled()) log.info("couldn't render the photo for user#" + userId);
-            throw new RuntimeException(e1);
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(os);
