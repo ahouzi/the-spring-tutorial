@@ -24,8 +24,6 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     private String userIdAttribute = "userId";
 
-    private String fullUrlAttribute = "fullUrl";
-
     @Override
     public void postHandle(WebRequest req, ModelMap model) throws Exception {
     }
@@ -42,10 +40,9 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
                 String usernameValue = httpServletRequest.getParameter(this.usernameAttribute);
                 if (null != usernameAttribute)
                     stringObjectHashMap.put(this.usernameAttribute, usernameValue);
-                stringObjectHashMap.put(userIdAttribute, buildUserIdAttribute(user));
+                stringObjectHashMap.put(userIdAttribute, user.getId());
             }
         }
-        stringObjectHashMap.put(fullUrlAttribute, buildFullUrlAttribute(swr));
         for (String k : stringObjectHashMap.keySet())
             swr.setAttribute(k, stringObjectHashMap.get(k), RequestAttributes.SCOPE_REQUEST);
     }
@@ -54,13 +51,4 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
     public void afterCompletion(WebRequest request, Exception ex) throws Exception {
     }
 
-    private long buildUserIdAttribute(User user) {
-        return user.getId();
-    }
-
-    private String buildFullUrlAttribute(ServletWebRequest swr) {
-        String servletPath = swr.getRequest().getServletPath();
-        String allUrl = swr.getRequest().getRequestURL().toString().trim();
-        return allUrl.substring(0, allUrl.length() - servletPath.length());
-    }
 }
