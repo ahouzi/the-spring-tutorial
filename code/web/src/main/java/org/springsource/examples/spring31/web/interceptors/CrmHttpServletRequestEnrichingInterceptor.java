@@ -43,6 +43,7 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
                 stringObjectHashMap.put(userIdAttribute, user.getId());
             }
         }
+
         for (String k : stringObjectHashMap.keySet())
             swr.setAttribute(k, stringObjectHashMap.get(k), RequestAttributes.SCOPE_REQUEST);
     }

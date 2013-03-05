@@ -456,8 +456,7 @@
 
 <P>
 
-    There is some data that is reprinted as part of the Apache Tiles template on every page. Data like, for example,
-    the sign-in  <CODE>user</CODE>s ID and username. This is information we could derive from the
+    There is some data that is reprinted as part of the Apache Tiles template on every page - data  like     the sign-in  <CODE>user</CODE>s ID and username. This is information we could derive from the
     <CODE>user</CODE> itself.   Instead of making a mess of the session simply to dereference values, and instead of long expressions in our templates,
     we'll simply recreate the values in a common place that gets executed across <EM>all</EM> requests to the application.
 
@@ -470,7 +469,13 @@
     That way, when we later change the way we lookup the current, authenticated user,
     the templates will need not change accordingly. We simply change  our
     <code class="class-reference" module="spring-webmvc">org.springframework.web.context.request.WebRequestInterceptor</code> implementation and the values will update accordingly.
+                       </p><P>
+            The <CODE>WebRequestInterceptor</CODE> SPI  lets you act on all requests, before a request has been handled by   a Spring MVC controller (<CODE>preHandle(WebRequest req)</code>),
+            after a request has been handled by a Spring MVC controller (but before the <EM>view</EM> has been rendered; (<CODE>postHandle(WebRequest req, ModelMap model)</code>)),
+            and after Spring MVC has finished processing the request entirely (<CODE>afterCompletion(WebRequest request, Exception ex)</code>).
 
+    Our code simply  inspects the current HTTP session (if it's available) and extracts information about the authenticated  user and puts that  information in the request attributes  where it's
+    available from inside of the view.
 
 </P>
 <div class="git-code" extension="java" q="tut_web" module="web">org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor</div>
