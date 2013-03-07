@@ -496,32 +496,57 @@
     org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor
 </div>
 
+<P> We need only override one more method in the <CODE class="class-reference" module="web" q="tut_web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>,
+    <CODE>addInterceptors</CODE>, to register our custom interceptor, like this:
 
-<P> With all these changes in place, our final class looks like this: </P>
+</P>
+
+<Div class="git-gist" gist="5087185">
+    addInterceptors()
+</Div>
+<P>
+    We can now reference these attributes from our JSP pages, like this <CODE>${username}</CODE>.
+
+
+    With all these changes in place, our final class looks like this: </P>
 
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
 </div>
 
 <P> Our application can now serve complex pages using Apache Tiles, JSP, and we can easily stream resources like
-    JavaScript and CSS files. There's a <EM>lot</EM> more that we could look at, but this is a good start. </P>
+    JavaScript and CSS files. We've setup Spring MVC and now we can move on to the final leg of this tour through basic
+    Spring MVC. </P>
 
 <h3>Building A Simple Sign In Page
 </h3>
 
-<P>
+<!--todo rewrite this?-->
+<P> We've done as much as we could to configure our application  and we've achieved a lot, but we haven't really laid down
+    any <EM>actual</em> code in service  of our application!   No <em>business</em> logic, as it were.
+    Let's look at the implementation of our signin page. We'll implement a far more robust version later, with far less code,  when
+    we introduce Spring Security. For now, however, this will let unblock us so we can build the rest of the application.
+
+<!--
     Now that we've got a good understanding of how to do page layouts in Spring MVC, let's look at building a simple
     sign in form.
 
     This will be a good chance for us to look a little bit more at Spring MVC's <CODE>Controller</CODE> component model,
     and to understand how to do basic form processing in Spring MVC. We'll revisit the sign in form later when we
     introduce Spring Security,
-    but for now a poor-man's sign in form is just what the doctor ordered. Let's look further at
+    but for now a poor-man's sign in form is just what the doctor ordered.
+-->
+    Let's look further at
     <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>,
     which we introduced earlier.
 
-
 </p>
+
+      <P>
+            The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE>
+          requests to the same URL.
+
+      </P>
 
 
 <h1> The Changing Face of the Web: Working with Business State using REST </h1>
@@ -544,7 +569,8 @@ The server would send down the updates to the clients and the clients would rend
 European Particle Physics Laboratory, in 1989. He wrote the first web client and server in 1990. His specifications of
 URIs, HTTP and HTML were refined as Web technology spread. The initial makeup of the web was fairly underwhelming. The
 first several years were uneventful because the clients - HTTP browsers - were no more impressive than the green-screen
-clients they replaced. They were dumb. <EM>Very</EM> dumb. Slowly, functionality was added to make the browsers smarter.
+clients they replaced. They were dumb. <EM>Very</EM> dumb. Slowly, functionality was added to make the browsers smarter, more useful. They evolved from mere
+<EM>clients</EM> to veritable <EM>platforms</EM> in unto themselves!
 As time progressed, the community devised of stopgap solutions to make the web a nicer place to build web applications.
 These were, on the whole, hacks. As time progressed, these hacks were baked into the browsers and into the standards
 driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side browsers have taken a quantum leap in
@@ -554,8 +580,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
     Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
     JavaScript. </P>
-<!-- <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
- </P> --> <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
+ <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
     are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
     that happens between the user and the user interface happens these days entirely on the client. The server doesn't
     really need to get involved too much in rendering HTML, besides serving the initial page load and the resources to
@@ -568,7 +593,6 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
 <H2> The Principles of REST</H2>
-<!--Resources Expose directory structure-like URIs URI’s should be easily understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped to these existing methods Stateless State dependencies limit or restrict scalability -->
 <p> HTTP resources (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way.
     Suppose, for example, that you want to map customer data from a CRM-style application (like ours!) to HTTP
     endpoints. You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers. You
@@ -690,11 +714,17 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 <p>
 
+    <!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell
+    -->
 </p>
-<script type="text/javascript" language="JavaScript"> $(function () {
-    setTimeout(function () {
-        window.scrollTo(0, document.body.scrollHeight);
-    }, 1000);
-}) </script>
+<script type="text/javascript" language="JavaScript">
+    $(function () {
+        setTimeout(function () {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 1000);
+    });
+</script>
+
 <A name="eof"/></body>
+
 </html>

@@ -39,7 +39,7 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
             if (null != user) {
                 String usernameValue = httpServletRequest.getParameter(this.usernameAttribute);
                 if (null != usernameAttribute)
-                    stringObjectHashMap.put(this.usernameAttribute, usernameValue);
+                    stringObjectHashMap.put(this.usernameAttribute, user.getUsername());
                 stringObjectHashMap.put(userIdAttribute, user.getId());
             }
         }

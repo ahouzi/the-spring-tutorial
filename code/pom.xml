@@ -152,7 +152,7 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
-                <version>4.0.0.GA</version>
+                <version>4.2.0.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -382,10 +382,12 @@
         </repository>
         <!-- For JPA and Hibernate artifacts -->
         <repository>
-            <id>JBoss Repo</id>
-            <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
-            <name>JBoss Repo</name>
+            <id>JBoss repository</id>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
+        <!--	<repositories>
+
+	</repositories>-->
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -396,17 +398,7 @@
     </pluginRepositories>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.cloudfoundry</groupId>
-                <artifactId>cf-maven-plugin</artifactId>
-                <version>1.0.0.M1</version>
-                <configuration>
-                    <server>mycloudfoundry-instance</server>
-                    <target>http://api.cloudfoundry.com</target>
-                    <url>cfdevnexus.cloudfoundry.com</url>
-                    <memory>512</memory>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
