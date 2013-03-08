@@ -326,7 +326,6 @@
         <td>there should of course be a screen to work with data related to customers.</td>
     </tr>
 </TABLE>
-
 <h3> Handling Page Layouts with Apache Tiles </h3>
 
 <P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
@@ -343,11 +342,10 @@
 </P>
 
 <div class="git-gist" gist="5059411"> @Bean UrlBasedViewResolver @Bean TilesConfigurer</div>
-
-
-<P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you
-    with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>.
-    Recall that Spring MVC delegates to <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
+<P> Apache Tiles has a lot of moving pieces that need to be installed, but Spring can handle all of this for you with
+    the <CODE class="class-reference"
+              module="spring-webmvc">org.springframework.web.servlet.view.tiles2.TilesConfigurer</CODE>. Recall that
+    Spring MVC delegates to <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</CODE>
     instances to translate strings like <CODE>home</CODE> to an appropriate view template. The <code
             module="spring-webmvc"
             class="class-reference">org.springframework.web.servlet.view.tiles2.TilesViewResolver</code> resolves the
@@ -440,7 +438,6 @@
     method, like this: </P>
 
 <div class="git-gist" gist="5067566"> addViewControllers()</div>
-
 <P> Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
     to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
     anyone sees is the signin form. We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views -
@@ -454,200 +451,183 @@
             class="wikipedia">HTTP_404</span> code is to be returned. </P>
 
 <div class="git-gist" gist="5067711"> configureHandlerExceptionResolvers</div>
-
-
-<h3>
-    Where do I Put Common Logic Across All Requests?
-</h3>
-
+<h3> Internationalization </h3>
 <P>
+   We don't live in monolingual world, and web applications can't afford to ignore the languages their users speak. Spring MVC can
+    detect the <em>locale</em> from each users HTTP requests. This can be used to give our application an idea
+    about what language the user is expecting language strings to be rendered in.
+     Spring MVC can look up message strings in <EM>resource bundles</EM>.
+    The JDK supports <CODE class="class-reference" module="java">java.util.ResourceBundle</CODE>s, which
+     map a given key and language combination to a string in a specific language and localized to a specific region.
 
-    There is some data that is reprinted as part of the Apache Tiles template on every page - data like the sign-in
-    <CODE>user</CODE>s ID and username. This is information we could derive from the
-    <CODE>user</CODE> itself. Instead of making a mess of the session simply to dereference values, and instead of long
-    expressions in our templates,
-    we'll simply recreate the values in a common place that gets executed across <EM>all</EM> requests to the
-    application.
 
-
-    Let's take advantage of Spring MVC's powerful <EM> <A
-        href="http://static.springsource.org/spring-framework/docs/current/spring-framework-reference/htmlsingle/#mvc-config-interceptors">
-    interceptor</a></EM> support.
-
-    The values we want, specifically, are the user's <CODE>userId</CODE>, and <CODE>username</CODE>.
-
-    These values can be made available inside the interceptor, and then dereferenced from our controllers and templates.
-    That way, when we later change the way we lookup the current, authenticated user,
-    the templates will need not change accordingly. We simply change our
-    <code class="class-reference"
-          module="spring-webmvc">org.springframework.web.context.request.WebRequestInterceptor</code> implementation and
-    the values will update accordingly.
-</p>
-
-<P>
-    The <CODE>WebRequestInterceptor</CODE> SPI lets you act on all requests, before a request has been handled by a
-    Spring MVC controller (<CODE>preHandle(WebRequest req)</code>),
-    after a request has been handled by a Spring MVC controller (but before the <EM>view</EM> has been rendered; (<CODE>postHandle(WebRequest
-    req, ModelMap model)</code>)),
-    and after Spring MVC has finished processing the request entirely (<CODE>afterCompletion(WebRequest request,
-    Exception ex)</code>).
-
-    Our code simply inspects the current HTTP session (if it's available) and extracts information about the
-    authenticated user and puts that information in the request attributes where it's
-    available from inside of the view.
-
+    Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a <CODE>String</CODE> for example, your program can load it from the resource bundle
+    that is appropriate for the current user's locale. In this way, you can write program code that is largely independent of the user's locale.
+    We register an instance of <code class="class-reference" module="spring-webmvc">org.springframework.web.servlet.i18n.SessionLocaleResolver</code> to resolve the current user's <CODE>Locale</CODE>.
+    Finally, we register an instance of <CODE class="class-reference" module="spring-webmvc">org.springframework.context.support.ResourceBundleMessageSource</CODE>
+    which looks at resource bundles for translation keys.
+    <!-- todo this should be covered more in the first -core Spring - tutorial -->
 </P>
+
+<h3> Where do I Put Common Logic Across All Requests? </h3>
+
+<P> There is some data that is reprinted as part of the Apache Tiles template on every page - data like the sign-in
+    <CODE>user</CODE>s ID and username. This is information we could derive from the <CODE>user</CODE> itself. Instead
+    of making a mess of the session simply to dereference values, and instead of long expressions in our templates,
+    we'll simply recreate the values in a common place that gets executed across <EM>all</EM> requests to the
+    application. Let's take advantage of Spring MVC's powerful <EM> <A
+            href="http://static.springsource.org/spring-framework/docs/current/spring-framework-reference/htmlsingle/#mvc-config-interceptors">
+        interceptor</a></EM> support. The values we want, specifically, are the user's <CODE>userId</CODE>, and <CODE>username</CODE>.
+    These values can be made available inside the interceptor, and then dereferenced from our controllers and templates.
+    That way, when we later change the way we lookup the current, authenticated user, the templates will need not change
+    accordingly. We simply change our <code class="class-reference" module="spring-webmvc">org.springframework.web.context.request.WebRequestInterceptor</code>
+    implementation and the values will update accordingly. </p>
+
+<P> The <CODE>WebRequestInterceptor</CODE> SPI lets you act on all requests, before a request has been handled by a
+    Spring MVC controller (<CODE>preHandle(WebRequest req)</code>), after a request has been handled by a Spring MVC
+    controller (but before the <EM>view</EM> has been rendered; (<CODE>postHandle(WebRequest req, ModelMap model)</code>)),
+    and after Spring MVC has finished processing the request entirely (<CODE>afterCompletion(WebRequest request,
+        Exception ex)</code>). Our code simply inspects the current HTTP session (if it's available) and extracts
+    information about the authenticated user and puts that information in the request attributes where it's available
+    from inside of the view. </P>
 
 <div class="git-code" extension="java" q="tut_web" module="web">
     org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor
 </div>
-
 <P> We need only override one more method in the <CODE class="class-reference" module="web" q="tut_web">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>,
-    <CODE>addInterceptors</CODE>, to register our custom interceptor, like this:
+    <CODE>addInterceptors</CODE>, to register our custom interceptor, like this: </P>
 
-</P>
-
-<Div class="git-gist" gist="5087185">
-    addInterceptors()
-</Div>
-<P>
-    We can now reference these attributes from our JSP pages, like this <CODE>${username}</CODE>.
-
-
-    With all these changes in place, our final class looks like this: </P>
+<Div class="git-gist" gist="5087185"> addInterceptors()</Div>
+<P> We can now reference these attributes from our JSP pages, like this <CODE>${username}</CODE>. With all these changes
+    in place, our final class looks like this: </P>
 
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
 </div>
-
 <P> Our application can now serve complex pages using Apache Tiles, JSP, and we can easily stream resources like
     JavaScript and CSS files. We've setup Spring MVC and now we can move on to the final leg of this tour through basic
     Spring MVC. </P>
 
-<h2>Building A Simple Sign In Page   with a Form
-</h2>
+<h2>Building A Simple Sign In Page with a Form </h2>
 
-<P>  Let's build our first view, supporting basic login, which requires form processing.
-
-    The implementation logic for this  login page is in
-    <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>.
-
-
+<P> Let's build our first view, supporting basic login, which requires form processing. The implementation logic for
+    this login page is in <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>.
 </p>
 
-
-<div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController</div>
-
+<div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController
+</div>
 <P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE>
     requests to the same URL, <CODE>/crm/signin.html</CODE>. Since all handlers in the class are for a common URL, we've
-    mapped the URL in one place, at the class, in a
-    <span class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.RequestMapping</span>.
-    There are some values that are shared in multiple places, so those values are
-    stored as <CODE>public static final String</CODE> values in the class.
-
-
-</P>
+    mapped the URL in one place, at the class, in a <span class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.RequestMapping</span>.
+    There are some values that are shared in multiple places, so those values are stored as <CODE>public static final
+        String</CODE> values in the class. </P>
 
 <p> We have two use cases. How will people arrive at this form? They'll visit the URL <CODE>/crm/signup.html</CODE> in
-    their browser. That requires handling an HTTP <CODE>GET</CODE> call.
-    The request handler doesn't do anything, it simply renders the view provided.
-</p>
+    their browser. That requires handling an HTTP <CODE>GET</CODE> call. The request handler doesn't do anything, it
+    simply renders the view provided. </p>
 
 <div class="git-gist" gist="5114686"></div>
-<P>
-    Then, once the users have landed, they'll input values into the form (data that we will want to work with in terms of a
-    <code>SignInAttempt</code> object) and
-    then submit, or <CODE>POST</CODE> the data to the URL <CODE>/crm/signup.html</CODE>.
-    That requires handling an HTTP <CODE>POST</CODE> call that contains form data that needs to be validated.
-</p>
+<P> Then, once the users have landed, they'll input values into the form (data that we will want to work with in terms
+    of a <code>SignInAttempt</code> object) and then submit, or <CODE>POST</CODE> the data to the URL <CODE>/crm/signup.html</CODE>.
+    That requires handling an HTTP <CODE>POST</CODE> call that contains form data that needs to be validated. </p>
+
 <div class="git-gist" gist="5114830"></div>
-
-
-<P>
-    The values will come from the client in the request as the request parameters <code>username</code> and <CODE>password</CODE>.
-
-
-    As written, the request handler declares three parameters of type
-    <CODE class="class-reference" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</CODE>,
-    <code class="class-reference" module="spring-webmvc">org.springframework.validation.BindingResult</code>,
-    and <code class="class-reference" module="spring-webmvc">org.springframework.ui.Model</code> respectively.
-    The first argument - of type <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>
-    -
-    is annotated with two annotations: <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
-    and
-    <CODE module="servlets" class="class-reference" q="spring-webmvc">javax.validation.Valid</CODE>.
- Let's look first at the <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>.
+<P> The values will come from the client in the request as the request parameters <code>username</code> and <CODE>password</CODE>.
+    As written, the request handler declares three parameters of type <CODE class="class-reference" module="web"
+                                                                            q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</CODE>,
+    <code class="class-reference" module="spring-webmvc">org.springframework.validation.BindingResult</code>, and <code
+            class="class-reference" module="spring-webmvc">org.springframework.ui.Model</code> respectively. The first
+    argument - of type <span class="class-reference" module="web" q="tut_web"> org.springsource.examples.spring31.web.SignInAttempt</span>
+    - is annotated with two annotations: <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
+    and <CODE module="servlets" class="class-reference" q="spring-webmvc">javax.validation.Valid</CODE>. Let's look
+    first at the <span class="class-reference" module="web" q="tut_web"> org.springsource.examples.spring31.web.SignInAttempt</span>.
 </p>
-<DIV class="git-code" extension="java" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</DIV>
 
-<P>          <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
-    tells Spring MVC that the request handler is expecting an object of the type annotated. By default, Spring MVC will attempt to instantiate an instance of the class
-    using a <EM>default</EM> constructor. It will use JavaBean conventions and set   properties on the object based on request parameters. Thus: the
-    <CODE>SignInAttempt</CODE> object will be created, and its <CODE>username</CODE> field will be set from the HTTP request attribute <CODE>username</CODE>, and its
-    <Code>password</Code> field will be set from the HTTP request attribute <CODE>password</CODE>.
-
-</P>
-
-<P>
-     If you want to synthesize the model object yourself - perhaps because you want to call a different constructor or
-    build the object based on more than just request parameters - you can annotate a factory method with
-    <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>.
-    This factory method can access anything from the request it wants.
-
-    We could declare our own <CODE>@ModelAttribute</CODE> factory method in the controller
-
-    to construct the   <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>.
-    <CODE>@ModelAttribute</CODE> factory methods can declare all the same arguments as request handlers.   Here's a
-      <code>@ModelAttribute</code> factory method that uses a non-default constructor.
-
-</P>
-<DIV class="git-gist" gist="5114560">@ModelAttribute public SignInAttempt signInAttempt</DIV>
-<P>
-
-    Now, let's look at what <CODE>@Valid</CODE> does for us.
-
-    <CODE>@Valid</CODE> is a <em>Java Validation API</Em> (<A href="http://jcp.org/en/jsr/detail?id=303">JSR 303</A>)
-    annotation that
-    signals that the bean it annotates has <EM>constraint</EM> annotations declared on its fields. These
-    <EM>constraints</EM> are declarative.
-
-        The class is a regular Java Object that declares two String fields, named the same as the request parameters: <CODE>username</CODE> and <CODE>passsword</CODE>.
-        It has a default constructor, and the fields have accessor (<code>get*</code>) and mutator methods (<code>set*</code>).
-         It also declares validation constraints through annotations on each field.
-          For example, the <COde>username</COde> field is required to have a valid, non-empty email string:
-      </P>
-<DIV class="git-gist" gist="5114717">
- @Email private String email ;
+<DIV class="git-code" extension="java" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt
 </DIV>
+<P><CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
+    tells Spring MVC that the request handler is expecting an object of the type annotated. By default, Spring MVC will
+    attempt to instantiate an instance of the class using a <EM>default</EM> constructor. It will use JavaBean
+    conventions and set properties on the object based on request parameters. Thus: the <CODE>SignInAttempt</CODE>
+    object will be created, and its <CODE>username</CODE> field will be set from the HTTP request attribute <CODE>username</CODE>,
+    and its <Code>password</Code> field will be set from the HTTP request attribute <CODE>password</CODE>. </P>
 
+<P> If you want to synthesize the model object yourself - perhaps because you want to call a different constructor or
+    build the object based on more than just request parameters - you can annotate a factory method with <CODE
+            class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>.
+    This factory method can access anything from the request it wants. We could declare our own
+    <CODE>@ModelAttribute</CODE> factory method in the controller to construct the <span class="class-reference"
+                                                                                         module="web" q="tut_web"> org.springsource.examples.spring31.web.SignInAttempt</span>.
+    <CODE>@ModelAttribute</CODE> factory methods can declare all the same arguments as request handlers. Here's a <code>@ModelAttribute</code>
+    factory method that uses a non-default constructor. </P>
 
-<h3>
-    Internationalization with Spring MVC
-</h3>
+<DIV class="git-gist" gist="5114560">@ModelAttribute public SignInAttempt signInAttempt</DIV>
+<P><CODE>@Valid</CODE> is a <em>Java Validation API</Em> (<A href="http://jcp.org/en/jsr/detail?id=303">JSR 303</A>)
+    annotation that signals that the bean it annotates has <EM>constraint</EM> annotations declared on its fields. These
+    <EM>constraints</EM> are declarative. The class is a regular Java Object that declares two String fields, named the
+    same as the request parameters: <CODE>username</CODE> and <CODE>passsword</CODE>. It has a default constructor, and
+    the fields have accessor (<code>get*</code>) and mutator methods (<code>set*</code>). It also declares validation
+    constraints through annotations on each field. For example, the <COde>username</COde> field is required to have a
+    valid, non-empty email string: </P>
 
-<P>Let's look at the page markup for the sign in form:</P>
+<DIV class="git-gist" gist="5114717"> @Email private String email ;</DIV>
+<P> Spring MVC will make any errors available for us in our second argument, an instance of <CODE
+        class="class-reference" q="tut_web" module="spring-webmvc">org.springframework.validation.BindingResult</CODE>.
+    In the code for the request handler, we use the <CODE>BindingResult</CODE> to check for errors and short circuit an
+    attempt to login and - if we proceed with the login but encounter an error - to register new errors. We use the
+    <CODE>reject</CODE> method to signal that the attempt to login failed to return a valid reference. We give the
+    method a <EM>message code</EM> (<code>login.invalid</code>) and a default error message to be rendered if the
+    message code doesn't exist yet (this is useful for debugging purposes). We'll look more at message codes in the next
+    section. </P>
 
-<div module="web" q="tut_web" class="git-code" extension="jsp">
-    src/main/webapp/WEB-INF/views/signin/signin.jsp
-</div>
+<p>Finally, we declare an argument of type <CODE>Model</CODE>, which is basically a glorified hash map that stores
+    values in the various web server memory storage caches: the current HTTP request context, the HTTP session context,
+    etc. By default values are stored and endure as long as the request they're created for. Because we want the model
+    object for the <CODE>user</CODE> to live for as long as the current user is signed in, we use the <CODE>@SessionAttributes(ViewController.USER_OBJECT_KEY) </CODE>
+    at the class level to signify that the <code>user</code> model attribute should be stored in the HTTP session.
+    Values in the <CODE>Model</CODE> object are also available for reference during the render. We use this object to
+    store the authenticated user into the model attribute <code>user</code>. </p>
 
+<P> If there are any errors, the method returns the String <CODE>"signin"</CODE> to signal that <CODE>signin</CODE> view
+    should be re-rendered to present the user with feedback about the errors. If there are no errors, the method returns
+    the String <CODE>"redirect:/crm/profile.html"</CODE>, which Spring MVC will handle by sending a redirect (a separate
+    HTTP GET call) to the user's <code>profile</code> page. </P>
+
+<h3> Internationalization with Spring MVC </h3>
+
+<p> In the previous section, we used the <code>reject</code> method on the <CODE>BindingResult</CODE> argument to
+    register an error, passing in a <EM>message code</EM> that corresponds to a message in the resource bundle we setup
+    earlier in our configuration class. As explained earlier, Spring MVC will look up the message key based on the
+    current HTTP session's <CODE class="class-reference" module="java">java.util.Locale</CODE>. Let's look at the page
+    markup for the sign in form: </P>
+
+<div module="web" q="tut_web" class="git-code" extension="jsp"> src/main/webapp/WEB-INF/views/signin/signin.jsp</div>
 <P> The page is a standard <CODE>.jsp</CODE> page that relies on the Apache Tiles tags (defined by the tag namespace
-    <CODE>http://tiles.apache.org/tags-tiles</CODE>) to define a content <EM>tile</EM> to be rendered, as we discussed
-    earlier.
-    It also relies on the Spring tags, defined by the tag namespace <CODE>http://www.springframework.org/tags</CODE>, to
-    handle dealing with errors and text labels for the HTML form.
-    Both the label handling and the error handling rely on Spring's internationalization support.
+    <CODE>http://tiles.apache.org/tags-tiles</CODE>) to enclose a region of markup and set it as the value to be
+    rendered in the <CODE>content</CODE> tile in the Tiles layout.
+</p><P>
+    The page also relies on the Spring tags, defined by
+    the tag namespace <CODE>http://www.springframework.org/tags</CODE> to  setup the form, and to handle dealing with presenting internationalized  errors and text labels to the user.
+    The declaration <CODE> &lt;form:errors element="li" path="*"/&gt;</CODE> tells Spring MVC to
+    render the errors currently stored in the <CODe>BindingResult</CODe> inside of <CODE>&lt;li&gt;</CODE> elements. We
+    use the <CODE>path</CODE> attribute to tell Spring MVC that it should render <EM>all</EM> errors. In the template
+    itself - and throughout the site - wherever user prompts are expected, we use the <CODE>&lt;spring:message code
+        =".." &gt;</CODE> element to import text resources from the resource bundle based on a key. Both the label
+    handling and the error handling rely on Spring's internationalization support. </P>
+<P>  The <CODE>&lt;spring:form&gt;</code> tag  establishes that we expect the fields in this form (one for <CODE>username</CODE> and one for <CODE>password</CODE>)
+      to be mapped to a   <EM>command object</EM> - which refers to the same object as the <CODE>@ModelAttribute</CODE>-annotated argument to the HTTP <CODE>POST</CODE> request handler.
 
-
+ </P>
+<P> The rest of the page is standard  HTML markup to render an HTML form complete with interactive JavaScript feedback and styling.
+  We now have a working sign in form!
 </P>
 
-<div class="git-gist" gist="5114444"></div>
-
-
-<!--
 <h1> The Changing Face of the Web: Working with Business State using REST </h1>
+
 <h2> The Smarter Client </h2>
+
 <P>
+
 <div style="float:left;margin-right:10px; width: 520px;">
     <div style="margin-bottom: 10px" class="diagram"><img src="images/green-screen-dinosaur.jpg"/> <span
             class="caption"> Computer monitors used to come in three colors: green, white, and amber, always on a black background. </span>
@@ -671,29 +651,27 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
             href="http://bellard.org/jslinux/">this JavaScript PC emulator by Fabrice Bellard </a>. It boots Linux.
     Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
     Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
-    JavaScript. </P>
-&lt;!&ndash; <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>.
-&lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
- </P> &ndash;&gt; <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
-    are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
-    that happens between the user and the user interface happens these days entirely on the client. The server doesn't
-    really need to get involved too much in rendering HTML, besides serving the initial page load and the resources to
-    support it. Nowadays, the client can do a <EM>lot</EM> of interesting things, and doesn't need to rely on the server
-    to keep user-interface state. Indeed all the server has to do is keep <EM>business</EM> state, and make that
-    available to the client. </p>
+    JavaScript. </P> <!-- todo link to our tutorial on cujos--> <P> What role does the server play here? While
+    individual resources, such as CSS and images and JavaScript, are served up by the web server, and while initial HTML
+    pages are sent down from the server, much of the interaction that happens between the user and the user interface
+    happens these days entirely on the client. The server doesn't really need to get involved too much in rendering
+    HTML, besides serving the initial page load and the resources to support it. Nowadays, the client can do a
+    <EM>lot</EM> of interesting things, and doesn't need to rely on the server to keep user-interface state. Indeed all
+    the server has to do is keep <EM>business</EM> state, and make that available to the client. </p>
 
 <P> Today, <span class="wikipedia"> REST </span> (or <EM>representational state transfer</EM>) is the most common way to
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-<H2> The Principles of REST</H2>
-&lt;!&ndash;Resources Expose directory structure-like URIs URI’s should be easily understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped to these existing methods Stateless State dependencies limit or restrict scalability &ndash;&gt;
-<p> HTTP resources (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way.
-    Suppose, for example, that you want to map customer data from a CRM-style application (like ours!) to HTTP
-    endpoints. You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers. You
-    might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose information specifically about a customer
-    whose ID is <CODE>42</CODE>. You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE> to expose
-    information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>. </p>
+<H2> The Principles of REST</H2> &lt;!&ndash;Resources Expose directory structure-like URIs URI’s should be easily
+understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data
+objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped
+to these existing methods Stateless State dependencies limit or restrict scalability &ndash;&gt; <p> HTTP resources
+    (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
+    that you want to map customer data from a CRM-style application (like ours!) to HTTP endpoints. You might use <code>http://localhost:8080/crm/customers</code>
+    to expose <EM>all</EM> the customers. You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose
+    information specifically about a customer whose ID is <CODE>42</CODE>. You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE>
+    to expose information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>. </p>
 
 <p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
     as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
@@ -761,11 +739,9 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </P>
 
 <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to
-    Spring MVC's component model and the API it uses to standup HTTP endpoits.
-
-    We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of
-    one type of request for an HTML resource is really not very different than the handling of a request for a RESTful
-    resource. </P>
+    Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section
+    at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource
+    is really not very different than the handling of a request for a RESTful resource. </P>
 
 <P> Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
                                                                       module="services">
@@ -777,23 +753,15 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
           module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
     information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
     We'll focus on the <CODE>UserApiController</CODE> in this tutorial, which is just another Spring bean annotated with
-    the
-    <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation.
-
-    We'll walk through the implementations of these methods step by step, but let's first look at the code:
+    the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE>
+    annotation. We'll walk through the implementations of these methods step by step, but let's first look at the code:
 </P>
 
 <div module="web" q="tut_rest" extension="java" class="git-code">
     org.springsource.examples.spring31.web.UserApiController
 </div>
-
-
-<P>
-    We'll need to retrieve user details by criteria.
-    Different kinds of criteria, but we can imagine wanting to retrieve their information by IDS, at least.
-</p>
-
-
+<P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve
+    their information by IDS, at least. </p>
 
 <P> You'll want to be able to create new users. </P>
 
@@ -802,18 +770,12 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <p> You'll need an endpoint to handle file uploads for the profile's photo image </p>
 
 <p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>
-
--->
-
-<!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell
--->
+<!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell -->
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
-
 <script type="text/javascript" language="JavaScript"> $(function () {
     setTimeout(function () {
         window.scrollTo(0, document.body.scrollHeight);
     }, 1000);
 }) </script>
 <A name="eof"/></body>
-
 </html>

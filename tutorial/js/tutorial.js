@@ -34,6 +34,11 @@ $(function () {
         };
     }
 
+    function JavaModule (baseUrl){
+        GenericModule(this,  'http://docs.oracle.com/javase/7/docs/api/');
+    }
+
+
     function ServletsModule(baseUrl) {
         GenericModule(this, 'http://docs.oracle.com/javaee/6/api/');
     }
@@ -72,6 +77,7 @@ $(function () {
             mapOfModulesToLinks[x] = new SpringModule();
     }
     mapOfModulesToLinks ['servlets'] = new ServletsModule();
+    mapOfModulesToLinks ['java'] = new JavaModule();
 
     var codeModules = 'services,web'.split(',');
     for (var i = 0; i < codeModules.length; i++) {
