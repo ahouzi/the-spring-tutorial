@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/html" xmlns="http: //www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-      xmlns="http://www.w3.org/1999/html">
+      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .todo {
@@ -327,7 +327,8 @@
     </tr>
 </TABLE>
 
-<h3>  Handling Page Layouts with Apache Tiles </h3>
+<h3> Handling Page Layouts with Apache Tiles </h3>
+
 <P><img src="http://tiles.apache.org/images/powered-by-tiles.png" width="200" style="float:left ; margin-right: 20px;"/>
     Building individual web pages is easy. Simply slap together some HTML and then you're set. Building web applications
     well, on the other hand, is an entirely different thing. Well built web applications are visually consistent, often
@@ -362,7 +363,8 @@
     pages. The only thing that will change on a page-by-page basis is the <code>body</code>. Let's look at the
     definition of the base template in Tiles' configuration format. Apache Tiles expects information about the templates
     to be provided in the form of an XML file, called <CODE>tiles.xml</code>. Apache Tiles supports template
-    inheritance. You might specify a base definition to be shared as the basis for other templates like this file (<CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
+    inheritance. You might specify a base definition to be shared as the basis for other templates like this file
+    (<CODE>web/src/main/webapp/WEB-INF/layouts/tiles.xml</CODE>): </P>
 
 <div module="web" q="tut_web" extension="xml" class="git-code"> src/main/webapp/WEB-INF/layouts/tiles.xml</div>
 <P> This specifies a <CODE>&lt;definition&gt;</CODE> (named <strong><CODE>page</code></strong>) that in turn specifies a
@@ -548,59 +550,102 @@
     which we introduced earlier.
 
     The goal here is to be able to take the email and password from an HTML <CODE>form</CODE>, check them against
-    a database,   sign them in if the credentials are valid, or show error feedback to the user.
-    The values will come from the client as values in the request,  <code>username</code> and <CODE>password</CODE>.
-
-
-
-    As written, the request handler  declares three parameters of type <CODE class="class-reference" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</CODE>, <code class="class-reference" module  ="spring-webmvc" >org.springframework.validation.BindingResult</code>,
-    and <code class="class-reference" module  ="spring-webmvc" >org.springframework.ui.Model</code>.
-
-
-    <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
-
+    a database, sign them in if the credentials are valid, or show error feedback to the user.
 
 
 </p>
+
 <DIv class="git-gist" gist="5114560">
- @ModelAttribute public SignInAttempt signInAttempt(@RequestParam ..)
+    @ModelAttribute public SignInAttempt signInAttempt(@RequestParam ..)
 </DIv>
 
 <div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController
 </div>
 
 <P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE>
-    requests to the same URL, <CODE>/crm/signin.html</CODE>.   Since all handlers in the class are for a common URL, we've mapped the URL in one place, at the class, in a
-     <span class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.RequestMapping</span>.
+    requests to the same URL, <CODE>/crm/signin.html</CODE>. Since all handlers in the class are for a common URL, we've
+    mapped the URL in one place, at the class, in a
+    <span class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.RequestMapping</span>.
     There are some values that are shared in multiple places, so those values are
     stored as <CODE>public static final String</CODE> values in the class. This is convenient when building up URL
     hierarchies to ensure consistent URL prefix strings.
 
 
-
 </P>
 
-<p> We have two use cases. How will people arrive at this form? They'll visit the URL <CODE>/crm/signup.html</CODE> in their browser. That requires handling an HTTP <CODE>GET</CODE> call.
-    Then, once they've landed, they'll input values into the form (data that we will want to work with in terms of a <code>SignInAttempt</code> object) and
+<p> We have two use cases. How will people arrive at this form? They'll visit the URL <CODE>/crm/signup.html</CODE> in
+    their browser. That requires handling an HTTP <CODE>GET</CODE> call.
+    The request handler doesn't do anything, it simply forwards the user to the signin view template, which includes the
+    markup for the sign in form.
+</p>
+
+<div class="git-gist" gist="5114686"></div>
+<P>
+    Then, once they've landed, they'll input values into the form (data that we will want to work with in terms of a
+    <code>SignInAttempt</code> object) and
     then submit, or <CODE>POST</CODE> the data to the URL <CODE>/crm/signup.html</CODE>.
     That requires handling an HTTP <CODE>POST</CODE> call that contains form data that needs to be validated.
 </p>
 
+<P>
+    The values will come from the client in the request as the request parameters <code>username</code> and <CODE>password</CODE>.
+
+
+    As written, the request handler declares three parameters of type
+    <CODE class="class-reference" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</CODE>,
+    <code class="class-reference" module="spring-webmvc">org.springframework.validation.BindingResult</code>,
+    and <code class="class-reference" module="spring-webmvc">org.springframework.ui.Model</code> respectively.
+    The first argument - of type <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>
+    -
+    is annotated with two annotations: <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
+    and
+    <CODE module="servlets" class="class-reference" q="spring-webmvc">javax.validation.Valid</CODE>.
+ Let's look first at the <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>.
+</p>
+<DIV class="git-code" extension="java" module="web" q="tut_web">org.springsource.examples.spring31.web.SignInAttempt</DIV>
+
+<P>          <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
+    tells Spring MVC that the request handler is expecting an object of the type annotated. By default, Spring MVC will attempt to instantiate an instance of the class
+    using a <EM>default</EM> constructor. It will use JavaBean conventions and set   properties on the object based on request parameters. So, since
+    the object declares
+
+</P>
+
+<P>
+
+    Now, let's look at what <CODE>Valid</CODE> does for us.
+
+    The <CODE>Valid</CODE> is a <em>Java Validation API</Em> (<A href="http://jcp.org/en/jsr/detail?id=303">JSR 303</A>)
+    annotation that
+    signals that the bean it annotates has <EM>constraint</EM> annotations declared on its fields. These
+    <EM>constraints</EM> are declarative. Let's look at the
+
+</P>
+
+<Div class="class-reference" module="web" q="tut_web">
+    org.springsource.examples.spring31.web.SignInAttempt
+</Div>
+
 <h3>
- Internationalization with Spring MVC
+    Internationalization with Spring MVC
 </h3>
+
 <P>Let's look at the page markup for the sign in form:</P>
+
 <div module="web" q="tut_web" class="git-code" extension="jsp">
-   src/main/webapp/WEB-INF/views/signin/signin.jsp
+    src/main/webapp/WEB-INF/views/signin/signin.jsp
 </div>
 
- <P>           The page is a standard <CODE>.jsp</CODE> page that relies on the Apache Tiles tags (defined by the tag namespace <CODE>http://tiles.apache.org/tags-tiles</CODE>) to define a content <EM>tile</EM> to be rendered, as we discussed earlier.
-        It also relies on the  Spring tags, defined by the tag namespace <CODE>http://www.springframework.org/tags</CODE>, to
-         handle dealing with errors and  text labels for the HTML form.
-     Both the label handling and the error handling rely on Spring's internationalization support.
+<P> The page is a standard <CODE>.jsp</CODE> page that relies on the Apache Tiles tags (defined by the tag namespace
+    <CODE>http://tiles.apache.org/tags-tiles</CODE>) to define a content <EM>tile</EM> to be rendered, as we discussed
+    earlier.
+    It also relies on the Spring tags, defined by the tag namespace <CODE>http://www.springframework.org/tags</CODE>, to
+    handle dealing with errors and text labels for the HTML form.
+    Both the label handling and the error handling rely on Spring's internationalization support.
 
 
- </P>
+</P>
+
 <div class="git-gist" gist="5114444"></div>
 
 
