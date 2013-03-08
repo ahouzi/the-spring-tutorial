@@ -451,23 +451,7 @@
             class="wikipedia">HTTP_404</span> code is to be returned. </P>
 
 <div class="git-gist" gist="5067711"> configureHandlerExceptionResolvers</div>
-<h3> Internationalization </h3>
-<P>
-   We don't live in monolingual world, and web applications can't afford to ignore the languages their users speak. Spring MVC can
-    detect the <em>locale</em> from each users HTTP requests. This can be used to give our application an idea
-    about what language the user is expecting language strings to be rendered in.
-     Spring MVC can look up message strings in <EM>resource bundles</EM>.
-    The JDK supports <CODE class="class-reference" module="java">java.util.ResourceBundle</CODE>s, which
-     map a given key and language combination to a string in a specific language and localized to a specific region.
 
-
-    Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a <CODE>String</CODE> for example, your program can load it from the resource bundle
-    that is appropriate for the current user's locale. In this way, you can write program code that is largely independent of the user's locale.
-    We register an instance of <code class="class-reference" module="spring-webmvc">org.springframework.web.servlet.i18n.SessionLocaleResolver</code> to resolve the current user's <CODE>Locale</CODE>.
-    Finally, we register an instance of <CODE class="class-reference" module="spring-webmvc">org.springframework.context.support.ResourceBundleMessageSource</CODE>
-    which looks at resource bundles for translation keys.
-    <!-- todo this should be covered more in the first -core Spring - tutorial -->
-</P>
 
 <h3> Where do I Put Common Logic Across All Requests? </h3>
 
@@ -498,15 +482,47 @@
     <CODE>addInterceptors</CODE>, to register our custom interceptor, like this: </P>
 
 <Div class="git-gist" gist="5087185"> addInterceptors()</Div>
-<P> We can now reference these attributes from our JSP pages, like this <CODE>${username}</CODE>. With all these changes
-    in place, our final class looks like this: </P>
+
+
+<h3> Internationalization </h3>
+<P>
+    We don't live in monolingual world, and web applications can't afford to ignore the languages their users speak. Spring MVC can
+    detect the <em>locale</em> from each users HTTP requests. This can be used to give our application an idea
+    about what language the user is expecting language strings to be rendered in.
+    Spring MVC can look up message strings in <EM>resource bundles</EM>.
+    The JDK supports <CODE class="class-reference" module="java">java.util.ResourceBundle</CODE>s, which
+    map a given key and language combination to a string in a specific language and localized to a specific region.
+
+
+    Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a <CODE>String</CODE> for example, your program can load it from the resource bundle
+    that is appropriate for the current user's locale. In this way, you can write program code that is largely independent of the user's locale.
+
+    We register an instance of  <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.i18n.SessionLocaleResolver</CODE>
+    to detect the current users <CODE>Locale</CODE> and store it for reference in the session. The <CODE>Locale</CODE> stored in the HTTP session can be
+    overriden with a  request parameter. We enable this by installing one more <EM>interceptor</EM>, an instance of the
+    <CODE class="class-reference" module="spring-webmvc">  org.springframework.web.servlet.i18n.LocaleChangeInterceptor </CODE>.
+
+    Finally, we register an instance of <CODE class="class-reference" module="spring-webmvc">org.springframework.context.support.ResourceBundleMessageSource</CODE>
+    which looks at resource bundles for translation keys having a <code>basename</code>. We've specified the <CODE>basename</CODE> <code>messages</code>.
+     Thus,  if a user's <CODE>Locale</CODE>  indicates that the user speaks  the German language (de) in Switzerland (CH),
+     Spring MVC will attempt to load <CODE>messages_de_CH.properties</CODE>, before then trying the more generic <CODE>messages_de.properties</CODE> for all German-language speaking countries.
+    If that doesn't work, it'll fall back to the resource bundle for the specified <Em>default</Em> <CODE>Locale</CODE>.
+
+    We'll look at how this internationalization support can be used in our application later when we introduce form validation and
+    demonstrate how to create templates with internationalized strings.
+    <!-- todo this should be covered more in the first -core Spring - tutorial -->
+</P>
+<div class="git-gist" gist="5115482"></div>
+
+<H3>Final Configuration</H3>
+
+<P> Our application can now serve complex pages using Apache Tiles, JSP, and we can easily stream resources like
+    JavaScript and CSS files. We've setup Spring MVC and now we can move on to the final leg of this tour through basic
+    Spring MVC. </P>
 
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
 </div>
-<P> Our application can now serve complex pages using Apache Tiles, JSP, and we can easily stream resources like
-    JavaScript and CSS files. We've setup Spring MVC and now we can move on to the final leg of this tour through basic
-    Spring MVC. </P>
 
 <h2>Building A Simple Sign In Page with a Form </h2>
 
@@ -663,10 +679,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-<H2> The Principles of REST</H2> &lt;!&ndash;Resources Expose directory structure-like URIs URI’s should be easily
-understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data
-objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped
-to these existing methods Stateless State dependencies limit or restrict scalability &ndash;&gt; <p> HTTP resources
+<H2> The Principles of REST</H2>  <p> HTTP resources
     (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
     that you want to map customer data from a CRM-style application (like ours!) to HTTP endpoints. You might use <code>http://localhost:8080/crm/customers</code>
     to expose <EM>all</EM> the customers. You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose
