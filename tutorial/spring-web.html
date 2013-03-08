@@ -225,7 +225,8 @@
 </div>
 <h2> Configuring Spring MVC </h2>
 
-<h3> Convention over Configuration, Mostly </h3>
+<h3>  The Simplest Possible Spring MVC Application
+</h3>
 
 <P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
     and tailor it based on our application requirements. To get a working, reasonably configured installation of Spring
@@ -256,37 +257,44 @@
     </LI>
 </uL>
 <p> We can do a lot with this simple setup! There's one thing missing, however. As configured, Spring MVC doesn't render
-    views in a useful way and it doesn't know about your controllers. You can use the standard <CODE
-            class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
+    views in a useful way and it doesn't know about your controllers. You can use the standard Spring annotation
+    <CODE class="class-reference" module="spring-context">org.springframework.context.annotation.ComponentScan</CODE>
     annotation to tell Spring to automatically register your data services (Spring beans that handle our data-access
     logic) and your Spring MVC controllers (beans annotated with the <CODE class="class-reference"
                                                                            module="spring-context">org.springframework.stereotype.Controller</CODE>
-    annotation) by scanning all the beans in or below a package, or packages specified. You can specify these packages
+    annotation) by scanning all the beans in or below the package, or packages, specified. You can specify these packages
     either as a String or by specifying a class that lives in the package you want to scan. The latter approach is more
     refactor-friendly: if you change the package structure of your code, your tooling will update references to classes,
     but might not necessarily refactor Strings that contain a package path. </p>
 
 <P> As depicted in the diagram above, Spring MVC will <EM>resolve</EM> a <EM>view</EM> based on some heuristic
-    prescribed by an implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
+    supplied by a registered implementation of <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.ViewResolver</span>.
     Let's install a very basic implementation ( <span class="class-reference" module="spring-webmvc">org.springframework.web.servlet.view.InternalResourceViewResolver</span>)
     that will render local <CODE>.jsp</code> pages. </p>
 
 <div class="git-gist" gist="5067119"> @Bean public InternalResourveViewResolver(){ ... }</div>
 <P> With this in place, Spring MVC will take a view String (say, <CODE>"hi"</CODE>) and resolve it to <CODE>WEB-INF/hi.jsp</CODE>,
-    which it will then render. Let's pause, do a sanity check, and take a moment to deploy a Spring MVC controller
-    complete with a working view. First, add your <CODE>.jsp</CODE> page (<CODE>WEB-INF/hi.jsp</CODE>): </p>
+    which it will then load and send back to the client, rendered with any data communicated through the <CODE>Model</code> object.
+    Let's pause, do a sanity check, and take a moment to deploy a Spring MVC controller complete with a working view.
+    First, add your <CODE>.jsp</CODE> page (<CODE>WEB-INF/hi.jsp</CODE>): </p>
 
 <DIV class="git-gist" gist="5067085"> some jsp content</DIV>
-<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later. Let's
-    just verify everything's working. Add the following class: </p>
+
+<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later, instead preferring to verify that everything's working now.
+    Add the following class: </p>
 
 <div class="git-gist" gist="5067155"> @Controller HelloWorldController</div>
-<P> Then simply build this and deploy to your application server. You should be able to bring up the page like
-    this: </P>
+
+<P> Then simply build this and deploy to your application server.
+     <!-- TODO link to the beginning of this tutorial If you're using the Spring Tool Suite, you simply need to deploy the application to Apache Tomcat in your <CODE>Servers</code> panel.
+     -->
+    You should be able to bring up the page like this: </P>
 
 <div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to whatever you like to change the name printed. If the name query parameter is not present, the code will simply default to printing "World." </span>
 </div>
-<h2> Better Views </h2>
+<h2>
+    Building the Screens for Our Application
+ </h2>
 
 <P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
     application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
@@ -393,7 +401,7 @@
 <P> Now, when a Spring MVC controller returns <CODE>"signin"</CODE>, the Tiles view definition named <CODE>signin</CODE>
     will be loaded and rendered. </P>
 
-<h3> Resources, Views and the Default Servlet </h3>
+<h3>Rendering Resources with the Default Servlet </h3>
 
 <P> Our application already has a lot going for it, but we're not done. You'll recall from our configuration in <span
         module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
@@ -418,9 +426,10 @@
     which implements <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>
     with empty no-op methods. </P>
 
-<P> First, let's need to <EM>enable</EM> the default servlet. The default servlet is unique to each web container, and
-    not specified by any standard. Spring MVC can not rely on the availability of this functionality, so it does not, by
-    default. It supports a wide range of deployment targets, though - so chances are it will work for you if you're
+<P>  To handle the  resources with no mapped <CODE>Servlet</CODE>, we <EM>enable</EM> the default servlet in our <CODE>@Configuration</CODE> class.
+    The default servlet is unique to each web container, and not specified by any standard.
+     Spring MVC can be made to depend on this functionality, if it's available, if you <EM>enable</EM> it.
+    It supports a wide range of deployment targets, though - so chances are it will work for you if you're
     running this application in Tomcat, Jetty, JBoss, and GlassFish, Google App Engine, Resin, WebLogic or WebSphere.
     Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet. </P>
 
@@ -430,7 +439,11 @@
     all requests to <code>/web/*</code> and render the appropriate resource in the <CODE>/web/</CODE> directory in the
     web application. </P>
 
+
 <Div class="git-gist" gist="5060815"> addResourceHandlers()...</Div>
+
+<h3> View Controllers </h3>
+
 <!-- now we need to introduce how to handle view controllers. but the things is, theyve not yet seen the full controllerl ifecycle. so perhaps i can introduce that above? -->
 <P> Some pages in an application are read-only - they don't require any functionality or processing logic. It would seem
     silly to implement a controller and a request handler just to render a view. Spring MVC can handle this eventuality
@@ -485,8 +498,10 @@
 
 
 <h3> Internationalization </h3>
+
 <P>
-    We don't live in monolingual world, and web applications can't afford to ignore the languages their users speak. Spring MVC can
+    We don't live in monolingual world, and web applications can't afford to ignore the languages their users speak.
+    Spring MVC can
     detect the <em>locale</em> from each users HTTP requests. This can be used to give our application an idea
     about what language the user is expecting language strings to be rendered in.
     Spring MVC can look up message strings in <EM>resource bundles</EM>.
@@ -494,24 +509,32 @@
     map a given key and language combination to a string in a specific language and localized to a specific region.
 
 
-    Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a <CODE>String</CODE> for example, your program can load it from the resource bundle
-    that is appropriate for the current user's locale. In this way, you can write program code that is largely independent of the user's locale.
+    Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a
+    <CODE>String</CODE> for example, your program can load it from the resource bundle
+    that is appropriate for the current user's locale. In this way, you can write program code that is largely
+    independent of the user's locale.
 
-    We register an instance of  <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.i18n.SessionLocaleResolver</CODE>
-    to detect the current users <CODE>Locale</CODE> and store it for reference in the session. The <CODE>Locale</CODE> stored in the HTTP session can be
-    overriden with a  request parameter. We enable this by installing one more <EM>interceptor</EM>, an instance of the
-    <CODE class="class-reference" module="spring-webmvc">  org.springframework.web.servlet.i18n.LocaleChangeInterceptor </CODE>.
+    We register an instance of <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.i18n.SessionLocaleResolver</CODE>
+    to detect the current users <CODE>Locale</CODE> and store it for reference in the session. The <CODE>Locale</CODE>
+    stored in the HTTP session can be
+    overriden with a request parameter. We enable this by installing one more <EM>interceptor</EM>, an instance of the
+    <CODE class="class-reference" module="spring-webmvc">
+        org.springframework.web.servlet.i18n.LocaleChangeInterceptor </CODE>.
 
     Finally, we register an instance of <CODE class="class-reference" module="spring-webmvc">org.springframework.context.support.ResourceBundleMessageSource</CODE>
-    which looks at resource bundles for translation keys having a <code>basename</code>. We've specified the <CODE>basename</CODE> <code>messages</code>.
-     Thus,  if a user's <CODE>Locale</CODE>  indicates that the user speaks  the German language (de) in Switzerland (CH),
-     Spring MVC will attempt to load <CODE>messages_de_CH.properties</CODE>, before then trying the more generic <CODE>messages_de.properties</CODE> for all German-language speaking countries.
+    which looks at resource bundles for translation keys having a <code>basename</code>. We've specified the <CODE>basename</CODE>
+    <code>messages</code>.
+    Thus, if a user's <CODE>Locale</CODE> indicates that the user speaks the German language (de) in Switzerland (CH),
+    Spring MVC will attempt to load <CODE>messages_de_CH.properties</CODE>, before then trying the more generic <CODE>messages_de.properties</CODE>
+    for all German-language speaking countries.
     If that doesn't work, it'll fall back to the resource bundle for the specified <Em>default</Em> <CODE>Locale</CODE>.
 
-    We'll look at how this internationalization support can be used in our application later when we introduce form validation and
+    We'll look at how this internationalization support can be used in our application later when we introduce form
+    validation and
     demonstrate how to create templates with internationalized strings.
     <!-- todo this should be covered more in the first -core Spring - tutorial -->
 </P>
+
 <div class="git-gist" gist="5115482"></div>
 
 <H3>Final Configuration</H3>
@@ -621,21 +644,29 @@
 <P> The page is a standard <CODE>.jsp</CODE> page that relies on the Apache Tiles tags (defined by the tag namespace
     <CODE>http://tiles.apache.org/tags-tiles</CODE>) to enclose a region of markup and set it as the value to be
     rendered in the <CODE>content</CODE> tile in the Tiles layout.
-</p><P>
+</p>
+
+<P>
     The page also relies on the Spring tags, defined by
-    the tag namespace <CODE>http://www.springframework.org/tags</CODE> to  setup the form, and to handle dealing with presenting internationalized  errors and text labels to the user.
+    the tag namespace <CODE>http://www.springframework.org/tags</CODE> to setup the form, and to handle dealing with
+    presenting internationalized errors and text labels to the user.
     The declaration <CODE> &lt;form:errors element="li" path="*"/&gt;</CODE> tells Spring MVC to
     render the errors currently stored in the <CODe>BindingResult</CODe> inside of <CODE>&lt;li&gt;</CODE> elements. We
     use the <CODE>path</CODE> attribute to tell Spring MVC that it should render <EM>all</EM> errors. In the template
     itself - and throughout the site - wherever user prompts are expected, we use the <CODE>&lt;spring:message code
-        =".." &gt;</CODE> element to import text resources from the resource bundle based on a key. Both the label
+    =".." &gt;</CODE> element to import text resources from the resource bundle based on a key. Both the label
     handling and the error handling rely on Spring's internationalization support. </P>
-<P>  The <CODE>&lt;spring:form&gt;</code> tag  establishes that we expect the fields in this form (one for <CODE>username</CODE> and one for <CODE>password</CODE>)
-      to be mapped to a   <EM>command object</EM> - which refers to the same object as the <CODE>@ModelAttribute</CODE>-annotated argument to the HTTP <CODE>POST</CODE> request handler.
 
- </P>
-<P> The rest of the page is standard  HTML markup to render an HTML form complete with interactive JavaScript feedback and styling.
-  We now have a working sign in form!
+<P> The <CODE>&lt;spring:form&gt;</code> tag establishes that we expect the fields in this form (one for
+    <CODE>username</CODE> and one for <CODE>password</CODE>)
+    to be mapped to a <EM>command object</EM> - which refers to the same object as the <CODE>@ModelAttribute</CODE>-annotated
+    argument to the HTTP <CODE>POST</CODE> request handler.
+
+</P>
+
+<P> The rest of the page is standard HTML markup to render an HTML form complete with interactive JavaScript feedback
+    and styling.
+    We now have a working sign in form!
 </P>
 
 <h1> The Changing Face of the Web: Working with Business State using REST </h1>
@@ -679,7 +710,9 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-<H2> The Principles of REST</H2>  <p> HTTP resources
+<H2> The Principles of REST</H2>
+
+<p> HTTP resources
     (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
     that you want to map customer data from a CRM-style application (like ours!) to HTTP endpoints. You might use <code>http://localhost:8080/crm/customers</code>
     to expose <EM>all</EM> the customers. You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose
