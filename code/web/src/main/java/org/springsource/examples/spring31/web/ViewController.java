@@ -39,7 +39,7 @@ public class ViewController {
                 model.addAttribute(USER_OBJECT_KEY, user);
                 return "redirect:/crm/profile.html";
             } else {
-                result.reject("login.invalid", "The email and password did not match any known records. Please attempt your signin again.");
+                result.reject("login.invalid");
             }
         }
         return SIGNIN;
