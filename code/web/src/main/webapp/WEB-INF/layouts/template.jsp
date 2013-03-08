@@ -74,7 +74,7 @@
         </c:if>
 
         <c:if test="${ not empty username }">
-            Welcome  ${username}.
+            Welcome  ${username}
             | <a href="${pageContext.request.contextPath}/crm/profile.html"><spring:message code="navigation.profile" /></a> |
             <a href="${pageContext.request.contextPath}/crm/customers.html"><spring:message code="navigation.my-customers" /></a> |
             <A href="#">   <spring:message code="navigation.signout" /></A>
