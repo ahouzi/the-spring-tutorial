@@ -39,3 +39,7 @@ legend h2 {
 form {
     margin: 0;
 }
+
+.error {
+    padding-left: 10px;
+}
