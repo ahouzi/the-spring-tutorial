@@ -87,7 +87,9 @@ module.factory('ajaxUtils', function () {
         post:function (url, data, cb) {
             sendDataFunction($.ajax, noopArgsProcessor, url, 'POST', data, cb);
         },
-
+        delete:function (url, data, cb) {
+            sendDataFunction($.ajax, noopArgsProcessor, url, 'DELETE', data, cb);
+        },
         get:function (url, data, cb) {
             $.ajax({
                 type:'GET',
@@ -284,11 +286,10 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     });
 
     $scope.isUsernameValid = function (u) {
-        var isString = typeof u == typeof '';
-        if (!isString) return true;
-        var m = u.match(/\w{8,}$/) != null;
-        console.log('does [' + u + '] match? ' + m);
-        return m;
+        return u!=null && u!='' ;
+        //var m = u.match(/\w{8,}$/) != null;
+        //console.log('does [' + u + '] match? ' + m);
+        //return m;
     };
 
     $scope.confirmPasswordMatches = function (cpw) {
@@ -407,8 +408,8 @@ function CustomerController($scope, customerService, ajaxUtils) {
         customerById(id, function (customer, arrIndx) {
 
             customerService.deleteCustomerById(userId, customer.id, function () {
-                $scope.refreshCustomers()
-            })
+                $scope.refreshCustomers();
+            });
             //$scope.customers[arrIndx].remove();
         });
         console.log('deleteCustomer() does not currently actually delete a resource on the server...');
