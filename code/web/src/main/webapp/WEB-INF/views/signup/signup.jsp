@@ -12,12 +12,14 @@
                 <div class="panel">
                     <fieldset>
                         <legend>
-                            <h2> Sign Up </h2>
+                            <h2>
+                                <spring:message code="signup.signup"/>
+                            </h2>
                         </legend>
 
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="username">User Name:</label>
+                            <label class="control-label" for="username"><spring:message code="signup.email"/>:</label>
 
                             <div class="controls"><input class="input-xlarge"
                                                          id="username"
@@ -27,33 +29,41 @@
                                                          ui-validate="{ validUsername : isUsernameValid }"
                                                          required="required"
                                                          ng-model="user.username"/>
-                                <span ng-show="${error}" class="help-block"> Please provide a valid value for the e-mail.   </span>
+                                <span ng-show="${error}" class="help-block">   
+                                <spring:message code="signup.email.prompt"/>
+                                </span>
                                 <span ng-show="form.username.$error.validUsername" class="help-block">
 
                                      <spring:message code="profile.email.error.invalid"/>
                                 </span>
-                                <span ng-show="usernameTaken" class="help-block"> <spring:message code="profile.email.error.taken"/>  </span>
+                                <span ng-show="usernameTaken" class="help-block"> <spring:message
+                                        code="profile.email.error.taken"/>  </span>
                             </div>
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="password">Password:</label>
+                            <label class="control-label" for="password"><spring:message
+                                    code="signup.password"/>:</label>
 
                             <div class="controls">
                                 <input class="input-xlarge" id="j_password" id="password" type="password"
                                        ng-model="user.password" required="required"/>
-                                <span ng-show="${error}" class="help-inline">  <spring:message code="signup.password.error.invalid"/> </span>
+                                <span ng-show="${error}" class="help-inline">  <spring:message
+                                        code="signup.password.error.invalid"/> </span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="password"><spring:message code="profile.password-confirm"/>:</label>
+                            <label class="control-label" for="password"><spring:message
+                                    code="profile.password-confirm"/>:</label>
 
                             <div class="controls">
                                 <input class="input-xlarge" ui-validate="{ confirmPassword : confirmPasswordMatches }"
                                        type="password"
                                        name="passwordConfirmation"
                                        ng-model="user.passwordConfirmation" required="required"/>
-                                <span ng-show="form.passwordConfirmation.$error.confirmPassword" class="help-block">            <spring:message code="profile.passwords.dont-match"/>  </span>
+                                <span ng-show="form.passwordConfirmation.$error.confirmPassword" class="help-block">            
+                                    <spring:message code="profile.passwords.dont-match"/>  
+                                </span>
                                 <span ng-show="${error}" class="help-inline">
                                   <spring:message code="profile.passwords.prompt"/>
                                 </span>
@@ -61,7 +71,8 @@
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="firstName"><spring:message code="signup.first-name"/> :</label>
+                            <label class="control-label" for="firstName"><spring:message code="signup.first-name"/>
+                                :</label>
 
                             <div class="controls"><input value="${firstName}" class="input-xlarge" id="firstName"
                                                          type="text"
@@ -73,12 +84,14 @@
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="lastName">      <spring:message code="profile.last-name"/>:</label>
+                            <label class="control-label" for="lastName"> <spring:message
+                                    code="profile.last-name"/>:</label>
 
                             <div class="controls"><input value="${lastName}" class="input-xlarge" id="lastName"
                                                          type="text"
                                                          ng-model="user.lastName" required="required"/>
-                                <span ng-show="${error}" class="help-inline">  <spring:message code="profile.last-name.prompt"/>  </span>
+                                <span ng-show="${error}" class="help-inline">  <spring:message
+                                        code="profile.last-name.prompt"/>  </span>
                             </div>
                         </div>
 
@@ -90,37 +103,18 @@
                                 <button type="submit" ng-disabled="form.$invalid" ng-click="saveProfileData()"
                                         href="javascript:void(0);" class="btn btn-primary" name="action" value="signin"
                                         ng-model-instant>
-                                    Sign Up
-                                </button>
-                                or
-                              <span>
-                        <%-- todo restore this    <a ng-click="signinWithFacebook()" href="javascript:void(0);">Sign Up with Facebook</a>--%>
-
-                            </span>
-
-                            </div>
-
-                         <%--   <div ng-show="isFacebookSignup()">
-
-                                <button type="submit" ng-disabled="form.$invalid" ng-click="continueSigninWithFacebook()"
-                                        href="javascript:void(0);" class="btn btn-primary" name="action" value="signin"
-                                        ng-model-instant>
-                                    Continue Signing Up With Facebook
+                                    <spring:message code="signup.signup"/>
                                 </button>
 
                             </div>
---%>
+
+
                         </div>
 
                     </fieldset>
                 </div>
             </form>
 
-         <%--   <c:url var="signinWithProvider" value="/signin/facebook"/>
-
-            <form method="POST" id="signinWithFacebook" action="${signinWithProvider}">
-            </form>
---%>
 
         </tiles:putAttribute>
 

@@ -1,13 +1,19 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ page session="false" %>
 
 <div class="normalBody">
-    <h1> Oops! </h1>
+    <h1> <spring:message code="oops.oops"/></h1>
 
-    <P> Evidently, something has gone terribly wrong. </P>
+    <P>
+        <spring:message code="oops.something-went-wrong"/>
+    </P>
 
-    <P> The full exception is </P>
+    <P>
+        <spring:message code="oops.full-exception-is"/>
+
+    </P>
     <BLOCKQUOTE><CODE style="font-size: smaller; ">
         ${exception}
     </CODE></BLOCKQUOTE>
