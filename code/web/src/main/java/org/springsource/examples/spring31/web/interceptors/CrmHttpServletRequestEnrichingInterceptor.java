@@ -25,10 +25,6 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
     private String userIdAttribute = "userId";
 
     @Override
-    public void postHandle(WebRequest req, ModelMap model) throws Exception {
-    }
-
-    @Override
     public void preHandle(WebRequest req) throws Exception {
         ServletWebRequest swr = (ServletWebRequest) req;
         Map<String, Object> stringObjectHashMap = new HashMap<String, Object>();
@@ -37,7 +33,6 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         if (null != session) {
             User user = (User) session.getAttribute(ViewController.USER_OBJECT_KEY);
             if (null != user) {
-                String usernameValue = httpServletRequest.getParameter(this.usernameAttribute);
                 if (null != usernameAttribute)
                     stringObjectHashMap.put(this.usernameAttribute, user.getUsername());
                 stringObjectHashMap.put(userIdAttribute, user.getId());
@@ -46,6 +41,10 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
         for (String k : stringObjectHashMap.keySet())
             swr.setAttribute(k, stringObjectHashMap.get(k), RequestAttributes.SCOPE_REQUEST);
+    }
+
+    @Override
+    public void postHandle(WebRequest req, ModelMap model) throws Exception {
     }
 
     @Override
