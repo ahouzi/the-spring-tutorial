@@ -524,68 +524,44 @@
     JavaScript and CSS files. We've setup Spring MVC and now we can move on to the final leg of this tour through basic
     Spring MVC. </P>
 
-<h2>Building A Simple Sign In Page
+<h2>Building A Simple Sign In Page   with a Form
 </h2>
 
-<!--todo rewrite this?-->
-<P> We've done as much as we could to configure our application and we've achieved a lot, but we haven't really laid
-    down
-    any <EM>actual</em> code in service of our application! No <em>business</em> logic, as it were.
-    Let's look at the implementation of our signin page. We'll implement a far more robust version later, with far less
-    code, when
-    we introduce Spring Security. For now, however, this will let unblock us so we can build the rest of the
-    application.
+<P>  Let's build our first view, supporting basic login, which requires form processing.
 
-    <!--
-        Now that we've got a good understanding of how to do page layouts in Spring MVC, let's look at building a simple
-        sign in form.
-
-        This will be a good chance for us to look a little bit more at Spring MVC's <CODE>Controller</CODE> component model,
-        and to understand how to do basic form processing in Spring MVC. We'll revisit the sign in form later when we
-        introduce Spring Security,
-        but for now a poor-man's sign in form is just what the doctor ordered.
-    -->
-    Let's look further at
-    <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>,
-    which we introduced earlier.
-
-    The goal here is to be able to take the email and password from an HTML <CODE>form</CODE>, check them against
-    a database, sign them in if the credentials are valid, or show error feedback to the user.
+    The implementation logic for this  login page is in
+    <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>.
 
 
 </p>
 
-<DIv class="git-gist" gist="5114560">
-    @ModelAttribute public SignInAttempt signInAttempt(@RequestParam ..)
-</DIv>
 
-<div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController
-</div>
+<div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController</div>
 
 <P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE>
     requests to the same URL, <CODE>/crm/signin.html</CODE>. Since all handlers in the class are for a common URL, we've
     mapped the URL in one place, at the class, in a
     <span class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.RequestMapping</span>.
     There are some values that are shared in multiple places, so those values are
-    stored as <CODE>public static final String</CODE> values in the class. This is convenient when building up URL
-    hierarchies to ensure consistent URL prefix strings.
+    stored as <CODE>public static final String</CODE> values in the class.
 
 
 </P>
 
 <p> We have two use cases. How will people arrive at this form? They'll visit the URL <CODE>/crm/signup.html</CODE> in
     their browser. That requires handling an HTTP <CODE>GET</CODE> call.
-    The request handler doesn't do anything, it simply forwards the user to the signin view template, which includes the
-    markup for the sign in form.
+    The request handler doesn't do anything, it simply renders the view provided.
 </p>
 
 <div class="git-gist" gist="5114686"></div>
 <P>
-    Then, once they've landed, they'll input values into the form (data that we will want to work with in terms of a
+    Then, once the users have landed, they'll input values into the form (data that we will want to work with in terms of a
     <code>SignInAttempt</code> object) and
     then submit, or <CODE>POST</CODE> the data to the URL <CODE>/crm/signup.html</CODE>.
     That requires handling an HTTP <CODE>POST</CODE> call that contains form data that needs to be validated.
 </p>
+<div class="git-gist" gist="5114830"></div>
+
 
 <P>
     The values will come from the client in the request as the request parameters <code>username</code> and <CODE>password</CODE>.
@@ -606,25 +582,44 @@
 
 <P>          <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
     tells Spring MVC that the request handler is expecting an object of the type annotated. By default, Spring MVC will attempt to instantiate an instance of the class
-    using a <EM>default</EM> constructor. It will use JavaBean conventions and set   properties on the object based on request parameters. So, since
-    the object declares
+    using a <EM>default</EM> constructor. It will use JavaBean conventions and set   properties on the object based on request parameters. Thus: the
+    <CODE>SignInAttempt</CODE> object will be created, and its <CODE>username</CODE> field will be set from the HTTP request attribute <CODE>username</CODE>, and its
+    <Code>password</Code> field will be set from the HTTP request attribute <CODE>password</CODE>.
 
 </P>
 
 <P>
+     If you want to synthesize the model object yourself - perhaps because you want to call a different constructor or
+    build the object based on more than just request parameters - you can annotate a factory method with
+    <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>.
+    This factory method can access anything from the request it wants.
 
-    Now, let's look at what <CODE>Valid</CODE> does for us.
+    We could declare our own <CODE>@ModelAttribute</CODE> factory method in the controller
 
-    The <CODE>Valid</CODE> is a <em>Java Validation API</Em> (<A href="http://jcp.org/en/jsr/detail?id=303">JSR 303</A>)
-    annotation that
-    signals that the bean it annotates has <EM>constraint</EM> annotations declared on its fields. These
-    <EM>constraints</EM> are declarative. Let's look at the
+    to construct the   <span class="class-reference" module="web" q="tut_web">    org.springsource.examples.spring31.web.SignInAttempt</span>.
+    <CODE>@ModelAttribute</CODE> factory methods can declare all the same arguments as request handlers.   Here's a
+      <code>@ModelAttribute</code> factory method that uses a non-default constructor.
 
 </P>
+<DIV class="git-gist" gist="5114560">@ModelAttribute public SignInAttempt signInAttempt</DIV>
+<P>
 
-<Div class="class-reference" module="web" q="tut_web">
-    org.springsource.examples.spring31.web.SignInAttempt
-</Div>
+    Now, let's look at what <CODE>@Valid</CODE> does for us.
+
+    <CODE>@Valid</CODE> is a <em>Java Validation API</Em> (<A href="http://jcp.org/en/jsr/detail?id=303">JSR 303</A>)
+    annotation that
+    signals that the bean it annotates has <EM>constraint</EM> annotations declared on its fields. These
+    <EM>constraints</EM> are declarative.
+
+        The class is a regular Java Object that declares two String fields, named the same as the request parameters: <CODE>username</CODE> and <CODE>passsword</CODE>.
+        It has a default constructor, and the fields have accessor (<code>get*</code>) and mutator methods (<code>set*</code>).
+         It also declares validation constraints through annotations on each field.
+          For example, the <COde>username</COde> field is required to have a valid, non-empty email string:
+      </P>
+<DIV class="git-gist" gist="5114717">
+ @Email private String email ;
+</DIV>
+
 
 <h3>
     Internationalization with Spring MVC

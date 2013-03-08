@@ -66,19 +66,12 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         exceptionResolvers.add(simpleMappingExceptionResolver);
     }
 
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
         registry.addWebRequestInterceptor(new CrmHttpServletRequestEnrichingInterceptor());
-
-        // add i18n
         registry.addInterceptor(new LocaleChangeInterceptor());
-
     }
 
-
-    /* add i18n */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
