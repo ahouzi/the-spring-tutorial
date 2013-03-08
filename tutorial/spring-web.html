@@ -553,13 +553,15 @@
 
 
 
-    As written, the request handler relies on Spring MVC <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
+    As written, the request handler  declares three parameters of type <CODE></CODE>.
+
+    <CODE class="class-reference" q="spring-webmvc" module="spring-webmvc">org.springframework.web.bind.annotation.ModelAttribute</CODE>
 
 
 
 </p>
 <DIv class="git-gist" gist="5114560">
- @ModelAttribute public SignInAttempt signInAttempt(@RequestParam String ... )
+ @ModelAttribute public SignInAttempt signInAttempt(@RequestParam ..)
 </DIv>
 
 <div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController

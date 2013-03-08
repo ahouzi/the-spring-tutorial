@@ -1,11 +1,12 @@
 package org.springsource.examples.spring31.web;
 
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
@@ -42,38 +43,5 @@ public class ViewController {
             }
         }
         return SIGNIN;
-    }
-
-
-
-    @SuppressWarnings("unchecked")
-    public static class SignInAttempt {
-        @NotEmpty
-        private String password;
-
-        @Email
-        @NotEmpty
-        private String username;
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public SignInAttempt(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
     }
 }
