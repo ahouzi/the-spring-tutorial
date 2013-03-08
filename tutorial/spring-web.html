@@ -510,23 +510,6 @@
 
 
     With all these changes in place, our final class looks like this: </P>
- <!--
-<div class="git-gist" gist="5067566"> addViewControllers()</div>
-<P> Here, we use the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.ViewControllerRegistry</CODE>
-    to map URLs to view names. For example, <CODE>/</CODE> gets mapped to <CODE>/signin</CODE>, so that the first page
-    anyone sees is the signin form. We also map other URLs (like <CODE>/crm/signin.html</CODE>) to appropriate views -
-    in this case, <CODE>signin</CODE>. </P>
-
-<P> While we're taking care of these sorts of things, let's configure an error handling page. If a component in our web
-    application throws an exception, Spring MVC can redirect to an error page and optionally return an error code for
-    us. For now, we'll install a catch-all error page view by overriding the
-    <CODE>configureHandlerExceptionResolvers</code> method. Here, we've specified that the view named <CODE>oops</CODE>
-    (which we defined above as a <EM>view controller</EM>) is to be rendered wheneverthere's an error, and a <span
-            class="wikipedia">HTTP_404</span> code is to be returned. </P>
-
-<div class="git-gist" gist="5067711"> configureHandlerExceptionResolvers</div>
-<P> With all these changes in place, our final class looks like this: </P>
->>>>>>> 5229d1891fcae68fe4a9f24ec402ed74de129865-->
 
 <div module="web" q="tut_web" extension="java" class="git-code">
     org.springsource.examples.spring31.web.config.WebMvcConfiguration
@@ -561,8 +544,21 @@
     <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span>,
     which we introduced earlier.
 
+    The goal here is to be able to take the email and password from an HTML <CODE>form</CODE>, check them against
+    a database,
+
 </p>
-<P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE> requests to the same URL. </P>
+<P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE> requests to the same URL, <CODE>/crm/signin.html</CODE>
+    There are some values that are shared in multiple places (for example, in the annotations decorating the various methods), so those values are
+    stored as  <CODE>public static final String</CODE> values in the class. This is convenient when building up URL hierarchies to ensure consistent URL  prefix strings.
+
+</P>
+<P>  We want all <CODE>GET</CODE> requests to the URL to result in the rendering of the <CODE>signin</CODE> view.
+    So, I've created an empty Spring MVC controller that will simply forward to the <CODE>signin</CODE> view when the page is accessed:
+</P>
+<div module="web" q="tut_web"  extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController</div>
+
+<!--
 <h1> The Changing Face of the Web: Working with Business State using REST </h1>
 <h2> The Smarter Client </h2>
 <P>
@@ -590,8 +586,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
     Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
     JavaScript. </P>
-<!-- <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
- </P> --> <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
+&lt;!&ndash; <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
+ </P> &ndash;&gt; <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
     are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
     that happens between the user and the user interface happens these days entirely on the client. The server doesn't
     really need to get involved too much in rendering HTML, besides serving the initial page load and the resources to
@@ -604,7 +600,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
 <H2> The Principles of REST</H2>
-<!--Resources Expose directory structure-like URIs URI’s should be easily understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped to these existing methods Stateless State dependencies limit or restrict scalability -->
+&lt;!&ndash;Resources Expose directory structure-like URIs URI’s should be easily understood Representations Transfer XML, JavaScript Object Notation (JSON), or both Use XML or JSON to represent data objects or attributes Messages Use HTTP methods explicitly (i.e. POST, GET, PUT, DELETE) CRUD operations can be mapped to these existing methods Stateless State dependencies limit or restrict scalability &ndash;&gt;
 <p> HTTP resources (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way.
     Suppose, for example, that you want to map customer data from a CRM-style application (like ours!) to HTTP
     endpoints. You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers. You
@@ -679,7 +675,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to
     Spring MVC's component model and the API it uses to standup HTTP endpoits.
-    <!-- Spring MVC is request/response oriented - it lets you deal with the appliction logic at the level of an HTTP request, the same granularity at which REST calls should be handled. -->
+
     We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of
     one type of request for an HTML resource is really not very different than the handling of a request for a RESTful
     resource. </P>
@@ -720,12 +716,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 <p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>
 
-<!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
-<p>
+-->
 
     <!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell
     -->
-</p>
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 
 <script type="text/javascript" language="JavaScript"> $(function () {

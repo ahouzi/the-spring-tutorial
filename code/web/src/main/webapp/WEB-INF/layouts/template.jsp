@@ -1,3 +1,4 @@
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
@@ -15,17 +16,17 @@
 
         var crmSession = {
 
-            getUsername:function () {
+            getUsername: function () {
                 var un = "${username}";
                 var pi;
                 if (un == '')
                     return null;
                 return un;
             },
-            isLoggedIn:function () {
+            isLoggedIn: function () {
                 return !(this.getUserId() == null );
             },
-            getUserId:function () {
+            getUserId: function () {
                 var uid = "${userId}";
                 var pi;
                 if (uid == '' || (pi = parseInt(uid)) == 0) {
@@ -53,28 +54,35 @@
     <link href="${pageContext.request.contextPath}/web/assets/css/jquery-ui.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/assets/bootstrap/bootstrap.css" rel="stylesheet"/>
     <link href="${pageContext.request.contextPath}/web/views/controllers.css" rel="stylesheet"/>
-    <!--[if lte IE 8]><script src="build/angular-ui-ieshiv.js"></script><![endif]-->
+    <!--[if lte IE 8]>
+    <script src="build/angular-ui-ieshiv.js"></script><![endif]-->
 </head>
 <body>
 
 
 <div id="navigation">
-    <%--
-      Use Spring Security tags to handle conditional display of
-      menu items based on whether there's an authenticated principal or not.
-    --%>
+
+
     <div ng-controller="NavigationController">
 
-        <A href="${pageContext.request.contextPath}/crm/signin.html">Sign In</a>
+        <span>
 
-        Welcome  ${username}.
+        <c:if test="${ empty username }">
+            <A href="${pageContext.request.contextPath}/crm/signin.html">
+                <spring:message code="navigation.signin" />
+            </a>
+        </c:if>
 
-            <span>
-                <a href="${pageContext.request.contextPath}/crm/profile.html">My Profile</a> |
-                <a href="${pageContext.request.contextPath}/crm/customers.html">My Customers</a> |
-                <A href="#">Sign out</A>
-                <%--<a ng-click="startLogoutFlow( '${logoutUrl}' )" href="${logoutUrl}">Sign Out</a>--%>
-            </span>
+        <c:if test="${ not empty username }">
+            Welcome  ${username}.
+            | <a href="${pageContext.request.contextPath}/crm/profile.html"><spring:message code="navigation.profile" /></a> |
+            <a href="${pageContext.request.contextPath}/crm/customers.html"><spring:message code="navigation.my-customers" /></a> |
+            <A href="#">   <spring:message code="navigation.signout" /></A>
+        </c:if>
+
+
+
+        </span>
 
     </div>
 </div>
@@ -92,7 +100,7 @@
 --%>
 
 <div id="copyright">
-    Brought to you by <A href="http://www.springsource.org">SpringSource</a>.
+    <spring:message code="brought-to-you-by"   /> <A href="http://www.springsource.org">SpringSource</a>.
 </div>
 </body>
 </html>

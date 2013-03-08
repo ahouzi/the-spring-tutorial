@@ -333,7 +333,7 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     };
 
 
-  //  $scope.loadUser(crmSession.getUserId());
+//  $scope.loadUser(crmSession.getUserId());
 
 
 }
@@ -363,6 +363,8 @@ function SignInController($scope, $location) {
     if (u != null) {
         $scope.user = { username:u };
     }
+
+    //$scope.user = { username : 'joshy@joshlong.com',password:'cowbell'}
 
     $scope.signinWithFacebook = function () {
         var facebookForm = $('#signinWithFacebook');
@@ -440,7 +442,9 @@ function CustomerController($scope, customerService, ajaxUtils) {
         });
     };
     resetNewCustomerForm();
- //   $scope.refreshCustomers();
+
+   // $scope.refreshCustomers();
+
 }
 
 
