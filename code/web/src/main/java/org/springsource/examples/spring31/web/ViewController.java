@@ -17,9 +17,9 @@ import javax.validation.Valid;
 
 @Controller
 @SessionAttributes(ViewController.USER_OBJECT_KEY)
+@RequestMapping("/crm/" + ViewController.SIGNIN + ".html")
 public class ViewController {
     public static final String SIGNIN = "signin";
-    public static final String CRM_SIGNIN_PAGE = "/crm/" + SIGNIN + ".html";
     public static final String USER_OBJECT_KEY = "user";
     private UserService userService;
 
@@ -28,12 +28,12 @@ public class ViewController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = CRM_SIGNIN_PAGE, method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public String showSignInPage() {
         return SIGNIN;
     }
 
-    @RequestMapping(value = CRM_SIGNIN_PAGE, method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public String signin(@ModelAttribute("signinAttempt") @Valid SignInAttempt signInAttempt, BindingResult result, Model model) throws Throwable {
         if (!result.hasErrors()) {
             User user = this.userService.login(signInAttempt.getUsername(), signInAttempt.getPassword());

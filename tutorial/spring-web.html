@@ -548,15 +548,23 @@
     a database,
 
 </p>
-<P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE> requests to the same URL, <CODE>/crm/signin.html</CODE>
-    There are some values that are shared in multiple places (for example, in the annotations decorating the various methods), so those values are
-    stored as  <CODE>public static final String</CODE> values in the class. This is convenient when building up URL hierarchies to ensure consistent URL  prefix strings.
+
+<div module="web" q="tut_web" extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController
+</div>
+
+<P> The obvious things: this is a Spring MVC controller, that handles both HTTP <CODE>POST</CODE> and <CODE>GET</CODE>
+    requests to the same URL, <CODE>/crm/signin.html</CODE>.
+    There are some values that are shared in multiple places (for example, in the annotations decorating the various
+    methods), so those values are
+    stored as <CODE>public static final String</CODE> values in the class. This is convenient when building up URL
+    hierarchies to ensure consistent URL prefix strings.
 
 </P>
-<P>  We want all <CODE>GET</CODE> requests to the URL to result in the rendering of the <CODE>signin</CODE> view.
-    So, I've created an empty Spring MVC controller that will simply forward to the <CODE>signin</CODE> view when the page is accessed:
-</P>
-<div module="web" q="tut_web"  extension="java" class="git-code">org.springsource.examples.spring31.web.ViewController</div>
+
+<p> We have two use cases: how will people arrive at this form? They'll visit the URL <CODE>/crm/signup.html</CODE> in their browser. That requires handling an HTTP <CODE>GET</CODE> call.
+    Then, once they've landed, they'll input values into the form (data that we will want to work with in terms of a <code>SignInAttempt</code> object) and then submit, or <CODE>POST</CODE> the
+    data to the URL <CODE>/crm/signup.html</CODE>.
+</p>
 
 <!--
 <h1> The Changing Face of the Web: Working with Business State using REST </h1>
@@ -586,7 +594,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Seriously. When you run it, it dumps you into a shell where you can use <code>vi</code> to edit the file <CODE>hello.c</CODE>.
     Then, you can recompile it and run it. All within Linux. Inside of a browser. Using an emulator written in
     JavaScript. </P>
-&lt;!&ndash; <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>. &lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
+&lt;!&ndash; <P> You can do anything. We won't talk too much more about client side capabilities here. Instead, I invite you to consult our tutorial <span class="todo"> (TODO!!!) on building better client applications with Spring</span>.
+&lt;!&ndash; TODO link to our tutorial for client side JavaScript and s2js&ndash;&gt;
  </P> &ndash;&gt; <P> What role does the server play here? While individual resources, such as CSS and images and JavaScript,
     are served up by the web server, and while initial HTML pages are sent down from the server, much of the interaction
     that happens between the user and the user interface happens these days entirely on the client. The server doesn't
@@ -718,8 +727,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 -->
 
-    <!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell
-    -->
+<!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell
+-->
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 
 <script type="text/javascript" language="JavaScript"> $(function () {
