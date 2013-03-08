@@ -5,10 +5,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
@@ -34,7 +31,7 @@ public class ViewController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String signin(@ModelAttribute("signinAttempt") @Valid SignInAttempt signInAttempt, BindingResult result, Model model) throws Throwable {
+    public String signin(@ModelAttribute @Valid SignInAttempt signInAttempt, BindingResult result, Model model) throws Throwable {
         if (!result.hasErrors()) {
             User user = this.userService.login(signInAttempt.getUsername(), signInAttempt.getPassword());
             if (user != null) {
@@ -47,15 +44,18 @@ public class ViewController {
         return SIGNIN;
     }
 
+    @ModelAttribute
+    public SignInAttempt signInAttempt(@RequestParam String username, @RequestParam String password) {
+        return new SignInAttempt(username, password);
+    }
+
     public static class SignInAttempt {
         @NotEmpty
         private String password;
+
         @Email
         @NotEmpty
         private String username;
-
-        public SignInAttempt() {
-        }
 
         public SignInAttempt(String username, String password) {
             this.username = username;
@@ -66,16 +66,8 @@ public class ViewController {
             return username;
         }
 
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
         public String getPassword() {
             return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
         }
     }
 }
