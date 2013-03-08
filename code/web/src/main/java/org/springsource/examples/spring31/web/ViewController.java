@@ -44,11 +44,9 @@ public class ViewController {
         return SIGNIN;
     }
 
-    @ModelAttribute
-    public SignInAttempt signInAttempt(@RequestParam String username, @RequestParam String password) {
-        return new SignInAttempt(username, password);
-    }
 
+
+    @SuppressWarnings("unchecked")
     public static class SignInAttempt {
         @NotEmpty
         private String password;
@@ -57,8 +55,11 @@ public class ViewController {
         @NotEmpty
         private String username;
 
-        public SignInAttempt(String username, String password) {
-            this.username = username;
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
             this.password = password;
         }
 
@@ -66,8 +67,13 @@ public class ViewController {
             return username;
         }
 
-        public String getPassword() {
-            return password;
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public SignInAttempt(String username, String password) {
+            this.username = username;
+            this.password = password;
         }
     }
 }
