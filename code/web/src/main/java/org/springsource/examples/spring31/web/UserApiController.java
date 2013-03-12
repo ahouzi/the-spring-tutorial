@@ -2,6 +2,7 @@ package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,7 @@ public class UserApiController {
         return taken;
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
     @ResponseBody
     public User registerUser(@RequestParam("username") String username,
@@ -85,7 +87,7 @@ public class UserApiController {
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.GET)
     public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) throws Throwable {
         InputStream is = userService.readUserProfilePhoto(userId);
-        httpServletResponse.setContentType(/*"image/jpg"*/MediaType.IMAGE_JPEG_VALUE );
+        httpServletResponse.setContentType(/*"image/jpg"*/MediaType.IMAGE_JPEG_VALUE);
         if (null == is) {
             return;
         }

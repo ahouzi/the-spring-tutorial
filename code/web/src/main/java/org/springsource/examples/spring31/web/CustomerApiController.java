@@ -1,6 +1,7 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springsource.examples.spring31.services.Customer;
@@ -58,12 +59,12 @@ public class CustomerApiController {
         return this.customerService.getAllUserCustomers(userId);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @RequestMapping(value = CUSTOMER_COLLECTION_URL, method = RequestMethod.POST)
     public Long addCustomer(@PathVariable("userId") Long userId, @RequestParam("firstName") String fn, @RequestParam("lastName") String ln) {
         return customerService.createCustomer(userId, fn, ln, new Date()).getId();
     }
-
 
     @ResponseBody
     @RequestMapping(value = CUSTOMER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
@@ -79,5 +80,4 @@ public class CustomerApiController {
         customerService.deleteCustomer(id);
         return id;
     }
-
 }             

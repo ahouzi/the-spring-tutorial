@@ -66,13 +66,13 @@
 <uL>
     <LI> Create a working web application</LI>
     <LI> Handle form submissions</LI>
-    <LI> Build a screen to handle CRUD, (create, read, update, and delete) </LI>
+    <LI> Build a screen to handle CRUD, (create, read, update, and delete)</LI>
     <LI>
-       Separate UI and Data Model via RESTful Web Services
+        Separate UI and Data Model via RESTful Web Services
     </LI>
     <LI> Learn how to secure your application (sign-in, and sign-out support)</LI>
-    <LI> Learn how to secure your REST services with OAuth </LI>
-    <LI> Learn how to connect your application to Social Service providers like Facebook </LI>
+    <LI> Learn how to secure your REST services with OAuth</LI>
+    <LI> Learn how to connect your application to Social Service providers like Facebook</LI>
 
 </uL>
 
@@ -81,11 +81,12 @@
 <h2>
     Who Is This Document For?
 </h2>
-<P>
-  Presumbly you've learned Java, but want to learn about web programming in Java, and you've got a good grasp
-    on the core concepts of Spring. For more, please consult the Green Beans blogs and the core Spring tutorial as part of
-    this set of tutorials.
 
+<P>
+    Presumbly you've learned Java, but want to learn about web programming in Java, and you've got a good grasp
+    on the core concepts of Spring. For more, please consult the Green Beans blogs and the core Spring tutorial as part
+    of
+    this set of tutorials.
 
 
 </P>
@@ -123,12 +124,13 @@
 <P> Also: maven has a certain build structure. </P>
 
 
-
 <h1> Basic Web Applications with Spring
 </h1>
 
 
-<p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span module="spring-web" q="tut_web" class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that Spring founder Rod
+<p> The original code in Spring was written to support the web. Indeed, the earliest classes (like, <span
+        module="spring-web" q="tut_web"
+        class="class-reference">org.springframework.web.context.WebApplicationContext</span>) that Spring founder Rod
     Johnson wrote in his study in England in 2001 were to support Java-based web applications environments. Spring's
     always had a great support for the web. From the beginning, Spring has featured an MVC framework, called Spring MVC.
     Spring MVC at the time looked conceptually very similar to the then entrenched Struts framework. While Spring MVC
@@ -175,7 +177,8 @@
     and segment-leading <A href="http://tomcat.apache.org">Apache Tomcat 7</A>, then it's even easier! Our initial Java
     web application consists of three classes - <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.servlet.CrmWebApplicationInitializer</span>,
     <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.config.WebMvcConfiguration</span>,
-    and <span module="web" q="tut_web" class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and several
+    and <span module="web" q="tut_web"
+              class="class-reference">org.springsource.examples.spring31.web.ViewController</span> - and several
     artifacts to generate the HTML views. Let's look at these classes. </p>
 
 <P> <!-- todo rewrite this to reflect --> To work with any web framework, like Spring MVC, you need to install the
@@ -248,7 +251,7 @@
 </div>
 <h2> Configuring Spring MVC </h2>
 
-<h3>  The Simplest Possible Spring MVC Application
+<h3> The Simplest Possible Spring MVC Application
 </h3>
 
 <P> Once we've told the Servlet environment everything it needs to know (for now), we simply need to turn on Spring MVC
@@ -285,7 +288,8 @@
     annotation to tell Spring to automatically register your data services (Spring beans that handle our data-access
     logic) and your Spring MVC controllers (beans annotated with the <CODE class="class-reference"
                                                                            module="spring-context">org.springframework.stereotype.Controller</CODE>
-    annotation) by scanning all the beans in or below the package, or packages, specified. You can specify these packages
+    annotation) by scanning all the beans in or below the package, or packages, specified. You can specify these
+    packages
     either as a String or by specifying a class that lives in the package you want to scan. The latter approach is more
     refactor-friendly: if you change the package structure of your code, your tooling will update references to classes,
     but might not necessarily refactor Strings that contain a package path. </p>
@@ -297,27 +301,29 @@
 
 <div class="git-gist" gist="5067119"> @Bean public InternalResourveViewResolver(){ ... }</div>
 <P> With this in place, Spring MVC will take a view String (say, <CODE>"hi"</CODE>) and resolve it to <CODE>WEB-INF/hi.jsp</CODE>,
-    which it will then load and send back to the client, rendered with any data communicated through the <CODE>Model</code> object.
+    which it will then load and send back to the client, rendered with any data communicated through the
+    <CODE>Model</code> object.
     Let's pause, do a sanity check, and take a moment to deploy a Spring MVC controller complete with a working view.
     First, add your <CODE>.jsp</CODE> page (<CODE>WEB-INF/hi.jsp</CODE>): </p>
 
 <DIV class="git-gist" gist="5067085"> some jsp content</DIV>
 
-<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later, instead preferring to verify that everything's working now.
+<p> Now, let's create a simple Spring MVC controller. We'll look at that the composition of the controller later,
+    instead preferring to verify that everything's working now.
     Add the following class: </p>
 
 <div class="git-gist" gist="5067155"> @Controller HelloWorldController</div>
 
 <P> Then simply build this and deploy to your application server.
-     <!-- TODO link to the beginning of this tutorial If you're using the Spring Tool Suite, you simply need to deploy the application to Apache Tomcat in your <CODE>Servers</code> panel.
-     -->
+    <!-- TODO link to the beginning of this tutorial If you're using the Spring Tool Suite, you simply need to deploy the application to Apache Tomcat in your <CODE>Servers</code> panel.
+    -->
     You should be able to bring up the page like this: </P>
 
 <div class="diagram"><IMG src="images/hello-world-controller.png"/> <span class="caption"> Change the <CODE>name</CODE> attribute to whatever you like to change the name printed. If the name query parameter is not present, the code will simply default to printing "World." </span>
 </div>
 <h2>
     Building the Screens for Our Application
- </h2>
+</h2>
 
 <P> While the default configuration gives you a lot out of the box, we will tailor the code a little bit to support our
     application's specific requirements. Most of what we will configure in Spring MVC has to do with customizing how
@@ -449,9 +455,10 @@
     which implements <CODE class="class-reference" module="spring-webmvc">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</CODE>
     with empty no-op methods. </P>
 
-<P>  To handle the  resources with no mapped <CODE>Servlet</CODE>, we <EM>enable</EM> the default servlet in our <CODE>@Configuration</CODE> class.
+<P> To handle the resources with no mapped <CODE>Servlet</CODE>, we <EM>enable</EM> the default servlet in our <CODE>@Configuration</CODE>
+    class.
     The default servlet is unique to each web container, and not specified by any standard.
-     Spring MVC can be made to depend on this functionality, if it's available, if you <EM>enable</EM> it.
+    Spring MVC can be made to depend on this functionality, if it's available, if you <EM>enable</EM> it.
     It supports a wide range of deployment targets, though - so chances are it will work for you if you're
     running this application in Tomcat, Jetty, JBoss, and GlassFish, Google App Engine, Resin, WebLogic or WebSphere.
     Here's our revised configuration class, this time enabling the <EM>default</EM> Servlet. </P>
@@ -531,6 +538,80 @@
     The JDK supports <CODE class="class-reference" module="java">java.util.ResourceBundle</CODE>s, which
     map a given key and language combination to a string in a specific language and localized to a specific region.
 
+</p>
+
+<div style="margin-bottom: 10px" class="diagram">
+    <table>
+        <thead>
+        <TR>
+            <th> Language</th>
+            <th> Language Code</th>
+            <th> Country Code</th>
+            <Th> Example Resource Bundle File Name</Th>
+        </TR>
+        </thead>
+
+        <TR>
+            <td>English</td>
+            <td>en</td>
+            <td>(none)</td>
+            <TD><CODE>messages_en.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>French</td>
+            <td>fr</td>
+            <td>(none)</td>
+            <TD><CODE>messages_fr.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>German</td>
+            <td><CODE>de</CODE></td>
+            <td>(none)</td>
+            <TD><CODE>messages_de.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>Italian</td>
+            <td><CODE>it</CODE></td>
+            <td>(none)</td>
+            <TD><CODE>messages_it.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>Japanese</td>
+            <td><CODE>ja</CODE></td>
+            <td>(none)</td>
+            <TD><CODE>messages_ja.properties</CODE></TD>
+        </TR>
+
+        <TR>
+            <td>Chinese</td>
+            <td><CODE>zh</CODE></td>
+            <td>(none)</td>
+            <TD><CODE>messages_zh.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>Chinese Spoken in China</td>
+            <td><CODE>zh</CODE></td>
+            <td><Code>CN</Code></td>
+            <TD><CODE>messages_zh_CN.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>Chinese Spoken in Taiwan</td>
+            <td><COde>zh</COde></td>
+            <td><CODE>TW</CODE></td>
+            <TD><CODE>messages_zh_TW.properties</CODE></TD>
+        </TR>
+        <TR>
+            <td>French Spoken in France</td>
+            <td><code>fr</code></td>
+            <td><CoDE>FR</CoDE></td>
+            <TD><CODE>messages_fr_FR.properties</CODE></TD>
+        </TR>
+
+    </TABLE>
+    <span class="caption">  Some common country code and language code designations and an example properties file name for that language and/or country. </span>
+</div>
+
+<P>
 
     Resource bundles contain locale-specific objects. When your program needs a locale-specific resource, a
     <CODE>String</CODE> for example, your program can load it from the resource bundle
@@ -553,9 +634,14 @@
     If that doesn't work, it'll fall back to the resource bundle for the specified <Em>default</Em> <CODE>Locale</CODE>.
 
     We'll look at how this internationalization support can be used in our application later when we introduce form
-    validation and
-    demonstrate how to create templates with internationalized strings.
-    <!-- todo this should be covered more in the first -core Spring - tutorial -->
+    validation and demonstrate how to create templates with internationalized strings.
+
+</P>
+
+<!-- todo i18n && MessageSource should be covered more in the first -core Spring - tutorial -->
+
+<P class="todo">For more on Spring's <code module="spring-webmvc" q="tut_web" class="class-reference">org.springframework.context.MessageSource</code>,
+    please see the first tutorial on core Spring.
 </P>
 
 <div class="git-gist" gist="5115482"></div>
@@ -733,30 +819,82 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-<H2> The Principles of REST</H2>
+<H2>  Designing RESTful Resources with Spring </H2>
 
-<p> HTTP resources
+<!-- todo interleave the relevant Spring MVC handler method syntax as u introduce concepts for REST-->
+
+<P>
+ Spring's support for REST builds upon the basic Spring MVC component model.
+  You've already been introduced to Spring MVC controllers, and so are more than halfway there.
+
+
+
+ Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
+                                                                      module="services">
+    org.springsource.examples.spring31.services.User </CODE> and <CODE class="class-reference" q="tut_rest"
+                                                                       module="services">
+    org.springsource.examples.spring31.services.Customer</CODE>.
+
+
+
+    We need to expose RESTful endpoints to deal with the
+    various things a user is likely to want to do with data represented by these entities. Let's add a controller -
+    <CODE class="class-reference" q="tut_rest"
+          module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
+    information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
+    We'll focus on the <CODE>UserApiController</CODE>, which is just another Spring bean annotated with
+    the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation.
+    We'll walk through the implementations of these methods step by step, but let's first look at the code:
+</P>
+
+<p>
+
+    HTTP resources
     (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
-    that you want to map customer data from a CRM-style application (like ours!) to HTTP endpoints. You might use <code>http://localhost:8080/crm/customers</code>
-    to expose <EM>all</EM> the customers. You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose
-    information specifically about a customer whose ID is <CODE>42</CODE>. You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE>
-    to expose information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>. </p>
+    that you want to map customer data from a CRM-style application (like ours!) to HTTP URIs.
+    You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers.
+    You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose information specifically about a customer whose ID is <CODE>42</CODE>.
+    You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE> to expose information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>.
 
-<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
-    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
-    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
-    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
-    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
-    encode data this way then it should. </p>
+     Here's the request handler to retreive  <CODE>User</CODE> data by ID.
+</p>
 
-<p> HTTP methods should be used explicitly. HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
-    <CODE>GET</CODE> map nicely to the transformations () our enterprise data typically goes through. </p>
+<DIV class="git-gist" gist="5129983">
+    @RequestMapping @ResponseBody public void userById( @PathVariable ...)
+</DIV>
+<P>
+ This method is very similar to the request handlers we've seen thus far! It has a <CODE class="class-reference" module="spring-web">org.springframework.web.bind.annotation.RequestMapping</CODE> annotation
+    establishing the method as a handler. It  specifies a URL and  an HTTP method (<CODE>GET</CODE>)       that it can respond to.
+</P>
+<P> The <CODE>public static final</CODE> field, <CODE>USER_COLLECTION_ENTRY_URL</CODE>,
+    is a String that we've defined once and built upon to ensure consistent URIs. The final URL is <CODE>/api/users/{userId}</CODE>.
+
+
+</P>
+
+<CODE class="git-gist" gist="5130002">
+    static public final String USER_COLLECTION_URL = "/api/users";
+    static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
+</CODE>
+<P>
+    Any token contained in braces (like: <CODE>{userId}</CODE>) is a <EM>path variable</EM>. Spring MVC will treat that as a wild card, extract the value out from each request and
+    inject the value into any request handler method argument annotated with <CODE class="class-reference"  module="spring-web">org.springframework.web.bind.annotation.PathVariable</CODE>,  like this:
+    <CODE>@PathVariable("userId") Long userId</CODE>. If, for example, someone  opened the URL <CODE>/api/users/24</CODE> in a browser, the request handler method (<CODE>getUserById</CODE>) would be invoked
+    and the value <CODE>24</CODE> would be converted to a type of <CODE class="class-reference" module="java">java.lang.Long</CODE> and passed as an argument to our controller  method.
+</P>
+
+<!-- todo
+    todo YOU NEED TO ADD @RESPONSESTATUS codes to your code as appropriate (see Roy's preso)
+-->
+<p> HTTP methods should be used explicitly.
+    HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
+    <CODE>GET</CODE> map nicely to the state transitions (creation, deleting, updating, reading and querying, respectively) our enterprise data typically goes through. </p>
 <ul>
     <LI><CODE>GET</CODE>, for example, can be used to retrieve information. It must be safe, and idempotent. It can have
         side effects, but since the user doesn't expect them, they shouldn't be critical to the operation of the system.
         GET can be conditional or partial based on the presence of the HTTP headers <CODE>If-Modified-Since</CODE> or
         <COde>Range</COde>. A HTTP <CODE>GET</CODE> request looks like this: <CODE>GET /api/crm/42/customers/242</CODE>.
-        This would be expected the entity identified by 242 holding customer data.
+        This would be expected the entity identified by <CODE>242</CODE> holding customer data.
     </LI>
     <LI><CODE>DELETE</CODE>s can be used to delete information identified by a URL. A <CODE>DELETE</CODE> request looks
         like this: <CODE>DELETE /api/crm/42/customers/242</CODE></LI>
@@ -771,6 +909,16 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
         this: <CODE>POST /toppings/1</CODE> and can return a payload, like this <CODE> { "name" : "Cheese" }</CODE>.
     </LI>
 </ul>
+
+
+<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
+    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
+    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
+    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
+    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
+    encode data this way then it should. </p>
+
+
 <P> HTTP supports status codes to convey system state to clients in a consistent way. These take the place of things
     like exceptions in programming languages. Status codes are an indicator the result of the server's attempt to
     satisfy the request. These status codes are returned in the response from the server. Status codes are broadly
@@ -789,13 +937,15 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of
     context. </P>
 
-<h2> Using REST with Spring </h2>
 
 <P> There are two aspects to Spring's support story for REST, the client side perspective and the server side
     perspective. </P>
 
-<P> From the client side, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>.
-    <code>RestTemplate</code> reduces common HTTP access operations to one-liners. It is very pluggable. The <CODE>RestTemplate</CODE>
+<P>
+
+    From the client side, to support connecting to RESTful web services, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>.
+    <code>RestTemplate</code> reduces common HTTP access operations to one-liners.  The <CODE>RestTemplate</CODE> is very configurable.
+    The <CODE>RestTemplate</CODE>
     can handle mapping results from requests to more useful types (through the <CODE class="class-reference"
                                                                                      module="spring-webmvc">
         org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security
@@ -811,20 +961,6 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section
     at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource
     is really not very different than the handling of a request for a RESTful resource. </P>
-
-<P> Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
-                                                                      module="services">
-    org.springsource.examples.spring31.services.User </CODE> and <CODE class="class-reference" q="tut_rest"
-                                                                       module="services">
-    org.springsource.examples.spring31.services.Customer</CODE>. We need to expose RESTful endpoints to deal with the
-    various things a user is likely to want to do with data represented by these entities. Let's add a controller -
-    <CODE class="class-reference" q="tut_rest"
-          module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
-    information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
-    We'll focus on the <CODE>UserApiController</CODE> in this tutorial, which is just another Spring bean annotated with
-    the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE>
-    annotation. We'll walk through the implementations of these methods step by step, but let's first look at the code:
-</P>
 
 <div module="web" q="tut_rest" extension="java" class="git-code">
     org.springsource.examples.spring31.web.UserApiController
