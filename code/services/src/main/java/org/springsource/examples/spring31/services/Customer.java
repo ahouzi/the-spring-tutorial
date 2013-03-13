@@ -1,15 +1,17 @@
 package org.springsource.examples.spring31.services;
 
 import javax.persistence.*;
-import java.io.Serializable;
+import javax.xml.bind.annotation.*;
 import java.util.Date;
 
-@Entity (name = "Customer")
-public class Customer   {
+@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement
+@Entity(name = "Customer")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long  id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -25,6 +27,7 @@ public class Customer   {
         return id;
     }
 
+    @XmlAttribute
     public void setId(Long id) {
         this.id = id;
     }
@@ -33,6 +36,7 @@ public class Customer   {
         return firstName;
     }
 
+    @XmlAttribute
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -41,6 +45,7 @@ public class Customer   {
         return lastName;
     }
 
+    @XmlAttribute
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -49,6 +54,7 @@ public class Customer   {
         return signupDate;
     }
 
+    @XmlAttribute
     public void setSignupDate(Date signupDate) {
         this.signupDate = signupDate;
     }
@@ -57,6 +63,7 @@ public class Customer   {
         return user;
     }
 
+    @XmlTransient
     public void setUser(User user) {
         this.user = user;
     }

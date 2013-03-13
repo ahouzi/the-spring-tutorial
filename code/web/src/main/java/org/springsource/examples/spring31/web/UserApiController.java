@@ -46,7 +46,9 @@ public class UserApiController {
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
     @ResponseBody
     public User getUserById(@PathVariable("userId") Long userId) {
-        return this.userService.getUserById(userId);
+        User user = this.userService.getUserById(userId);
+
+        return user;
     }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
@@ -89,9 +91,7 @@ public class UserApiController {
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnPathVariable(final @PathVariable("userId") Long userId, final @RequestParam("file") MultipartFile file) throws Throwable {
-        assert userId != null : "you must specify a userId when uploading!";
-        assert file != null : "you must specify a file object when uploading!";
+    public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) throws Throwable {
         byte[] bytesForImage = file.getBytes();
         userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
         return userId;
@@ -100,7 +100,7 @@ public class UserApiController {
     @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.GET)
     public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) throws Throwable {
         InputStream is = userService.readUserProfilePhoto(userId);
-        httpServletResponse.setContentType(/*"image/jpg"*/MediaType.IMAGE_JPEG_VALUE);
+        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
         if (null == is) {
             return;
         }

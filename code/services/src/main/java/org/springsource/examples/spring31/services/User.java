@@ -2,6 +2,7 @@ package org.springsource.examples.spring31.services;
 
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -13,6 +14,8 @@ import java.util.Set;
  *
  * @author Josh Long
  */
+@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlRootElement
 @Entity(name = "UserAccount")
 public class User implements Serializable {
 
@@ -34,22 +37,24 @@ public class User implements Serializable {
         return firstName;
     }
 
+    @XmlAttribute
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
     }
 
     public boolean isImportedFromServiceProvider() {
         return importedFromServiceProvider;
     }
 
+    @XmlAttribute
     public void setImportedFromServiceProvider(boolean importedFromServiceProvider) {
         this.importedFromServiceProvider = importedFromServiceProvider;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+    @XmlAttribute
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -58,6 +63,7 @@ public class User implements Serializable {
         return profilePhotoExt;
     }
 
+    @XmlAttribute
     public void setProfilePhotoExt(String profilePhotoExt) {
         this.profilePhotoExt = profilePhotoExt;
     }
@@ -66,6 +72,7 @@ public class User implements Serializable {
         return profilePhotoImported;
     }
 
+    @XmlAttribute
     public void setProfilePhotoImported(boolean profilePhotoImported) {
         this.profilePhotoImported = profilePhotoImported;
     }
@@ -74,7 +81,7 @@ public class User implements Serializable {
         return enabled;
     }
 
-
+    @XmlAttribute
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
@@ -83,6 +90,7 @@ public class User implements Serializable {
         return signupDate;
     }
 
+    @XmlAttribute
     public void setSignupDate(Date signupDate) {
         this.signupDate = signupDate;
     }
@@ -91,6 +99,7 @@ public class User implements Serializable {
         return username;
     }
 
+    @XmlAttribute
     public void setUsername(String username) {
         this.username = username;
     }
@@ -99,6 +108,7 @@ public class User implements Serializable {
         return password;
     }
 
+    @XmlAttribute
     public void setPassword(String password) {
         this.password = password;
     }
@@ -107,14 +117,17 @@ public class User implements Serializable {
         return id;
     }
 
+    @XmlAttribute
     public void setId(Long id) {
         this.id = id;
     }
+
 
     public Set<Customer> getCustomers() {
         return customers;
     }
 
+    @XmlTransient
     public void setCustomers(Set<Customer> customers) {
         this.customers = customers;
     }

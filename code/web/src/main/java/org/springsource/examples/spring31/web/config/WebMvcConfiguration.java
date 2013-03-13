@@ -6,8 +6,14 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.LocaleResolver;
@@ -23,6 +29,7 @@ import org.springsource.examples.spring31.web.ViewController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
+import javax.xml.transform.Source;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -107,11 +114,24 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
+
+        StringHttpMessageConverter stringConverter = new StringHttpMessageConverter();
+        stringConverter.setWriteAcceptCharset(false);
+
+        messageConverters.add(new ByteArrayHttpMessageConverter());
+        messageConverters.add(stringConverter);
+        messageConverters.add(new ResourceHttpMessageConverter());
+        messageConverters.add(new SourceHttpMessageConverter<Source>());
+        messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+        messageConverters.add(new Jaxb2RootElementHttpMessageConverter());
+
         MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
         mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
-        converters.add(mappingJacksonHttpMessageConverter);
+        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList( MediaType.APPLICATION_JSON ));
+
+        messageConverters.add(mappingJacksonHttpMessageConverter);
+
     }
 
 }

@@ -854,8 +854,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 
 <h3> URI Structures </h3>
-<p>
 
+<p>
 
 
     HTTP resources
@@ -904,22 +904,27 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     and passed as an argument to our controller method. Of course, path variables are just as naturally used with
     regular Spring MVC and <EM>classic</EM> web applications.
 </P>
+
 <h3>Content Negotiation</h3>
 
 <P>
     The return value is annotated with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.ResponseBody</CODE>
     annotation.
-    When Spring MVC sees this annotation, it short circuits the view resolution process that's normally at play, and
+    When Spring MVC sees this annotation, it short circuits the view resolution process that's normally at play and then
     attempts to convert the returned value into a representation that the HTTP client can work with.
-    The client signals which representation formats it's prepared to accept through a process called <EM>content negotiation</EM>, a
-     fundamental feature of HTTP.   Usually, the client sends a <CODE>Accept</CODE> header that specifies which representation formats it's prepared to read.
+    The client signals which representation formats it's prepared to accept through a process called <EM>content
+    negotiation</EM>, a
+    fundamental feature of HTTP. Usually, the client sends a <CODE>Accept</CODE> header that specifies which
+    representation formats it's prepared to read.
 </p>
 
 <P>
-     On the server side, Spring MVC uses the <EM>strategy pattern</EM> to delegate the conversion to a configured
-    <CODE class="class-reference" module="spring-webmvc">org.springframework.http.converter.HttpMessageConverter</CODE> instance.
+    On the server side, Spring MVC uses the <EM>strategy pattern</EM> to delegate the conversion to a configured
+    <CODE class="class-reference" module="spring-webmvc">org.springframework.http.converter.HttpMessageConverter</CODE>
+    instance.
 
-    We could easily add our own custom <CODE>HttpMessageConverter</CODE> types in our configuration class by overriding the <code>configureMessageConverters</code> method, but there is rarely any need to.
+    We could easily add our own custom <CODE>HttpMessageConverter</CODE> types in our configuration class by overriding
+    the <code>configureMessageConverters</code> method, but there is rarely any need to.
     Depending on what is available on your CLASSPATH, Spring MVC will automatically support marshalling
     XML with a JAXB implementation and JAXB-annotated POJOs, JSON through the Jackson JSON library, multipart file data
     through the <A href="http://commons.apache.org/proper/commons-fileupload/">Apache Commons FileUpload </A> library or
@@ -929,12 +934,41 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
     Thus, if a client requests the data in one of these URLs and species that it will only <CODE>Accept</CODE> data of
     the type <CODE>application/json</CODE>,
-    then the client will attempt to convert the results into JSON and send it in the response body.
+    then the server will attempt to convert the results into JSON and send it in the response body.
 </p>
 
+<!-- todo diagrams showing the XML and JSON representations of data -->
+<div class="diagram" style="width:800px;">
+
+    <TABLE width="100%">
+        <thead>
+        <TR>
+            <th>
+                <CODE> Accept: application/json</CODE>
+            </th>
+            <th>
+                <CODE> Accept: application/xml</CODE>
+            </th>
+        </tr>
+        </thead>
+        <TR>
+            <TD><span class="git-gist" gist="5154456"></span></TD>
+            <TD><span class="git-gist" gist="5154481"></span></TD>
+        </TR>
+    </TABLE>
+
+
+    <span class="caption">
+       I use the command line tool <CODE>curl</CODE> to call the REST service, like this:      <br/>
+        <STRONG><code>$  curl --header "Accept: application/xml"  http://localhost:8080/api/users/58 </code></STRONG>
+    </span>
+</div>
+
+
 <h3>HTTP Verbs</h3>
+
 <p>
-     HTTP methods should be used explicitly.
+    HTTP methods should be used explicitly.
     HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
     <CODE>GET</CODE> map nicely to the state transitions (creation, deleting, updating, reading and querying,
     respectively) our enterprise data typically goes through. </p>
@@ -968,6 +1002,12 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 </ul>
 
+ <P> You can see that we've  different request handlers to the same URI, differentiating only on the HTTP verb to which the handler responds.
+
+
+
+        </P>
+
 <h3>HTTP Status Codes
 </h3>
 
@@ -986,29 +1026,17 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     By default Spring returns HTTP 200 on successful requests.
     HTTP 200 means "everything worked."
     You don't need to indicate this status code if everything succeeds.
-    You can, in specific cases, provide a different status code using the <CODE module="spring-webmvc"
-                                                                                class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE>
-    annotation
-    on the Spring MVC request handler.
+    You can, in specific cases, provide a different status code using the
+    <CODE module="spring-webmvc" class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE>
+    annotation on the Spring MVC request handler or by setting it manually. Let's look at some examples.
 </P>
 
-<h3> Our RESTful Controller </h3>
 
-<P>
-    Let's look at a Spring MVC controller for working with <CODE class="class-reference" module="services">org.springsource.examples.spring31.services.User</CODE>s.
-
-</P>
 
 
 <!--
 
 
-<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
-    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
-    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
-    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
-    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
-    encode data this way then it should. </p>
 
 <P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as
     possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There
@@ -1016,10 +1044,6 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     arbitrarily bound to. There are a lot of benefits to this, though. For example, if you want to scale your
     application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of
     context. </P>
-
-
-<P> There are two aspects to Spring's support story for REST, the client side perspective and the server side
-    perspective. </P>
 
 <P>
 
@@ -1042,7 +1066,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource
     is really not very different than the handling of a request for a RESTful resource. </P>
 -->
-<P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve
+<!--<P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve
     their information by IDS, at least. </p>
 
 <P> You'll want to be able to create new users. </P>
@@ -1051,7 +1075,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 <p> You'll need an endpoint to handle file uploads for the profile's photo image </p>
 
-<p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>
+<p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>-->
 <!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell -->
 <!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
 <script type="text/javascript" language="JavaScript"> $(function () {
