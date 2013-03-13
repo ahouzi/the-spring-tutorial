@@ -1002,11 +1002,15 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 </ul>
 
- <P> You can see that we've  different request handlers to the same URI, differentiating only on the HTTP verb to which the handler responds.
+ <P>
+  Our request handlers are often mapped to the same URI, differing only on the type of HTTP verb that the controller is prepared to support.
+  In  the example below, we support one request handler to
+ </P>
+<DIV class="git-gist" gist="5154652">
+    @RequestMapping(POST)
+    @RequestMapping(GET)
+</DIV>
 
-
-
-        </P>
 
 <h3>HTTP Status Codes
 </h3>
@@ -1022,15 +1026,51 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI><b>4XX</b>: Client Error</LI>
     <LI><b> 5XX</b>: Server Error</LI>
 </ul>
+ <P>Spring MVC provides an enum (<CODE class="class-reference" module="spring-web">org.springframework.http.HttpStatus</CODE>) of common HTTP status codes.</P>
 <P>
-    By default Spring returns HTTP 200 on successful requests.
-    HTTP 200 means "everything worked."
+    By default Spring returns HTTP <CODE>200</CODE>  on successful requests.
+    HTTP  <CODE>200</CODE> means "everything worked."
     You don't need to indicate this status code if everything succeeds.
     You can, in specific cases, provide a different status code using the
     <CODE module="spring-webmvc" class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE>
-    annotation on the Spring MVC request handler or by setting it manually. Let's look at some examples.
-</P>
+    annotation on the Spring MVC request handler or by setting it manually.
 
+    You don't need to specify a particular status code for most errors, however, as Spring MVC already knows how to map certain types of Spring MVC
+    exception types to HTTP status codes.
+</P>
+   <P>
+
+       The convention for handling HTTP <CODE>POST</CODE> requests that create a resource is to send the status code  <CODE>201</CODE>, which means <CODE>CREATED</CODE>, along with a <CODE>Location</CODE> header
+       that provides the URI for the newly created resource.
+
+       In our controller, the  <CODE>registerUser</CODE> method adds a user to the system by accepting HTTP request data,
+       delegating to an injected service instance (<COde>userService</COde>) and then returning a response that contains a <CODE>Location</CODE> header that indicates the
+       location of the newly created resource. The <CODE>Location</CODE> is simply a URI
+       built using the injected instance of the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.util.UriComponentsBuilder</CODE>, a convenience class
+       that Spring MVC provides to build up URIs  - both relative and absolute  - complete with support for path variable expansion.
+
+
+       This method returns an instance of Spring MVC's <CODE class="class-reference" module="spring-web">org.springframework.http.ResponseEntity</CODE> class. <CODE>ResponseEntity</CODE>
+           is a generic envelope type that holds a payload  - the response to be rendered or marshalled -  and any other data that  might be in a response
+       such as status codes and header values.
+            In this example, we pass in a payload (<CODE>user</CODE>), headers to emit in the response (<CODE>httpHeaders</CODE>), and an HTTP status code (<CODE>HttpStatus.CREATED</CODE>) in the
+       <CODE>ResponseEntity</CODE> constructor.
+        Spring MVC will unpack the payload (the <CODE>user</CODE>) and marshall it just as it would have any other object, and it will send the status code and headers in the response.
+   </P>
+  <DIV class="git-gist" gist="5154769">
+    @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
+    public ResponseEntity [User] registerUser ...
+  </DIV>
+
+ <h3> Reading and Writing Binary Data </h3>
+
+<P> Our users have profile photos. These photos are stored  as <CODE>byte</CODE>s using the <CODE>userService</code> (which in turn writes to
+    <A href="http://docs.mongodb.org/manual/applications/gridfs/">
+    MongoDB's GridFS abstraction</A>  using  Spring Data MongoDB's <CODE class="class-reference" module="spring-data-mongodb">org.springframework.data.mongodb.gridfs.GridFsTemplate</code>).
+
+    <!-- todo introduce the file upload and download code
+    -->
+</P>
 
 
 

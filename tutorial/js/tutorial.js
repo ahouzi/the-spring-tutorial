@@ -20,6 +20,11 @@ $(function () {
         };
     }
 
+    /* Specifically for SD MongoDB. There's got to be a cleaner way. */
+    function SpringDataMongoDbModule(){
+        GenericModule(this,'http://static.springsource.org/spring-data/data-mongodb/docs/current/api/');
+    }
+
     function GitHubProjectModule(mod) {
         var self = this;
         var ghUrl = 'https://github.com/joshlong/the-spring-tutorial/blob/_Q_/code/' + mod + '/src/main/java/';
@@ -78,6 +83,7 @@ $(function () {
     }
     mapOfModulesToLinks ['servlets'] = new ServletsModule();
     mapOfModulesToLinks ['java'] = new JavaModule();
+    mapOfModulesToLinks['spring-data-mongodb'] = new SpringDataMongoDbModule()
 
     var codeModules = 'services,web'.split(',');
     for (var i = 0; i < codeModules.length; i++) {
