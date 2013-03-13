@@ -2,11 +2,15 @@ package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
@@ -54,23 +58,30 @@ public class UserApiController {
         return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
-    @RequestMapping(value = USER_COLLECTION_URL + "/usernames/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = USER_COLLECTION_URL + "/usernames", method = RequestMethod.GET)
     @ResponseBody
-    public boolean isUserNameTaken(@PathVariable("username") String username) {
+    public boolean isUserNameTaken(@RequestParam("username") String username) {
         boolean taken = this.userService.isUserNameAlreadyTaken(username);
         log.debug("the username " + username + " is taken: " + taken);
         return taken;
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
-    @ResponseBody
-    public User registerUser(@RequestParam("username") String username,
-                             @RequestParam("password") String password,
-                             @RequestParam("firstname") String fn,
-                             @RequestParam("lastname") String ln,
-                             @RequestParam("imported") boolean importedFromServiceProvider) {
-        return this.userService.createOrGet(username, password, fn, ln, importedFromServiceProvider);
+    public ResponseEntity<User> registerUser(@RequestParam("username") String username,
+                                         @RequestParam("password") String password,
+                                         @RequestParam("firstname") String fn,
+                                         @RequestParam("lastname") String ln,
+                                         @RequestParam("imported") boolean importedFromServiceProvider,
+                                         UriComponentsBuilder componentsBuilder) throws Throwable {
+
+        User user = this.userService.createOrGet(username, password, fn, ln, importedFromServiceProvider);
+
+        UriComponents uriComponents = componentsBuilder.path(USER_COLLECTION_ENTRY_URL).buildAndExpand(user.getId());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponents.toUri());
+
+        return new ResponseEntity<User>(user, httpHeaders, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.POST)
@@ -82,7 +93,6 @@ public class UserApiController {
         userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
         return userId;
     }
-
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL + "/photo", method = RequestMethod.GET)
     public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) throws Throwable {

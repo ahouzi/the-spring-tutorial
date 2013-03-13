@@ -1,11 +1,16 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.springsource.examples.spring31.services.Customer;
 import org.springsource.examples.spring31.services.CustomerService;
+import org.springsource.examples.spring31.services.User;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -59,11 +64,16 @@ public class CustomerApiController {
         return this.customerService.getAllUserCustomers(userId);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     @RequestMapping(value = CUSTOMER_COLLECTION_URL, method = RequestMethod.POST)
-    public Long addCustomer(@PathVariable("userId") Long userId, @RequestParam("firstName") String fn, @RequestParam("lastName") String ln) {
-        return customerService.createCustomer(userId, fn, ln, new Date()).getId();
+    public ResponseEntity<Customer> addCustomer( @PathVariable("userId") Long userId, @RequestParam("firstName") String fn, @RequestParam("lastName") String ln,  UriComponentsBuilder componentsBuilder) throws Throwable {
+        Customer customer = customerService.createCustomer(userId, fn, ln, new Date())  ;
+
+        UriComponents uriComponents = componentsBuilder.path(CUSTOMER_COLLECTION_ENTRY_URL).buildAndExpand( userId, customer.getId());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(uriComponents.toUri());
+
+        return new ResponseEntity<Customer>( customer, httpHeaders, HttpStatus.CREATED);
     }
 
     @ResponseBody

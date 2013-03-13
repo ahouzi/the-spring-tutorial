@@ -6,7 +6,7 @@
 <div ng-controller="SignInController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form:form class="form-horizontal" method="POST" commandName="signInAttempt" name="signin" action="${pageContext.request.contextPath}/crm/signin.html">
+            <form:form class="form-horizontal" id="form" name="form" method="POST" commandName="signInAttempt"   action="${pageContext.request.contextPath}/crm/signin.html">
                 <div class="panel">
                     <fieldset>
 

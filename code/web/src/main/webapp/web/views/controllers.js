@@ -157,7 +157,7 @@ module.factory('userService', function (ajaxUtils) {
             return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
         },
         isUserNameTaken:function (username, cb) {
-            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames/' + username);
+            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames?username=' + username);
             console.log('url for isUserNameTaken is ' + url);
             ajaxUtils.get(url, {}, cb);
         },
@@ -287,9 +287,6 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
 
     $scope.isUsernameValid = function (u) {
         return u!=null && u!='' ;
-        //var m = u.match(/\w{8,}$/) != null;
-        //console.log('does [' + u + '] match? ' + m);
-        //return m;
     };
 
     $scope.confirmPasswordMatches = function (cpw) {
@@ -435,7 +432,7 @@ function CustomerController($scope, customerService, ajaxUtils) {
     $scope.addCustomer = function () {
         var fn = $scope.firstName, ln = $scope.lastName;
 
-        customerService.addNewCustomer(userId, $scope.firstName, $scope.lastName, function () {
+        customerService.addNewCustomer(userId, fn, ln, function () {
             $scope.refreshCustomers();
             resetNewCustomerForm();
         });

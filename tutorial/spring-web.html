@@ -867,7 +867,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     establishing the method as a handler. It  specifies a URL and  an HTTP method (<CODE>GET</CODE>)       that it can respond to.
 </P>
 <P> The <CODE>public static final</CODE> field, <CODE>USER_COLLECTION_ENTRY_URL</CODE>,
-    is a String that we've defined once and built upon to ensure consistent URIs. The final URL is <CODE>/api/users/{userId}</CODE>.
+    is a <CODE>String</CODE> that we've defined once and built upon to ensure consistent URIs. The final URL is <CODE>/api/users/{userId}</CODE>.
 
 
 </P>
@@ -883,9 +883,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     and the value <CODE>24</CODE> would be converted to a type of <CODE class="class-reference" module="java">java.lang.Long</CODE> and passed as an argument to our controller  method.
 </P>
 
-<!-- todo
-    todo YOU NEED TO ADD @RESPONSESTATUS codes to your code as appropriate (see Roy's preso)
--->
+<h3>HTTP Verbs</h3>
+
 <p> HTTP methods should be used explicitly.
     HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
     <CODE>GET</CODE> map nicely to the state transitions (creation, deleting, updating, reading and querying, respectively) our enterprise data typically goes through. </p>
@@ -897,27 +896,24 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
         This would be expected the entity identified by <CODE>242</CODE> holding customer data.
     </LI>
     <LI><CODE>DELETE</CODE>s can be used to delete information identified by a URL. A <CODE>DELETE</CODE> request looks
-        like this: <CODE>DELETE /api/crm/42/customers/242</CODE></LI>
-    <LI><CODE>PUT</CODE> requests that the entity passed be stored at the URI. It can be used to create a new entity or
-        modify an existing one. The creation of new entities is uncommon as it allows the client to select the id of the
-        new entity. A HTTP <CODE>PUT</CODE> looks like this: <CODE> PUT /toppings/1 </CODE> and can return a payload,
-        like this <CODE> { "name" : "Cheese" }</CODE>.
+        like this: <CODE>DELETE /api/crm/42/customers/242</CODE>.  A <CODE>DELETE</CODE> request can </LI>
+    <LI>
+     Usually, a <CODE>PUT</CODE>  requests that the payload of the request be used to update or create a resource on the server
+        with a specific ID. Thus, <CODE>PUT /api/crm/42/customers/243</CODE> might create a new customer record identified by the
+        number <CODE>242</CODE>, and can return a response. Such a response might be  <CODE>{ "name" : "Mark", "id" : "242" }</CODE>.
     </LI>
-    <LI><CODE>POST</CODE> requests that the resource at a URI do something with the enclosed entity. The major
-        difference between <CODE>POST</CODE> and <CODE>PUT</CODE> are what resource the request URI identifies. For
-        example, use <CODE>PUT</code> to create and <CODE>POST</CODE> to modify. A HTTP <CODE>POST</CODE> looks like
-        this: <CODE>POST /toppings/1</CODE> and can return a payload, like this <CODE> { "name" : "Cheese" }</CODE>.
+    <LI>
+        Usually, a <CODE>POST</CODE> requests that the payload of the request be used to  update or create a resource on the server with
+        <EM>no</EM> specific ID. Thus, <CODE>POST /api/crm/42/customers</CODE> might create a customer record  and then return that as the response,
+        just as with <CODE>PUT</CODE>:    <CODE>{ "name" : "Mark", "id" : "242" }</CODE>.
+               You might respond  with an HTTP status code.  For example, you could return an <CODE>HTTP 201 Created</code> code
+             and a <CODE>Location</CODE> header with the URI that points to the newly created resource.
     </LI>
+
 </ul>
 
-
-<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
-    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
-    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
-    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
-    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
-    encode data this way then it should. </p>
-
+<h3>HTTP Status Codes
+</h3>
 
 <P> HTTP supports status codes to convey system state to clients in a consistent way. These take the place of things
     like exceptions in programming languages. Status codes are an indicator the result of the server's attempt to
@@ -930,6 +926,36 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI><b>4XX</b>: Client Error</LI>
     <LI><b> 5XX</b>: Server Error</LI>
 </ul>
+ <P>
+  By default Spring returns HTTP 200 on successful requests.
+     HTTP 200 means "everything worked."
+     You don't need to indicate this status code if everything succeeds.
+     You can, in specific cases, provide a different status code using the <CODE module="spring-webmvc" class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE> annotation
+     on the Spring MVC request handler.
+ </P>
+          <h3> Our RESTful Controller </h3>
+
+<P>
+    Let's look at a Spring MVC controller for working with <CODE class="class-reference" module="services">org.springsource.examples.spring31.services.User</CODE>s.
+
+</P>
+
+
+<div module="web" q="tut_rest" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.UserApiController
+</div>
+
+
+<!--
+
+
+<p> Data coming from these resources should be represented in an easily understood way. For example as XML document, or
+    as a JSON object, or both, depending on the capabilities supported by the resource and the requirements of the
+    client. This is a fundamental tenant of the web, called <EM>content negotiation</EM>. Content negotiation is most
+    commonly done using the <CODE>Accept</CODE> header on requests. If a client sends a request with <CODE>Accept=application/json</CODE>
+    then the client is expecting a response in the mime type <CODE>application/json</CODE>. If the server resource can
+    encode data this way then it should. </p>
+
 <P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as
     possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There
     are some, useful, exceptions such as when we introduce OAuth sessions which require minimal state and can't be
@@ -961,10 +987,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section
     at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource
     is really not very different than the handling of a request for a RESTful resource. </P>
-
-<div module="web" q="tut_rest" extension="java" class="git-code">
-    org.springsource.examples.spring31.web.UserApiController
-</div>
+-->
 <P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve
     their information by IDS, at least. </p>
 
