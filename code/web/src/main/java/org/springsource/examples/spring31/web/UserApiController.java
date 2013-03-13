@@ -15,9 +15,7 @@ import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Simple Spring MVC controller that can be used to adminster information about the users
@@ -98,18 +96,12 @@ public class UserApiController {
     }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.GET)
-    public void renderMedia(HttpServletResponse httpServletResponse, OutputStream os, @PathVariable("userId") Long userId) throws Throwable {
+    public ResponseEntity<byte[]> renderMedia(@PathVariable("userId") Long userId) throws Throwable {
         InputStream is = userService.readUserProfilePhoto(userId);
-        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        if (null == is) {
-            return;
-        }
-        try {
-            IOUtils.copyLarge(is, os);
-        } finally {
-            IOUtils.closeQuietly(is);
-            IOUtils.closeQuietly(os);
-        }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.IMAGE_JPEG);
+        byte buffer[] = IOUtils.toByteArray(is);
+        return new ResponseEntity<byte[]>(buffer, httpHeaders, HttpStatus.OK);
     }
 
 }
