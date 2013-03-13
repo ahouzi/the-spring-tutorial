@@ -739,7 +739,7 @@
 <P> If there are any errors, the method returns the String <CODE>"signin"</CODE> to signal that <CODE>signin</CODE> view
     should be re-rendered to present the user with feedback about the errors. If there are no errors, the method returns
     the String <CODE>"redirect:/crm/profile.html"</CODE>, which Spring MVC will handle by sending a redirect (a separate
-    HTTP GET call) to the user's <code>profile</code> page. </P>
+    <CODE>HTTP GET</CODE> call) to the user's <code>profile</code> page. </P>
 
 <h3> Internationalization with Spring MVC </h3>
 
@@ -819,53 +819,68 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     expose server side business state to clients. REST builds upon the principles of HTTP, so doesn't require any new
     infrastructure or any specialized types of middleware. There are some fundamental principles behind REST. </p>
 
-<H2>  Designing RESTful Resources with Spring </H2>
+<H2> Designing RESTful Resources with Spring </H2>
 
 <!-- todo interleave the relevant Spring MVC handler method syntax as u introduce concepts for REST-->
 
 <P>
- Spring's support for REST builds upon the basic Spring MVC component model.
-  You've already been introduced to Spring MVC controllers, and so are more than halfway there.
+    Spring's support for REST builds upon the basic Spring MVC component model.
+    You've already been introduced to Spring MVC controllers, and so are more than halfway there. Our application deals
+    with two different types of data, or entities: <CODE class="class-reference" q="tut_rest" module="services">
+    org.springsource.examples.spring31.services.User </CODE> and
+    <CODE class="class-reference" q="tut_rest" module="services">
+        org.springsource.examples.spring31.services.Customer</CODE>.
 
 
+    We'll build RESTful web services to support manipulating these entities.
 
- Our application deals with two different types of entities, <CODE class="class-reference" q="tut_rest"
-                                                                      module="services">
-    org.springsource.examples.spring31.services.User </CODE> and <CODE class="class-reference" q="tut_rest"
-                                                                       module="services">
-    org.springsource.examples.spring31.services.Customer</CODE>.
-
-
-
-    We need to expose RESTful endpoints to deal with the
-    various things a user is likely to want to do with data represented by these entities. Let's add a controller -
+    Let's add a controller -
     <CODE class="class-reference" q="tut_rest"
           module="web">org.springsource.examples.spring31.web.UserApiController</CODE> - which will manage the <COde>User</COde>
-    information. Remember: a <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> data.
-    We'll focus on the <CODE>UserApiController</CODE>, which is just another Spring bean annotated with
-    the <CODE class="class-reference" module="spring-context">org.springframework.stereotype.Controller</CODE> annotation.
-    We'll walk through the implementations of these methods step by step, but let's first look at the code:
+    information. The controller will expose endpoints to handle common operations for a <CODE>User</CODE>. A
+    <CODE>User</CODE> will login, manage her profile, and manage <CODE>Customer</CODE> records.
+    First, let's look at the code, then we'll dissect the novel parts.
+
 </P>
 
+
+<div module="web" q="tut_rest" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.UserApiController
+</div>
+<P> This code should look fairly familiar. It's a set of Spring MVC controllers that deal with requests to various URIs.
+    There are a couple of novel things in this code, however.
+
+</P>
+
+
+<h3> URI Structures </h3>
 <p>
 
+
+
     HTTP resources
-    (URIs) map nicely to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
+    (URIs) map to data hierarchies, like directory structures, in an easily understood way. Suppose, for example,
     that you want to map customer data from a CRM-style application (like ours!) to HTTP URIs.
     You might use <code>http://localhost:8080/crm/customers</code> to expose <EM>all</EM> the customers.
-    You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose information specifically about a customer whose ID is <CODE>42</CODE>.
-    You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE> to expose information about the <CODE>orders</CODE> of that same <CODE>customer</CODE>.
+    You might use <CODE>http://localhost:8080/crm/customers/42</CODE> to expose information specifically about a
+    customer whose ID is <CODE>42</CODE>.
+    You might use <CODE>http://localhost:8080/crm/customers/42/orders</CODE> to expose information about the <CODE>orders</CODE>
+    of that same <CODE>customer</CODE>.
 
-     Here's the request handler to retreive  <CODE>User</CODE> data by ID.
+    Here's the request handler to retrieve <CODE>User</CODE> data by ID.
 </p>
 
 <DIV class="git-gist" gist="5129983">
     @RequestMapping @ResponseBody public void userById( @PathVariable ...)
 </DIV>
 <P>
- This method is very similar to the request handlers we've seen thus far! It has a <CODE class="class-reference" module="spring-web">org.springframework.web.bind.annotation.RequestMapping</CODE> annotation
-    establishing the method as a handler. It  specifies a URL and  an HTTP method (<CODE>GET</CODE>)       that it can respond to.
+    This method is very similar to the request handlers we've seen thus far! It has a <CODE class="class-reference"
+                                                                                            module="spring-web">org.springframework.web.bind.annotation.RequestMapping</CODE>
+    annotation
+    establishing the method as a handler. It specifies a URL and an HTTP method (<CODE>GET</CODE>) that it can respond
+    to.
 </P>
+
 <P> The <CODE>public static final</CODE> field, <CODE>USER_COLLECTION_ENTRY_URL</CODE>,
     is a <CODE>String</CODE> that we've defined once and built upon to ensure consistent URIs. The final URL is <CODE>/api/users/{userId}</CODE>.
 
@@ -876,18 +891,53 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     static public final String USER_COLLECTION_URL = "/api/users";
     static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
 </CODE>
+
 <P>
-    Any token contained in braces (like: <CODE>{userId}</CODE>) is a <EM>path variable</EM>. Spring MVC will treat that as a wild card, extract the value out from each request and
-    inject the value into any request handler method argument annotated with <CODE class="class-reference"  module="spring-web">org.springframework.web.bind.annotation.PathVariable</CODE>,  like this:
-    <CODE>@PathVariable("userId") Long userId</CODE>. If, for example, someone  opened the URL <CODE>/api/users/24</CODE> in a browser, the request handler method (<CODE>getUserById</CODE>) would be invoked
-    and the value <CODE>24</CODE> would be converted to a type of <CODE class="class-reference" module="java">java.lang.Long</CODE> and passed as an argument to our controller  method.
+    Any token contained in braces (like: <CODE>{userId}</CODE>) is a <EM>path variable</EM>. Spring MVC will treat that
+    as a wild card, extract the value out from each request and
+    inject the value into any request handler method argument annotated with <CODE class="class-reference"
+                                                                                   module="spring-web">org.springframework.web.bind.annotation.PathVariable</CODE>,
+    like this:
+    <CODE>@PathVariable("userId") Long userId</CODE>. If, for example, someone opened the URL <CODE>/api/users/24</CODE>
+    in a browser, the request handler method (<CODE>getUserById</CODE>) would be invoked
+    and the value <CODE>24</CODE> would be converted to a type of <CODE class="class-reference" module="java">java.lang.Long</CODE>
+    and passed as an argument to our controller method. Of course, path variables are just as naturally used with
+    regular Spring MVC and <EM>classic</EM> web applications.
 </P>
+<h3>Content Negotiation</h3>
+
+<P>
+    The return value is annotated with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.ResponseBody</CODE>
+    annotation.
+    When Spring MVC sees this annotation, it short circuits the view resolution process that's normally at play, and
+    attempts to convert the returned value into a representation that the HTTP client can work with.
+    The client signals which representation formats it's prepared to accept through a process called <EM>content negotiation</EM>, a
+     fundamental feature of HTTP.   Usually, the client sends a <CODE>Accept</CODE> header that specifies which representation formats it's prepared to read.
+</p>
+
+<P>
+     On the server side, Spring MVC uses the <EM>strategy pattern</EM> to delegate the conversion to a configured
+    <CODE class="class-reference" module="spring-webmvc">org.springframework.http.converter.HttpMessageConverter</CODE> instance.
+
+    We could easily add our own custom <CODE>HttpMessageConverter</CODE> types in our configuration class by overriding the <code>configureMessageConverters</code> method, but there is rarely any need to.
+    Depending on what is available on your CLASSPATH, Spring MVC will automatically support marshalling
+    XML with a JAXB implementation and JAXB-annotated POJOs, JSON through the Jackson JSON library, multipart file data
+    through the <A href="http://commons.apache.org/proper/commons-fileupload/">Apache Commons FileUpload </A> library or
+    the Servlet 3 Part API,
+    RSS and ATOM feeds with the ROME library, and images using the <code>java.awt.image.BufferedImage</code> API and
+    more.
+
+    Thus, if a client requests the data in one of these URLs and species that it will only <CODE>Accept</CODE> data of
+    the type <CODE>application/json</CODE>,
+    then the client will attempt to convert the results into JSON and send it in the response body.
+</p>
 
 <h3>HTTP Verbs</h3>
-
-<p> HTTP methods should be used explicitly.
+<p>
+     HTTP methods should be used explicitly.
     HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
-    <CODE>GET</CODE> map nicely to the state transitions (creation, deleting, updating, reading and querying, respectively) our enterprise data typically goes through. </p>
+    <CODE>GET</CODE> map nicely to the state transitions (creation, deleting, updating, reading and querying,
+    respectively) our enterprise data typically goes through. </p>
 <ul>
     <LI><CODE>GET</CODE>, for example, can be used to retrieve information. It must be safe, and idempotent. It can have
         side effects, but since the user doesn't expect them, they shouldn't be critical to the operation of the system.
@@ -896,18 +946,24 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
         This would be expected the entity identified by <CODE>242</CODE> holding customer data.
     </LI>
     <LI><CODE>DELETE</CODE>s can be used to delete information identified by a URL. A <CODE>DELETE</CODE> request looks
-        like this: <CODE>DELETE /api/crm/42/customers/242</CODE>.  A <CODE>DELETE</CODE> request can </LI>
-    <LI>
-     Usually, a <CODE>PUT</CODE>  requests that the payload of the request be used to update or create a resource on the server
-        with a specific ID. Thus, <CODE>PUT /api/crm/42/customers/243</CODE> might create a new customer record identified by the
-        number <CODE>242</CODE>, and can return a response. Such a response might be  <CODE>{ "name" : "Mark", "id" : "242" }</CODE>.
+        like this: <CODE>DELETE /api/crm/42/customers/242</CODE>. A <CODE>DELETE</CODE> request can
     </LI>
     <LI>
-        Usually, a <CODE>POST</CODE> requests that the payload of the request be used to  update or create a resource on the server with
-        <EM>no</EM> specific ID. Thus, <CODE>POST /api/crm/42/customers</CODE> might create a customer record  and then return that as the response,
-        just as with <CODE>PUT</CODE>:    <CODE>{ "name" : "Mark", "id" : "242" }</CODE>.
-               You might respond  with an HTTP status code.  For example, you could return an <CODE>HTTP 201 Created</code> code
-             and a <CODE>Location</CODE> header with the URI that points to the newly created resource.
+        Usually, a <CODE>PUT</CODE> requests that the payload of the request be used to update or create a resource on
+        the server
+        with a specific ID. Thus, <CODE>PUT /api/crm/42/customers/243</CODE> might create a new customer record
+        identified by the
+        number <CODE>242</CODE>, and can return a response. Such a response might be <CODE>{ "name" : "Mark", "id" :
+        "242" }</CODE>.
+    </LI>
+    <LI>
+        Usually, a <CODE>POST</CODE> requests that the payload of the request be used to update or create a resource on
+        the server with
+        <EM>no</EM> specific ID. Thus, <CODE>POST /api/crm/42/customers</CODE> might create a customer record and then
+        return that as the response,
+        just as with <CODE>PUT</CODE>: <CODE>{ "name" : "Mark", "id" : "242" }</CODE>.
+        You might respond with an HTTP status code. For example, you could return an <CODE>HTTP 201 Created</code> code
+        and a <CODE>Location</CODE> header with the URI that points to the newly created resource.
     </LI>
 
 </ul>
@@ -926,24 +982,22 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI><b>4XX</b>: Client Error</LI>
     <LI><b> 5XX</b>: Server Error</LI>
 </ul>
- <P>
-  By default Spring returns HTTP 200 on successful requests.
-     HTTP 200 means "everything worked."
-     You don't need to indicate this status code if everything succeeds.
-     You can, in specific cases, provide a different status code using the <CODE module="spring-webmvc" class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE> annotation
-     on the Spring MVC request handler.
- </P>
-          <h3> Our RESTful Controller </h3>
+<P>
+    By default Spring returns HTTP 200 on successful requests.
+    HTTP 200 means "everything worked."
+    You don't need to indicate this status code if everything succeeds.
+    You can, in specific cases, provide a different status code using the <CODE module="spring-webmvc"
+                                                                                class="class-reference">org.springframework.web.bind.annotation.ResponseStatus</CODE>
+    annotation
+    on the Spring MVC request handler.
+</P>
+
+<h3> Our RESTful Controller </h3>
 
 <P>
     Let's look at a Spring MVC controller for working with <CODE class="class-reference" module="services">org.springsource.examples.spring31.services.User</CODE>s.
 
 </P>
-
-
-<div module="web" q="tut_rest" extension="java" class="git-code">
-    org.springsource.examples.spring31.web.UserApiController
-</div>
 
 
 <!--
