@@ -801,7 +801,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     argument to our controller method. Of course, path variables are just as naturally used with regular Spring MVC and
     <EM>classic</EM> web applications. </P>
 
-<h3>Content Negotiation</h3>
+<h3>Content Negotiation and HTTP Message Conversion
+</h3>
 
 <P> The return value is annotated with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.ResponseBody</CODE>
     annotation. When Spring MVC sees this annotation, it short circuits the view resolution process that's normally at
@@ -812,8 +813,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 <P> On the server side, Spring MVC uses the <EM>strategy pattern</EM> to delegate the conversion to a configured <CODE
         class="class-reference" module="spring-webmvc">org.springframework.http.converter.HttpMessageConverter</CODE>
-    instance. We could easily add our own custom <CODE>HttpMessageConverter</CODE> types in our configuration class by
-    overriding the <code>configureMessageConverters</code> method, but there is rarely any need to. Depending on what is
+    instance. Depending on what is
     available on your CLASSPATH, Spring MVC will automatically support marshalling XML with a JAXB implementation and
     JAXB-annotated POJOs, JSON through the Jackson JSON library, multipart file data through the <A
             href="http://commons.apache.org/proper/commons-fileupload/">Apache Commons FileUpload </A> library or the
@@ -837,6 +837,52 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     </TABLE>
     <span class="caption"> I use the command line tool <CODE>curl</CODE> to call the REST service, like this: <br/> <STRONG><code>$
         curl --header "Accept: application/xml" http://localhost:8080/api/users/58 </code></STRONG> </span></div>
+
+<h3> Serializing   Hibernate Objects over HTTP
+</h3>
+
+<P>
+     You don't often have to override the configured <CODE>HttpMessageConverters</CODE>, but it's nice to know that you can.
+      You simply override the <code>configureMessageConverters</code> method in the  configuration class.
+
+    In this method, you're given a reference to a list of <CODE>HttpMessageConverters</CODE>, which you may populate however you like. However,
+    if you don't  provide anything, then Spring MVC will install the default converters.
+</p><P>
+    Our application works with domain model objects that describe a <CODE>User</CODE> and a <CODE>Customer</CODE> data.
+    These domain  model objects are plain old POJOs that work with <A href="http://hibernate.org">Hibernate</A>, a  popular object-relational mapping framework.
+    Our domain model objects are annotated with JPA and JAXB annotations. JPA annotations describe the layout of the object to a JPA provider
+    like Hibernate so that it can effectively pick apart the important values in the object and save them to a database table.
+    JAXB annotations describe the layout of the object to a JAXB provider so that it can effectively pick apart the important values  in the object and write them out
+    as an XML document. Our POJOs don't need any changes to work with Jackson, which converts objects to and from JSON.
+</P>
+<P> Unfortunately, there's still a small fly in our ointment.  Our <CODE>User</CODE> objects maintain a  collection of <CODE>Customer</CODE> records. This is a typical <EM>master-detail</EM>, or <EM>one-to-many</EM> arrangement.
+      Unfortunately, these <CODE>User</CODE> entities in turn have a reference  to the  <CODE>User</CODE> objects to which they belong creating a circular reference.
+    Circular references are easy to manage in  Hibernate, but the Jackson  library  that handles the conversion of an object to and from JSON for Spring MVC doesn't like it so much. It ultimately leads to a stack overflow.
+    There are a few well known solutions. One of them is to tailor the
+     <CODE>ObjectMapper</CODE> used by the registered
+    <CODE class="class-reference" module="spring-web">org.springframework.http.converter.json.MappingJacksonHttpMessageConverter</CODE>.
+
+    We'll rely on a third party library that provides a <CODE>ObjectMapper</CODE> implementation that knows how to   simply ignore relationships that could cause a circular relationship.  This also has the benefit of not
+    sending all the <CODE>Customer</CODE> data on each request.
+
+
+</P>
+
+<DIV class="git-gist" gist="5157555">
+
+    MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
+    mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
+    mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList( MediaType.APPLICATION_JSON ));
+
+    messageConverters.add(mappingJacksonHttpMessageConverter);
+</DIV>
+
+<P> The <CODE class="class-reference" module="web">org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper</CODE> class simply installs the <CODE>HibernateObjectMapper</CODE> provided by the third party library.
+    And, just like that, we can serialize Hibernate POJOs  using JSON.     This is yet another example where Spring makes possible the impossible possible, and easier the difficult  chores of enterprise application development.
+
+</P>
+
+
 <h3>HTTP Verbs</h3>
 
 <p> HTTP methods should be used explicitly. HTTP methods (<CODE>POST</CODE> , <CODE>DELETE</CODE>, <CODE>PUT</CODE>,
@@ -942,11 +988,35 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </DIV>
 <P>
     Reading a file is even easier.
-     Our  request handler simply retreives the <CODE>byte</CODE>s from our MongoDB GridFS-powered file repository and writes the  <CODE>byte</CODE>s out
-    to the client through the <CODE>OutputStream</CODE> reference given to us by
+    Our request handler simply retreives the <CODE>byte</CODE>s from our MongoDB GridFS-powered file repository, copies the  <CODE>byte</CODE>s to a buffer,
+    and then sends the whole thing with an HTTP  <CODE>200</CODE> status code to the client.
+
+    Earlier, we registered a <CODE class="class-reference" module="spring-web"> org.springframework.http.converter.ByteArrayHttpMessageConverter</CODE> that handles converting <CODE>byte[]</CODE> payloads to and from an HTTP request for us, so we're done!
+
 </P>
 
+
 <DIv class="git-gist" gist="5156263"> renderMedia(HttpServletResponse, OutputStream, @PathVariable..)</DIv>
+
+
+
+
+
+
+
+<h2>  Interacting with our  RESTful Web Applications with the Poster plugin,  <CODE>curl</CODE>, and the Spring REST Shell</h2>
+<P>
+
+ </P>
+
+
+
+
+
+
+
+
+
 <!-- <P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There are some, useful, exceptions such as when we introduce OAuth sessions which require minimal state and can't be arbitrarily bound to. There are a lot of benefits to this, though. For example, if you want to scale your application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of context. </P> <P> From the client side, to support connecting to RESTful web services, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>. <code>RestTemplate</code> reduces common HTTP access operations to one-liners. The <CODE>RestTemplate</CODE> is very configurable. The <CODE>RestTemplate</CODE> can handle mapping results from requests to more useful types (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security authorization transmission (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.client.ClientHttpRequestInterceptor </CODE> SPI). We'll cover the <CODE>RestTemplate</CODE> a bit more when we look at <A href="http://www.springsource.org/spring-social">Spring Social</a>, but for a really detailed look at this class, and the peer class provided as part of the <A href="http://www.springsource.org/spring-android">Spring Android</a> project to enable secure RESTful access from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span> . </P> <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource is really not very different than the handling of a request for a RESTful resource. </P> -->
 <!--<P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve their information by IDS, at least. </p> <P> You'll want to be able to create new users. </P> <P> You'll need to be able to update a users details. </P> <p> You'll need an endpoint to handle file uploads for the profile's photo image </p> <p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>-->
 <!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell -->
