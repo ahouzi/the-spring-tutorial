@@ -1,8 +1,9 @@
 <html xmlns="http://www.w3.org/1999/html" xmlns="http: //www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
       xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
-    <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
+    <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code  todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .todo {
         color: red;
     }
@@ -838,31 +839,44 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <span class="caption"> I use the command line tool <CODE>curl</CODE> to call the REST service, like this: <br/> <STRONG><code>$
         curl --header "Accept: application/xml" http://localhost:8080/api/users/58 </code></STRONG> </span></div>
 
-<h3> Serializing   Hibernate Objects over HTTP
+<h3> Serializing Hibernate Objects over HTTP
 </h3>
 
 <P>
-     You don't often have to override the configured <CODE>HttpMessageConverters</CODE>, but it's nice to know that you can.
-      You simply override the <code>configureMessageConverters</code> method in the  configuration class.
+    You don't often have to override the configured <CODE>HttpMessageConverters</CODE>, but it's nice to know that you
+    can.
+    You simply override the <code>configureMessageConverters</code> method in the configuration class.
 
-    In this method, you're given a reference to a list of <CODE>HttpMessageConverters</CODE>, which you may populate however you like. However,
-    if you don't  provide anything, then Spring MVC will install the default converters.
-</p><P>
+    In this method, you're given a reference to a list of <CODE>HttpMessageConverters</CODE>, which you may populate
+    however you like. However,
+    if you don't provide anything, then Spring MVC will install the default converters.
+</p>
+
+<P>
     Our application works with domain model objects that describe a <CODE>User</CODE> and a <CODE>Customer</CODE> data.
-    These domain  model objects are plain old POJOs that work with <A href="http://hibernate.org">Hibernate</A>, a  popular object-relational mapping framework.
-    Our domain model objects are annotated with JPA and JAXB annotations. JPA annotations describe the layout of the object to a JPA provider
-    like Hibernate so that it can effectively pick apart the important values in the object and save them to a database table.
-    JAXB annotations describe the layout of the object to a JAXB provider so that it can effectively pick apart the important values  in the object and write them out
+    These domain model objects are plain old POJOs that work with <A href="http://hibernate.org">Hibernate</A>, a
+    popular object-relational mapping framework.
+    Our domain model objects are annotated with JPA and JAXB annotations. JPA annotations describe the layout of the
+    object to a JPA provider
+    like Hibernate so that it can effectively pick apart the important values in the object and save them to a database
+    table.
+    JAXB annotations describe the layout of the object to a JAXB provider so that it can effectively pick apart the
+    important values in the object and write them out
     as an XML document. Our POJOs don't need any changes to work with Jackson, which converts objects to and from JSON.
 </P>
-<P> Unfortunately, there's still a small fly in our ointment.  Our <CODE>User</CODE> objects maintain a  collection of <CODE>Customer</CODE> records. This is a typical <EM>master-detail</EM>, or <EM>one-to-many</EM> arrangement.
-      Unfortunately, these <CODE>User</CODE> entities in turn have a reference  to the  <CODE>User</CODE> objects to which they belong creating a circular reference.
-    Circular references are easy to manage in  Hibernate, but the Jackson  library  that handles the conversion of an object to and from JSON for Spring MVC doesn't like it so much. It ultimately leads to a stack overflow.
+
+<P> Unfortunately, there's still a small fly in our ointment. Our <CODE>User</CODE> objects maintain a collection of
+    <CODE>Customer</CODE> records. This is a typical <EM>master-detail</EM>, or <EM>one-to-many</EM> arrangement.
+    Unfortunately, these <CODE>User</CODE> entities in turn have a reference to the <CODE>User</CODE> objects to which
+    they belong creating a circular reference.
+    Circular references are easy to manage in Hibernate, but the Jackson library that handles the conversion of an
+    object to and from JSON for Spring MVC doesn't like it so much. It ultimately leads to a stack overflow.
     There are a few well known solutions. One of them is to tailor the
-     <CODE>ObjectMapper</CODE> used by the registered
+    <CODE>ObjectMapper</CODE> used by the registered
     <CODE class="class-reference" module="spring-web">org.springframework.http.converter.json.MappingJacksonHttpMessageConverter</CODE>.
 
-    We'll rely on a third party library that provides a <CODE>ObjectMapper</CODE> implementation that knows how to   simply ignore relationships that could cause a circular relationship.  This also has the benefit of not
+    We'll rely on a third party library that provides a <CODE>ObjectMapper</CODE> implementation that knows how to
+    simply ignore relationships that could cause a circular relationship. This also has the benefit of not
     sending all the <CODE>Customer</CODE> data on each request.
 
 
@@ -877,8 +891,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     messageConverters.add(mappingJacksonHttpMessageConverter);
 </DIV>
 
-<P> The <CODE class="class-reference" module="web">org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper</CODE> class simply installs the <CODE>HibernateObjectMapper</CODE> provided by the third party library.
-    And, just like that, we can serialize Hibernate POJOs  using JSON.     This is yet another example where Spring makes possible the impossible possible, and easier the difficult  chores of enterprise application development.
+<P> The <CODE class="class-reference" module="web">org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper</CODE>
+    class simply installs the <CODE>HibernateObjectMapper</CODE> provided by the third party library.
+    And, just like that, we can serialize Hibernate POJOs using JSON. This is yet another example where Spring makes
+    possible the impossible possible, and easier the difficult chores of enterprise application development.
 
 </P>
 
@@ -988,10 +1004,13 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </DIV>
 <P>
     Reading a file is even easier.
-    Our request handler simply retreives the <CODE>byte</CODE>s from our MongoDB GridFS-powered file repository, copies the  <CODE>byte</CODE>s to a buffer,
-    and then sends the whole thing with an HTTP  <CODE>200</CODE> status code to the client.
+    Our request handler simply retrieves the <CODE>byte</CODE>s from our MongoDB GridFS-powered file repository, copies
+    the <CODE>byte</CODE>s to a buffer,
+    and then sends the whole thing with an HTTP <CODE>200</CODE> status code to the client.
 
-    Earlier, we registered a <CODE class="class-reference" module="spring-web"> org.springframework.http.converter.ByteArrayHttpMessageConverter</CODE> that handles converting <CODE>byte[]</CODE> payloads to and from an HTTP request for us, so we're done!
+    Earlier, we registered a <CODE class="class-reference" module="spring-web">
+    org.springframework.http.converter.ByteArrayHttpMessageConverter</CODE> that handles converting <CODE>byte[]</CODE>
+    payloads to and from an HTTP request for us, so we're done!
 
 </P>
 
@@ -999,25 +1018,118 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <DIv class="git-gist" gist="5156263"> renderMedia(HttpServletResponse, OutputStream, @PathVariable..)</DIv>
 
 
+<h2> Exercising RESTful Web Services </h2>
+
+<P>
+    To familiarize yourself with an API, it can be helpful to interact with the endpoints and make calls against it and
+    verify payloads.
+    One of the nice things about REST is that it's basic HTTP so any modern day HTTP client will suffice
+    as a way to exercise the service. Here are some of my favorite options.
+</P>
+
+<h3>The Spring REST Shell </h3>
+
+<P>
+    The Spring REST Shell is a shell environment that lets you interact with RESTful resources in an interactive manner,
+    much as though you were sitting at a <SPAN class="wikipedia">REPL</SPAN> for a scripting language.
+</P>
+
+<P>
+    Releases of the <A href="https://github.com/SpringSource/rest-shell">Spring REST Shell</A> can be downloaded from
+    the GitHub <A href="https://github.com/jbrisbin/rest-shell/downloads"> rest-shell downloads </a> page or built from
+    source.
+    If you're using Mac OS X and <a href="http://mxcl.github.com/homebrew/">Homebrew</a>, you can install the <code>rest-shell</code>
+    using <code>brew install</code>
+</P>
 
 
+<P> Using the <CODE>rest-shell</CODE> to navigate your REST resources is
+    very similar to traversing a directory structure in your system terminal. The <CODE>rest-shell</CODE> always
+    maintains a <CODE>baseUri</CODE> that is considered the
+    root to which all other path references are considered relative. If you have a REST service exposed at <CODE>http://localhost:8080/api/crm</CODE>,
+    then you'd consider that your <CODE>baseUri</CODE>.
 
+</P>
 
+<P> Once you have it running, it's easy to interact with it. Hit <CODE>TAB</CODE> to see more commands available.
+    There's a lot more to be learned, and I won't endeavour to cover it all here, but let's look at an interactive
+    session to understand more.
+</P>
 
-<h2>  Interacting with our  RESTful Web Applications with the Poster plugin,  <CODE>curl</CODE>, and the Spring REST Shell</h2>
+<P>
+    Once you've installed the <code>rest-shell</code>, simply launch the shell by invoking <CODE>rest-shell</CODE>. Once
+    you're in the shell, you can
+    get assistance on what to do next by typing <CODE>TAB</CODE>.
+
+</P>
+
+<DIV class="git-gist" gist="5183821"></DIV>
+
+<P> It's a simple matter to save typing by setting session-global directives, like the <CODE>baseUri</CODE> command.
+    This sets the base URI relative to which all
+    subsequent queries will build.
+</P>
+
+<DIV class="git-gist" gist="5183823"></DIV>
+
+<P> with the current <CODE>baseUri</CODE> set, you can simply issue queries, using intuitively named commands named
+    after the HTTP versbs. </P>
+
+<div class="git-gist" gist="5184448"></div>
+<P> You can also invoke commands and have the output streamed to a file (perhaps for analysis later).</P>
+
+<DIV class="git-gist" gist="5183825"></DIV>
+<P> You can further customize your session by setting a header to be applied to all subsequent requests. Here we specify
+    a <CODE>Accept</CODE> header value of <CODE>application/json</CODE> and then re-issue the same request as above,
+    resuling in data in a different mime type.
+
+</P>
+
+<DIV class="git-gist" gist="5183827"></DIV>
+
+<P> For a more comprehensive look at the Spring <CODE>rest-shell</CODE>, consult the <A
+        href="https://github.com/SpringSource/rest-shell/wiki/Getting-Started"><EM>Getting Started</EM></a> guide.</P>
+
+<h3> Another Option: <CODE>curl</CODE></h3>
 
 <P>
 
- </P>
-<h3>The Spring REST Shell </h3>
-<P></P>
-<h3> <CODE>curl</CODE></h3>
-<P></P>
+    <CODE>curl</CODE> is a command line tool that ships on most Unix systems and can be used from Windows with the
+    support of a Unix-emulation layer like <A href="http://cygwin.org">Cygwin</A>.
+    <CODE>curl</CODE> can be installed on OSX using the <CODE>brew</CODE> package manager, like this: <CODE>brew install
+    curl</CODE>. Once you've installed it, you can make requests on the command line,
+    like this:
 
+</P>
 
+<DIV class="git-gist" gist="5184517"></DIV>
+<h3> Another Option: the Firefox Poster plugin</h3>
 
+<P> The Firefox <A href="https://addons.mozilla.org/en-us/firefox/addon/poster/">Poster</A> plugin is a very capable
+    little HTTP client, as well.
+    You must install it from the Firefox market.
+    Once installed, it appears as a little yellow icon in the bottom of the Firefox browser window. You can use it to
+    interact with RESTful resources, as well.  </p>
+<div class="diagram">
+    <img src="images/poster%20-%20poster-icon.png"/>
+    <span class="caption"></span>
+</div>
+<P>
+    Here, we make the same request as we did in the <CODE>curl</CODE> command above, this time by making a request and
+    specifying a custom header in the <CODE>Header</CODE> tab.
 
+</P>
 
+<DIV class="diagram">
+    <img src="images/poster%20-%20poster%20request%20setup.png"/>
+    <span class="caption"></span>
+</div>
+
+<p> The content returned from the request will be displayed </p>
+
+<div class="diagram">
+    <img src="images/poster%20-%20poster-results.png"/><span class="caption"></span>
+</DIV>
 
 
 <!-- <P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There are some, useful, exceptions such as when we introduce OAuth sessions which require minimal state and can't be arbitrarily bound to. There are a lot of benefits to this, though. For example, if you want to scale your application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of context. </P> <P> From the client side, to support connecting to RESTful web services, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>. <code>RestTemplate</code> reduces common HTTP access operations to one-liners. The <CODE>RestTemplate</CODE> is very configurable. The <CODE>RestTemplate</CODE> can handle mapping results from requests to more useful types (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security authorization transmission (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.client.ClientHttpRequestInterceptor </CODE> SPI). We'll cover the <CODE>RestTemplate</CODE> a bit more when we look at <A href="http://www.springsource.org/spring-social">Spring Social</a>, but for a really detailed look at this class, and the peer class provided as part of the <A href="http://www.springsource.org/spring-android">Spring Android</a> project to enable secure RESTful access from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span> . </P> <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource is really not very different than the handling of a request for a RESTful resource. </P> -->

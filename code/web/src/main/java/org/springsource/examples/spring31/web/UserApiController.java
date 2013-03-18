@@ -44,9 +44,7 @@ public class UserApiController {
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
     @ResponseBody
     public User getUserById(@PathVariable("userId") Long userId) {
-        User user = this.userService.getUserById(userId);
-
-        return user;
+        return this.userService.getUserById(userId);
     }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
@@ -64,7 +62,7 @@ public class UserApiController {
     @ResponseBody
     public boolean isUserNameTaken(@RequestParam("username") String username) {
         boolean taken = this.userService.isUserNameAlreadyTaken(username);
-        log.debug("the username " + username + " is taken: " + taken);
+        log.debug("the username " + username + " is taken? " + taken + ".");
         return taken;
     }
 

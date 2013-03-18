@@ -14,6 +14,7 @@ import org.springframework.http.converter.json.MappingJacksonHttpMessageConverte
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.LocaleResolver;
@@ -104,6 +105,8 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         resourceBundleMessageSource.setBasename("messages");
         return resourceBundleMessageSource;
     }
+
+
 
     // file uploads
     @Bean
