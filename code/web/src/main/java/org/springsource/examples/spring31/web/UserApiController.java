@@ -1,11 +1,14 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.session.HttpSessionCreatedEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +26,7 @@ import java.io.InputStream;
  * @author Josh Long
  */
 @Controller
-public class UserApiController {
+public class UserApiController  implements ApplicationListener<HttpSessionCreatedEvent  > {
 
     /**
      * Root URL template for all modifications to a {@link User}
@@ -102,4 +105,8 @@ public class UserApiController {
         return new ResponseEntity<byte[]>(buffer, httpHeaders, HttpStatus.OK);
     }
 
+    @Override
+    public void onApplicationEvent(HttpSessionCreatedEvent event) {
+         System.out.println( "Event: " + ToStringBuilder.reflectionToString(  event));
+    }
 }

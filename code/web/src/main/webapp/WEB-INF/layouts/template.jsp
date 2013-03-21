@@ -65,24 +65,18 @@
 
     <div ng-controller="NavigationController">
 
-        <span>
-
-        <c:if test="${ empty username }">
-            <A href="${pageContext.request.contextPath}/crm/signin.html">
-                <spring:message code="navigation.signin" />
-            </a>
-        </c:if>
-
-        <c:if test="${ not empty username }">
-            Welcome  ${username}
-            | <a href="${pageContext.request.contextPath}/crm/profile.html"><spring:message code="navigation.profile" /></a> |
-            <a href="${pageContext.request.contextPath}/crm/customers.html"><spring:message code="navigation.my-customers" /></a> |
-            <A href="#">   <spring:message code="navigation.signout" /></A>
-        </c:if>
-
-
-
-        </span>
+        <security:authorize access="isAnonymous()">
+            <A href="${pageContext.request.contextPath}/crm/signin.html">Sign In</a>
+        </security:authorize>
+        <security:authorize access="isAuthenticated()">
+            <c:url value="/j_spring_security_logout" var="logoutUrl"/>
+            Welcome <strong><security:authentication property="principal.username"/></strong> |
+            <span>
+                <a href="${pageContext.request.contextPath}/crm/profile.html">My Profile</a> |
+                <a href="${pageContext.request.contextPath}/crm/customers.html">My Customers</a> |
+                <a ng-click="startLogoutFlow( '${logoutUrl}' )" href="${logoutUrl}">Sign Out</a>
+            </span>
+        </security:authorize>
 
     </div>
 </div>
@@ -100,7 +94,7 @@
 --%>
 
 <div id="copyright">
-    <spring:message code="brought-to-you-by"   /> <A href="http://www.springsource.org">SpringSource</a>.
+    <spring:message code="brought-to-you-by"/> <A href="http://www.springsource.org">SpringSource</a>.
 </div>
 </body>
 </html>

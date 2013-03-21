@@ -33,9 +33,9 @@
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript"> var StringUtils = { a: function (label, url) {
+    <script type="text/javascript" lang="javascript"> var StringUtils = { a:function (label, url) {
         return '<a href="' + url + '">' + label + '</a>';
-    }, code: function (inp) {
+    }, code:function (inp) {
         var lt = '<', gt = '>';
         while (inp.indexOf(lt) != -1) {
             inp = inp.replace(lt, '&lt;');
@@ -44,13 +44,13 @@
             inp = inp.replace(gt, '&gt;');
         }
         return "<PRE><CODE>" + inp + "</CODE></PRE>";
-    }, encodeFullyQualifiedPath: function (ref) {
+    }, encodeFullyQualifiedPath:function (ref) {
         var url = ref;
         while (url.indexOf('.') != -1) {
             url = url.replace('.', '/');
         }
         return url;
-    }, classForFullyQualifiedClass: function (ref) {
+    }, classForFullyQualifiedClass:function (ref) {
         var lastPeriod = ref.lastIndexOf('.');
         if (lastPeriod == -1) return ref;
         return ref.substring(lastPeriod + 1);
@@ -1108,7 +1108,8 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <P> The Firefox <A href="https://addons.mozilla.org/en-us/firefox/addon/poster/">Poster</A> plugin is a very capable
     little HTTP client, as well.
     You must install it from the Firefox market.
-     </p>
+</p>
+
 <div class="diagram">
     <img src="images/poster%20-%20poster-icon.png"/>
     <span class="caption">Once installed, it appears as a little yellow icon in the bottom of the Firefox browser window. You can use it to
@@ -1128,10 +1129,146 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </DIV>
 
 
-<!-- <P> Services are stateless. Because HTTP is stateless, you should design your services themselves to be as stateless as possible. Of course there's business state, but you shouldn't attempt to keep things in some sort of session. There are some, useful, exceptions such as when we introduce OAuth sessions which require minimal state and can't be arbitrarily bound to. There are a lot of benefits to this, though. For example, if you want to scale your application you can simply add more HTTP servers are requests can be routed across them randomly with no loss of context. </P> <P> From the client side, to support connecting to RESTful web services, Spring features the <code class="class-reference" module="spring-webmvc">org.springframework.web.client.RestTemplate</code>. <code>RestTemplate</code> reduces common HTTP access operations to one-liners. The <CODE>RestTemplate</CODE> is very configurable. The <CODE>RestTemplate</CODE> can handle mapping results from requests to more useful types (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.converter.HttpMessageConverter </CODE> SPI) and aspect-like concerns like security authorization transmission (through the <CODE class="class-reference" module="spring-webmvc"> org.springframework.http.client.ClientHttpRequestInterceptor </CODE> SPI). We'll cover the <CODE>RestTemplate</CODE> a bit more when we look at <A href="http://www.springsource.org/spring-social">Spring Social</a>, but for a really detailed look at this class, and the peer class provided as part of the <A href="http://www.springsource.org/spring-android">Spring Android</a> project to enable secure RESTful access from Android, check out our tutorial <span class="todo">on client-side application development with Spring</span> . </P> <P> What concerns us in this tutorial is how to design and standup RESTful webservices. We've already been introduced to Spring MVC's component model and the API it uses to standup HTTP endpoits. We'll look more closely in this section at handling different kinds of requests and we'll see how the handling of one type of request for an HTML resource is really not very different than the handling of a request for a RESTful resource. </P> -->
-<!--<P> We'll need to retrieve user details by criteria. Different kinds of criteria, but we can imagine wanting to retrieve their information by IDS, at least. </p> <P> You'll want to be able to create new users. </P> <P> You'll need to be able to update a users details. </P> <p> You'll need an endpoint to handle file uploads for the profile's photo image </p> <p> You'll need an endpoint to render the files uploaded for the profile's photo image </p>-->
-<!-- todo when we introduce the REST endpoitns be sure to introduce Spring Rest Shell -->
-<!--<h3> Use Cases for Our RESTful Services </h3> <P> Let's revisit our existing application and the screens involved. What what data do we need access to? </P>-->
+<h1>
+    Securing An Application with Spring Security
+</h1>
+
+<h2>
+    An Insecure Application
+</h2>
+
+<P>
+
+    We've come a long way. Already our application works well enough and - to the untrained eye - the application would
+    appear to be done.
+    But, pull back the covers of the various screens in the application - particularly forms that transmit data and
+    screens that read data from the server -
+    and you'll see that the HTTP calls go unprotected without even the most basic of access checks.
+    This doesn't bode well for our users who've trusted us with their confidential data.
+</p>
+
+<P> Our application is functional, but not secure. Security is one of the hardest things to get right in an application.
+    The conventional wisdom is that you shouldn't delay security until later in the application development cycle,
+    because it needs to be grafted into the architecture and because - discipline under deadlines being what it is -
+    people tend to do a poor job with security when they're in a hurry.
+</p>
+
+<P>
+    "Security" refers to many different concerns (including, but not limited to) the following: </p>
+<uL>
+    <LI>
+        <B>authentication </B> verification that a user is who she says she is
+    </LI>
+    <LI>
+        <B>authorization </b> - verification that a user has the permissions required to access or work with a resource
+    </LI>
+
+    <LI><B>encryption </B> refers to encoding data - particularly data transmitted over the network - in such a way that
+        the data can't be read by unknown third parties.
+    </LI>
+</uL>
+
+<P>
+    Spring Security can help with all of those things. Spring Security is built on top of Spring, and through
+    common-sense and elegance, makes short work of the common cases and makes the hitherto impossible things possible.
+    It's fairly easy to see where our application could use better security, and we can build on Spring Security to
+    improve our application.
+</p>
+<OL>
+    <LI>
+
+        First, our sign in form is hand-rolled. Sign in functionality is something that almost all
+        applications have to support, so why should we recreate that functionality each time?
+    </LI>
+    <LI>
+        The pages in the application behind the sign-in form are completely unprotected: anyone could -
+        given the URL - bring the page up in the browser, even if there is no logged in user session.
+    </LI>
+    <LI>
+        Additionally, the client-side JavaScript code makes calls to unprotected REST resources that in turn do no
+        authorization.
+    </LI>
+    <LI>
+        No care is taken to prevent certain types of attacks intended to manipulate or steal a user's session.
+    </LI>
+    <LI> As a practical matter, our application doesn't currently support a <EM>sign out</EM> operation, and that's
+        pretty important.
+        It would be nice to have that, and do as little work as possible to get it.
+    </LI>
+</OL>
+
+<P> Our application doesn't have <EM>roles</EM>, at the moment, but it's easy to see where they slot in. Suppose we let
+    customers log into the system. The customers should not be able to update the profile information of the system user
+    that manages the customer's account. That would be a bit presumptuous! With <EM>roles</EM> we could block access to
+    certain parts of the application, based on the role assigned to that user. Conceptually, this separates the concept
+    of access privileges from the user classes in your application. If we think ahead a little, it wouldn't be hard to
+    imagine scenarios where it would be mighty useful to limit access to parts of our REST API based on roles as well,
+    perhaps
+    limiting access to resources for other users, creating a tier of users - <EM>administrative</EM> users, and <EM>regular</EM>
+    users.
+</P>
+
+<P>
+    As we look at our application we'll go through several mental exercises to improve the application.¬
+
+    <span class="todo">todo these steps come from Rob Winch's awesome Packt book on Spring Security</span>
+
+</P>
+
+<ul>
+    <LI>Segment users of the system into user classes</LI>
+    <LI> Assign levels of authorization to user roles</LI>
+    <LI>Assign user roles to user classes</LI>
+    <LI>Apply authentication rules globally across application resources</LI>
+    <LI> Apply authorization rules at all levels of the application architecture</LI>
+    <LI>Prevent common types of attacks intended to manipulate or steal a user's session</LI>
+</ul>
+<h2> Introducing Spring Security</h2>
+
+<P>
+
+    We'll use Spring Security.
+    Spring Security makes short work of most of these concerns. We can easily <EM>adapt</EM> our system's notion of
+    users to the common SPIs exposed by Spring Security. Once we've done this, Spring Security will happily provide a
+    lot of services for us,
+    including sign in functionality, sign out functionality, and support for protecting insecure resources.
+</P>
+
+<h3>
+    Adapting Spring Security to Your Domain Model
+</h3>
+
+<P>
+    Currently, all functionality for working users lives inside a service bean. This service bean (<span
+        class="class-reference" module="services">org.springsource.examples.spring31.services.UserService</span>)
+    provides the ability to read, update and delete <code>user</code> data. It can also be used to authenticate that the
+    user is who we think it is by taking a username and a password and
+    searching for any users that have the given credentials.
+
+    This, it turns out, is a common concern for all security systems, so
+    the responsibility's extracted into a common interface,  <SPAN q="tut_security" module="spring-security" class="class-reference">org.springframework.security.core.userdetails.UserDetailsService</SPAN>,
+    which de
+
+
+</P>
+
+<H3>
+    Building a Spring Security Sign In Form
+</H3>
+
+<p>
+    Earlier, we built a form to handle signing in. The sign in form had a few text fields and submitted values to the
+    server where a Spring MVC controller received the values, attempted to find
+    a match in the database for the specified username and password, and then stored the authenticated user in a freshly
+    created HTTP session.
+    From the client side, the only thing of note was that we named our HTML <CODE>input</CODE> fields and those names
+    had to match server
+    request parameters expected in the Spring MVC controller.
+</p>
+
+<div class="todo">todo show the code of the Spring MVC signin controller again, with the old login functionlity</div>
+
+
 <script type="text/javascript" language="JavaScript"> $(function () {
     setTimeout(function () {
         window.scrollTo(0, document.body.scrollHeight);

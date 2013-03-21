@@ -1,12 +1,15 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ page session="false" %>
 <div ng-controller="SignInController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-            <form:form class="form-horizontal" id="form" name="form" method="POST" commandName="signInAttempt"   action="${pageContext.request.contextPath}/crm/signin.html">
+        <form name="form" class="form-horizontal" method="POST" action="j_spring_security_check">
+
+        <%--
+            <form:form class="form-horizontal" id="form" name="form" method="POST" commandName="signInAttempt"   action="j_spring_security_check">
+--%>
                 <div class="panel">
                     <fieldset>
 
@@ -22,25 +25,20 @@
                         </div>
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="username">
+                            <label class="control-label" for="j_username">
                                 <spring:message code="login.email"/>:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="username" name="username" type="text"
-                                       ng-model="user.username" required="required"/>
-                                <span ng-show="${error}" class="help-inline">  <spring:message
-                                        code="login.email.prompt"/>  </span>
+                                <input class="input-xlarge"  id="j_username" name="j_username" type="text" ng-model="user.username" required="required"/>
+                                <span ng-show="${error}" class="help-inline"><spring:message code="login.email.prompt"/></span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="password"> <spring:message
-                                    code="login.password"/>:</label>
+                            <label class="control-label" for="j_password"><spring:message code="login.password"/>:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="password" name="password" type="password"
-                                       ng-model="user.password" required="required"/>
-                                <span ng-show="${error}" class="help-inline">  <spring:message
-                                        code="login.password.prompt"/> </span>
+                                <input class="input-xlarge" id="j_password" name="j_password" type="password" ng-model="user.password" required="required"/>
+                                <span ng-show="${error}" class="help-inline">  <spring:message code="login.password.prompt"/> </span>
                             </div>
                         </div>
 
@@ -67,7 +65,7 @@
                         </div>
                     </fieldset>
                 </div>
-            </form:form>
+            </form>
 
 
         </tiles:putAttribute>

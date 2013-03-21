@@ -26,8 +26,10 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
+import org.springsource.examples.spring31.services.UserService;
 import org.springsource.examples.spring31.web.ViewController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
+import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import javax.xml.transform.Source;
@@ -136,5 +138,14 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         messageConverters.add(mappingJacksonHttpMessageConverter);
 
     }
+
+
+
+    // added for tut_security
+    @Bean
+    public UserSignInUtilities userSignInUtilities(UserService userService) {
+        return new UserSignInUtilities(userService);
+    }
+
 
 }

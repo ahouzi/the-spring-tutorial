@@ -21,8 +21,8 @@ $(function () {
     }
 
     /* Specifically for SD MongoDB. There's got to be a cleaner way. */
-    function SpringDataMongoDbModule(){
-        GenericModule(this,'http://static.springsource.org/spring-data/data-mongodb/docs/current/api/');
+    function SpringDataMongoDbModule() {
+        GenericModule(this, 'http://static.springsource.org/spring-data/data-mongodb/docs/current/api/');
     }
 
     function GitHubProjectModule(mod) {
@@ -39,8 +39,8 @@ $(function () {
         };
     }
 
-    function JavaModule (baseUrl){
-        GenericModule(this,  'http://docs.oracle.com/javase/7/docs/api/');
+    function JavaModule(baseUrl) {
+        GenericModule(this, 'http://docs.oracle.com/javase/7/docs/api/');
     }
 
 
@@ -50,6 +50,10 @@ $(function () {
 
     function SpringModule(baseUrl) {
         GenericModule(this, 'http://static.springsource.org/spring/docs/current/javadoc-api/');
+    }
+
+    function SpringSecurityModule(baseUrl) {
+        GenericModule(this, 'http://static.springsource.org/spring-security/site/docs/current/apidocs/')
     }
 
 
@@ -83,7 +87,8 @@ $(function () {
     }
     mapOfModulesToLinks ['servlets'] = new ServletsModule();
     mapOfModulesToLinks ['java'] = new JavaModule();
-    mapOfModulesToLinks['spring-data-mongodb'] = new SpringDataMongoDbModule()
+    mapOfModulesToLinks['spring-data-mongodb'] = new SpringDataMongoDbModule();
+    mapOfModulesToLinks['spring-security'] = new SpringSecurityModule();
 
     var codeModules = 'services,web'.split(',');
     for (var i = 0; i < codeModules.length; i++) {
@@ -104,13 +109,13 @@ $(function () {
 
     visitElements('.git-gist', ['q' , 'module', 'gist'], function (node, val, attrs) {
         var q = attrs['q'], gist = attrs['gist'], mod = attrs['module'];
-        var user='joshlong'
-        $.getGithubGist( user , gist,  function (data) {
-            var html =StringUtils.code(data)
-            var url = 'https://gist.github.com/' + user+ '/'+ gist +'/edit' ;
+        var user = 'joshlong'
+        $.getGithubGist(user, gist, function (data) {
+            var html = StringUtils.code(data)
+            var url = 'https://gist.github.com/' + user + '/' + gist + '/edit';
 
-            html += '<div style="font-family:sans-serif;font-size:smaller;"><a target="_blank" href="' +url + '">GIST # ' + gist+ '</a></div>' ;
-            node.html( html );
+            html += '<div style="font-family:sans-serif;font-size:smaller;"><a target="_blank" href="' + url + '">GIST # ' + gist + '</a></div>';
+            node.html(html);
 
             // maybe we can append something so that i can see where the gist came from ?
 

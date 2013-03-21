@@ -12,6 +12,10 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springsource.examples.spring31.web.config.WebMvcConfiguration;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+import java.util.Date;
 
 /**
  * Simple replacement for <CODE>web.xml</CODE> that is constructed entirely in Java code.
@@ -28,11 +32,13 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
 
+        registerFilter(servletContext, "springSecurityFilterChain", new DelegatingFilterProxy());
         registerFilter(servletContext, "hiddenHttpMethodFilter", new HiddenHttpMethodFilter());
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
         servletContext.addListener(new HttpSessionEventPublisher());
         servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, WebMvcConfiguration.class)));
+
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);
@@ -40,6 +46,24 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         spring.addMapping(patternAll);
         spring.setAsyncSupported(true);
 
+    }
+
+    public class SessionAttributeDisplayingHttpSessionListener implements HttpSessionListener {
+
+        // Notification that a new session was created
+        public void sessionCreated(HttpSessionEvent event) {
+            HttpSession session = event.getSession();
+
+            System.out.println("New session created  : " + session.getId());
+            System.out.println("Session creation time: " + new Date(session.getCreationTime()));
+        }
+
+        // Notification that a session was invalidated
+        public void sessionDestroyed(HttpSessionEvent event) {
+            HttpSession session = event.getSession();
+
+            System.out.println("Session destroyed  : " + session.getId());
+        }
     }
 
     protected void registerFilter(ServletContext servletContext, String name, Filter filter) {
@@ -57,6 +81,5 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         return ac;
     }
 
+
 }
-
-
