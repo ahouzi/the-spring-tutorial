@@ -10,11 +10,11 @@ import org.springsource.examples.spring31.services.UserService;
 
 import javax.inject.Inject;
 
-@Controller
+//@Controller
 //@SessionAttributes(ViewController.USER_OBJECT_KEY)
-@RequestMapping("/crm/" + ViewController.SIGNIN + ".html")
+//@RequestMapping("/crm/" + ViewController.SIGNIN + ".html")
 public class ViewController {
-    public static final String SIGNIN = "signin";
+/*    public static final String SIGNIN = "signin";
     public static final String USER_OBJECT_KEY = "user";
     private UserService userService;
 
@@ -33,5 +33,5 @@ public class ViewController {
         model.addAttribute("error", isInError);
         model.addAttribute("errorMessage", err);
         return "signin";
-    }
+    }*/
 }

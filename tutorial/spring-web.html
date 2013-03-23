@@ -1287,37 +1287,163 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
         alias for the email.
     </LI>
     <LI>What <EM>password</EM> does the user have?</LI>
-    <LI> Is the user's account <EM>locked</EM>, or has it <EM>expired</EM>,   requiring that access be revoked?</LI>
+    <LI> Is the user's account <EM>locked</EM>, or has it <EM>expired</EM>, requiring that access be revoked?</LI>
 </UL>
-<P>We can now use the  <CODE>UserService</CODE> bean anywhere that
+<P>We can now use the <CODE>UserService</CODE> bean anywhere that
     Spring Security expects an implementation of <CODE>UserDetailsService</CODE>.
-    Our <CODE>UserService</CODE>  lives in the <CODE>services</CODE> module,
+    Our <CODE>UserService</CODE> lives in the <CODE>services</CODE> module,
     and our <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>
     configuration class imports it when it imports
     <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.services.config.ServicesConfiguration</CODE>.
     The id of the bean is <CODE>userService</CODE>.
 
 </P>
- <P>  As before when we configured Spring MVC, we want to customize the way Spring Security works a little, so we'll provide the definition for
-     common objects in a   new configuration class,
-     <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>, that will be
-    loaded when the application starts up.    It in turn imports security configuration defined in XML using the Spring Security XML namespace in a file called <CODE>security.xml</CODE>.
- </p>
-<div module="web" q="tut_security" extension="java" class="git-code">org.springsource.examples.spring31.web.config.SecurityConfiguration</div>
+
+<P> As before when we configured Spring MVC, we want to customize the way Spring Security works a little, so we'll
+    provide the definition for
+    common objects in a new configuration class,
+    <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>,
+    that will be
+    loaded when the application starts up. It in turn imports security configuration defined in XML using the Spring
+    Security XML namespace in a file called <CODE>security.xml</CODE>.
+</p>
+
+<div class="git-gist" gist="5226788">
+    public class SecurityConfiguration { ... }
+</div>
 
 <h3> Securing Access to Resources
 </h3>
- <P> A typical first step in securing an application is ensuring that requests to resources are secure, requiring authentication to succeed.
-    To do this, we will use Spring Security's XML namespace to cordon off certain URLs from prying eyes. Here is the definition of first cut at <CODE>security.xml</CODE>,
-     an XML file that uses the Spring Security namespace to secure resources.
- </P>
-<DIV class="git-gist" gist="">
-    &lt;http&gt;
-        ...
-    &lt;http&gt;
+
+<P> A typical first step in securing an application is ensuring that requests to resources are secure, requiring
+    authentication to succeed.
+    To do this, we will use Spring Security's XML namespace to cordon off certain URLs from prying eyes. Here is the
+    definition of first cut at <CODE>security.xml</CODE>,
+    an XML file that uses the Spring Security namespace to secure resources.
+    Let's examine some of the application URLs and examine which parts need to be secured.
+</P>
+
+
+<TABLE>
+    <thead>
+    <TR>
+        <th> URL Pattern</th>
+
+        <th> Restrictions</th>
+    </TR>
+    </thead>
+    <tr>
+        <TD><CODE>/crm/profile.html</CODE></TD>
+        <TD> All requests should only be made to a user that has authenticated and that has the <EM>authority</EM> of a
+            user. Requests made by an <EM>anonymous</EM> or untrusted request will be shown the sign in form.
+        </TD>
+    </tr>
+
+    <tr>
+        <TD><CODE>/crm/customers.html</CODE></TD>
+        <TD> All requests should only be made to a user that has authenticated and that has the <EM>authority</EM> of a
+            user.
+            Requests made by an <EM>anonymous</EM> or untrusted request will be shown the sign in form.
+        </TD>
+
+    </tr>
+    <TR>
+        <td><code>/**</code></TD>
+        <TD> All <EM>anonymous</EM> requests to resources not otherwise protected by a rule defined above are permitted
+            through.
+        </TD>
+    </TR>
+</table>
+<P> To implement these rules, we'll setup HTTP resource protection using the Spring Security XML namespace, as
+    demonstrated below. </P>
+
+
+<DIV class="git-gist" gist="5226793">
+    <!-- <?xml version="1.0" encoding="UTF-8" ?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:sec="http://www.springframework.org/schema/security"
+           xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+        <sec:authentication-manager alias="authenticationManager">
+            <sec:authentication-provider user-service-ref="userService"/>
+        </sec:authentication-manager>
+
+        <sec:http use-expressions="true" auto-config="true">
+
+            <sec:anonymous enabled="true"/>
+
+            <sec:intercept-url pattern="/crm/profile.html" access="hasRole('ROLE_USER')"/>
+            <sec:intercept-url pattern="/crm/customers.html" access="hasRole('ROLE_USER')"/>
+            <sec:intercept-url pattern="/**" access="isAnonymous()"/>
+
+            <sec:form-login login-page="/crm/signin.html" default-target-url="/crm/profile.html" authentication-failure-url="/crm/signin.html?error=true"/>
+
+        </sec:http>
+
+    </beans>-->
 
 </DIV>
+<p> The first thing that you notice is that we've used the <code>sec:authentication-manager</code> element to define an
+    instance of <CODE module="spring-security" class="class-reference">org.springframework.security.authentication.AuthenticationManager</code>,
+    which in
+    turn delegates to configured instances of <CODE module="spring-security" class="class-reference">org.springframework.security.authentication.AuthenticationProvider</CODE>.
+    As configured, Spring Security will create an <CODE>AuthenticationProvider</CODE> which delegates to our <CODE>userService</CODE>
+    bean.
+    The <Code>AuthenticationManager</Code> is used by practically <EM>everything</EM> in the Spring Security framework,
+    in one way or another, so get in the habit of setting this element up whenever you start with Spring Security.
 
+
+</p>
+
+<P>
+    Next up, we define a <CODE>http</CODE> stanza, which helps define rules for access to HTTP resources.
+    We tell it that we want to use the Spring Expression Language expressions in our configuration by enabling the
+    <CODE>use-expressions</CODE> attribute.
+    By setting the <CODE>auto-config</CODE> attribute to true, we automatically enable several niceties, including:
+
+</P>
+<UL>
+    <li><B>a login form</B> Specifically, Spring Security exposes an endpoint that can handle authentication of a
+        username and password from a form of our own design.
+        If the authentication is successful, Spring Security will persist the user's <CODE>authentication</CODE> in the
+        HTTP session where other Spring Security related functionality will
+        know to find it.
+    </li>
+    <LI><B>anonymous authentication</B> Some resources can be accessed by so-called <EM>anonymous</EM> users, or users
+        that have made requests of the web site without being signed in.
+    </LI>
+    <LI><B>logout services</B>
+        An HTTP endpoint that when invoked will clear the session of any user <CODE>authentication</CODE> information,
+        which should have the effect of disabling all the functionality
+        that's protected by Spring Security checks for a valid user.
+    </LI>
+    <LI><B>remember-me support</B> Spring Security can persist (using an HTTP cookie) and pre-fill a username in the
+        sign in form, necessitating only that the password
+        be entered. This is a convenience to spare users from having to constantly remember a username.
+    </LI>
+    <li>
+        <B>basic authentication</B> Spring Security will respond to, and handle, requests made using HTTP <CODE
+            class="wikipedia">Basic access authentication</CODE>.
+    </li>
+</UL>
+<P> Inside of our <CODE>http</CODE> stanza,  we first enable <CODE>anonymous</CODE> access using the <CODE>sec:anonymous</CODE> element. Then,  using the <CODE>sec:intercept-url</CODE> element,
+    we declaratively  restrict access to certain URLs. The conditions upon which access are granted are specified by the <CODE>access</CODE> attribute, which in this case
+    is evaluating method calls against an instance of <CODE class="class-reference" module="spring-security">org.springframework.security.access.expression.SecurityExpressionRoot</CODE>,
+    which can answer questions about the authentication in the current request: is the request <EM>anonymous</EM>; does the request
+        come from someone who has been authenticated?
+
+</P>
+
+<P> Finally, we establish that we want Spring Security to handle HTTP sign in requests for us using the <Code>sec:form-login</Code> element.
+    We specify which page a user (<CODE>/crm/signin.html</CODE>) should be presented with when accessing a resource to which the user does not currently have access.
+    We specify the URL to which a successfully authenticated user is redirected after authentication (<CODE>/crm/profile.html</CODE>) and then we specify
+    what resource (<CODE>/crm/signin.html?error=true</code>) should be displayed when there is an error attempting to sign in.
+    Let's look a little deeper at Spring Security's support for sign in forms.
+
+</P>
 <H3>
     Re-Building Our Sign In Functionality
 </H3>
@@ -1326,13 +1452,14 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     Earlier, we built a form to handle signing in. The sign in form had a few text fields and submitted values to the
     server where a Spring MVC controller received the values, attempted to find
     a match in the database for the specified username and password, and then stored the authenticated user in a freshly
-    created HTTP session.
-    From the client side, the only thing of note was that we named our HTML <CODE>input</CODE> fields and those names
-    had to match server
-    request parameters expected in the Spring MVC controller.
+    created HTTP session. From the client side, the only thing of note was that we named our HTML <CODE>input</CODE>
+    fields and those names had to match server request parameters expected in the Spring MVC controller.
 </p>
+ <P> Now that we've installed Spring Security, we can throw away the code in our custom Spring MVC controller request handler inside of <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.ViewController</CODE>.
+ You can simply remove the class, as we won't be needing it.
+ </P>
 
-<div class="todo">todo show the code of the Spring MVC signin controller again, with the old login functionlity</div>
+<div class="todo">todo show the code of the Spring MVC sign in controller again, with the old login functionality</div>
 
 <h3>
     Adding Sign Out Functionality

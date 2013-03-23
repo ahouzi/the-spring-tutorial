@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Dave Syer
  */
-@Controller
+//@Controller
 public class AdminController {
 
     private ConsumerTokenServices tokenServices;

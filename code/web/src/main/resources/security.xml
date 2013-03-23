@@ -17,12 +17,11 @@
 
         <sec:anonymous enabled="true"/>
 
-        <sec:intercept-url pattern="/crm/profile.html" access="hasRole('ROLE_USER')"/>
-        <sec:intercept-url pattern="/crm/customers.html" access="hasRole('ROLE_USER')"/>
+        <sec:intercept-url pattern="/crm/profile.html" access="isAuthenticated()"/>
+        <sec:intercept-url pattern="/crm/customers.html" access="isAuthenticated()"/>
         <sec:intercept-url pattern="/**" access="isAnonymous()"/>
-        <sec:intercept-url pattern="/web/views/**" access="hasRole('ROLE_USER')"/>
 
-        <sec:form-login login-page="/crm/signin.html" default-target-url="/crm/profile.html" authentication-failure-url="/crm/signin.html?error=true"/>
+        <sec:form-login login-page="/crm/signin.html" default-target-url="/crm/profile.html" authentication-failure-url="/crm/signin.html?error=true" />
 
     </sec:http>
 

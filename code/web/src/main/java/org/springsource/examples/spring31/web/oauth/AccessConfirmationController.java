@@ -18,7 +18,7 @@ import java.util.Map;
  *
  * @author Josh Long
  */
-@Controller
+//@Controller
 @SessionAttributes("authorizationRequest")
 public class AccessConfirmationController {
 

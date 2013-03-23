@@ -1,15 +1,14 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page session="false" %>
 <div ng-controller="SignInController">
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
-        <form name="form" class="form-horizontal" method="POST" action="j_spring_security_check">
 
-        <%--
-            <form:form class="form-horizontal" id="form" name="form" method="POST" commandName="signInAttempt"   action="j_spring_security_check">
---%>
+            <form:form class="form-horizontal" id="form" name="form" method="POST"  action="j_spring_security_check">
+
                 <div class="panel">
                     <fieldset>
 
@@ -21,6 +20,12 @@
                         <div class="control-group error">
                             <UL>
                                 <form:errors element="li" path="*"/>
+
+                                <c:if test="${param.error == 'true'}">
+                                    <li><spring:message code="login.invalid" /></li>
+                                </c:if>
+
+
                             </UL>
                         </div>
 
@@ -65,7 +70,7 @@
                         </div>
                     </fieldset>
                 </div>
-            </form>
+            </form:form>
 
 
         </tiles:putAttribute>
