@@ -19,13 +19,9 @@
 
                         <div class="control-group error">
                             <UL>
-                                <form:errors element="li" path="*"/>
-
                                 <c:if test="${param.error == 'true'}">
                                     <li><spring:message code="login.invalid" /></li>
                                 </c:if>
-
-
                             </UL>
                         </div>
 
