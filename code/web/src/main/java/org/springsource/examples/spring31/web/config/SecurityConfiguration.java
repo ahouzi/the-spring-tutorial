@@ -43,11 +43,6 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public InMemoryTokenStore tokenStore() {
-        return new InMemoryTokenStore();
-    }
-
-    @Bean
     public UnanimousBased accessDecisionManager() {
         List<AccessDecisionVoter> decisionVoters = new ArrayList<AccessDecisionVoter>();
         decisionVoters.add(new ScopeVoter());
@@ -56,6 +51,12 @@ public class SecurityConfiguration {
         return new UnanimousBased(decisionVoters);
     }
 
+
+    /*
+    @Bean
+    public InMemoryTokenStore tokenStore() {
+        return new InMemoryTokenStore();
+    }
     @Bean
     public DefaultTokenServices tokenServices(InMemoryTokenStore tokenStore, ClientDetailsService jpaUserCredentialsService) {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
@@ -93,7 +94,7 @@ public class SecurityConfiguration {
         approvalHandler.setUseTokenServices(true);
         approvalHandler.setTokenServices(tokenServices);
         return approvalHandler;
-    }
+    }*/
 
 }
 

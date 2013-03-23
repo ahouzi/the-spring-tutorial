@@ -1291,9 +1291,19 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </UL>
 <P>We can now use the  <CODE>UserService</CODE> bean anywhere that
     Spring Security expects an implementation of <CODE>UserDetailsService</CODE>.
+    Our <CODE>UserService</CODE>  lives in the <CODE>services</CODE> module,
+    and our <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>
+    configuration class imports it when it imports
+    <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.services.config.ServicesConfiguration</CODE>.
+    The id of the bean is <CODE>userService</CODE>.
 
 </P>
-
+ <P>  As before when we configured Spring MVC, we want to customize the way Spring Security works a little, so we'll provide the definition for
+     common objects in a   new configuration class,
+     <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>, that will be
+    loaded when the application starts up.    It in turn imports security configuration defined in XML using the Spring Security XML namespace in a file called <CODE>security.xml</CODE>.
+ </p>
+<div module="web" q="tut_security" extension="java" class="git-code">org.springsource.examples.spring31.web.config.SecurityConfiguration</div>
 
 <h3> Securing Access to Resources
 </h3>
