@@ -2,14 +2,6 @@ $(function () {
 
     var mapOfModulesToLinks = {};
 
-    //// global functions
-
-    //
-    // module supporting resolution of SpringSource JavaDoc URLs
-
-
-    // todo handle gists http://developer.github.com/v3/gists/#list-gists
-
     function GenericModule(self, bu) {
         self.baseUrl = bu;
         self.urlForCodeReference = function (ref, attrs) {
@@ -26,16 +18,18 @@ $(function () {
     }
 
     function GitHubProjectModule(mod) {
+
         var self = this;
         var ghUrl = 'https://github.com/joshlong/the-spring-tutorial/blob/_Q_/code/' + mod + '/src/main/java/';
-        console.log('the github url is ' + ghUrl);
+
         self.urlForCodeReference = function (ref, attrs) {
             var q = attrs['q'];
             var u = ghUrl.replace('_Q_', q) + StringUtils.encodeFullyQualifiedPath(ref) + '.java';
             return u;
         };
         self.labelForCodeReference = function (ref, attrs) {
-            return StringUtils.classForFullyQualifiedClass(ref);
+            var label = StringUtils.classForFullyQualifiedClass(ref);
+            return label;
         };
     }
 
@@ -53,7 +47,7 @@ $(function () {
     }
 
     function SpringSecurityModule(baseUrl) {
-        GenericModule(this, 'http://static.springsource.org/spring-security/site/docs/current/apidocs/')
+        GenericModule(this, 'http://static.springsource.org/spring-security/site/docs/current/apidocs/');
     }
 
 
@@ -85,15 +79,14 @@ $(function () {
         if (x.indexOf('spring-') != -1)
             mapOfModulesToLinks[x] = new SpringModule();
     }
-    mapOfModulesToLinks ['servlets'] = new ServletsModule();
-    mapOfModulesToLinks ['java'] = new JavaModule();
+    mapOfModulesToLinks['servlets'] = new ServletsModule();
+    mapOfModulesToLinks['java'] = new JavaModule();
     mapOfModulesToLinks['spring-data-mongodb'] = new SpringDataMongoDbModule();
     mapOfModulesToLinks['spring-security'] = new SpringSecurityModule();
 
     var codeModules = 'services,web'.split(',');
     for (var i = 0; i < codeModules.length; i++) {
-        var m = codeModules[i];
-        mapOfModulesToLinks[m] = new GitHubProjectModule(m);
+        mapOfModulesToLinks[ codeModules[i] ] = new GitHubProjectModule(codeModules[i]);
     }
 
     visitElements('.git-code', ['q', 'extension', 'module'], function (node, val, attrs) {
@@ -109,16 +102,12 @@ $(function () {
 
     visitElements('.git-gist', ['q' , 'module', 'gist'], function (node, val, attrs) {
         var q = attrs['q'], gist = attrs['gist'], mod = attrs['module'];
-        var user = 'joshlong'
+        var user = 'joshlong';
         $.getGithubGist(user, gist, function (data) {
             var html = StringUtils.code(data)
             var url = 'https://gist.github.com/' + user + '/' + gist + '/edit';
-
             html += '<div style="font-family:sans-serif;font-size:smaller;"><a target="_blank" href="' + url + '">GIST # ' + gist + '</a></div>';
             node.html(html);
-
-            // maybe we can append something so that i can see where the gist came from ?
-
         });
     });
 
@@ -130,7 +119,6 @@ $(function () {
             var processor = mapOfModulesToLinks[attrs['module']];
             var url = processor.urlForCodeReference(val, attrs),
                 label = processor.labelForCodeReference(val, attrs);
-
             node.html(StringUtils.a(label, url));
         } catch (e) {
             console.log('ERROR! ' + e + ' in processing module ' + attrs['module']);  //  console.log('hit an error ' + e)

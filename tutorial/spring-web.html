@@ -241,6 +241,8 @@
     to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. </p>
 
 <div class="git-gist" gist="4726096"> @Configuration @EnableWebMvc public class WebMvcConfiguration {}</div>
+
+
 <P> By default, this will activate many things based on conventions and the availability of certain libraries on the
     class path. Some of the things supported out of the box: </P>
 <uL>
@@ -1208,12 +1210,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     users.
 </P>
 
-<P>
-    As we look at our application we'll go through several mental exercises to improve the application.¬
-
-    <span class="todo">todo these steps come from Rob Winch's awesome Packt book on Spring Security</span>
-
+<P> As we look at our application we'll go through several mental exercises to improve the application.
 </P>
+
+<div class="todo"> these steps come from Rob Winch's awesome Packt book on Spring Security</div>
 
 <ul>
     <LI>Segment users of the system into user classes</LI>
@@ -1223,10 +1223,11 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI> Apply authorization rules at all levels of the application architecture</LI>
     <LI>Prevent common types of attacks intended to manipulate or steal a user's session</LI>
 </ul>
-<h2> Introducing Spring Security</h2>
+<h2>
+    Using Spring Security to Secure Access to Our Web Application
+</h2>
 
 <P>
-
     We'll use Spring Security.
     Spring Security makes short work of most of these concerns. We can easily <EM>adapt</EM> our system's notion of
     users to the common SPIs exposed by Spring Security. Once we've done this, Spring Security will happily provide a
@@ -1234,26 +1235,81 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     including sign in functionality, sign out functionality, and support for protecting insecure resources.
 </P>
 
-<h3>
-    Adapting Spring Security to Your Domain Model
+
+<h3> Introducing Spring Security in our Application
 </h3>
 
+
 <P>
-    Currently, all functionality for working users lives inside a service bean. This service bean (<span
-        class="class-reference" module="services">org.springsource.examples.spring31.services.UserService</span>)
+    Currently, all functionality for working users lives inside a service bean.
+    This service bean (<span q="tut_security" class="class-reference" module="services">org.springsource.examples.spring31.services.UserService</span>)
     provides the ability to read, update and delete <code>user</code> data. It can also be used to authenticate that the
     user is who we think it is by taking a username and a password and
     searching for any users that have the given credentials.
+</p>
 
-    This, it turns out, is a common concern for all security systems, so
-    the responsibility's extracted into a common interface,  <SPAN q="tut_security" module="spring-security" class="class-reference">org.springframework.security.core.userdetails.UserDetailsService</SPAN>,
-    which de
+<P>
+    Spring Security will need the ability to authenticate an identity given credentials to handle common functionality
+    like the sign in and sign out forms. Our <COde>UserService</COde> can provide this functionality for our
+    application, but we need
+    to adapt it to Spring Security by implementing an interface, <SPAN module="spring-security" class="class-reference">org.springframework.security.core.userdetails.UserDetailsService</SPAN>.
 
+    <SPAN class="todo"> The full explanation of the <CODE>UserService</CODE> is beyond the scope of this text, but refer to the data access tutorial and the core tutorial</SPAN>.
+    Let's focus on the implementation of <CODE>UserDetailsService</CODE>. First, the <CODE>loadUserByUsername</CODE>
+    method:
+</P>
+
+<div class="git-gist" gist="5226077">
+    loadUserByUsername(String username)
+</div>
+
+<P>
+    This method loads the record for the <CODE>User</CODE> from the database and then adapts it to the Spring
+    Security
+    <CODE class="class-reference">org.springframework.security.core.userdetails.UserDetails</CODE> contract, the
+    implementation of which is as follows:
 
 </P>
 
+<div class="git-gist" gist="5226079">
+    class CrmUserDetails { .. }
+</div>
+
+<P>The <code>CrmUserDetails</code> implementation simply stores information about the user along with a few other pieces
+    of hardcoded data
+    used to satisfy the Spring Security contract. Broadly, this implementation can answer questions such as:
+</P>
+<UL>
+    <LI> What <EM>authorities</EM> does this user have? (can he make changes to the data, or can he only read data)</LI>
+    <LI> What <EM>role</EM> does this user have? In our application the user is not further distinguished.</LI>
+    <LI> What <EM>username</EM> does the user have? A username may change from system to system. There is no specific
+        format, so long as the username uniquely identifies a record. In our system, the <EM>username</EM> is simply an
+        alias for the email.
+    </LI>
+    <LI>What <EM>password</EM> does the user have?</LI>
+    <LI> Is the user's account <EM>locked</EM>, or has it <EM>expired</EM>,   requiring that access be revoked?</LI>
+</UL>
+<P>We can now use the  <CODE>UserService</CODE> bean anywhere that
+    Spring Security expects an implementation of <CODE>UserDetailsService</CODE>.
+
+</P>
+
+
+<h3> Securing Access to Resources
+</h3>
+ <P> A typical first step in securing an application is ensuring that requests to resources are secure, requiring authentication to succeed.
+    To do this, we will use Spring Security's XML namespace to cordon off certain URLs from prying eyes. Here is the definition of first cut at <CODE>security.xml</CODE>,
+     an XML file that uses the Spring Security namespace to secure resources.
+ </P>
+<DIV class="git-gist" gist="">
+    &lt;http&gt;
+        ...
+    &lt;http&gt;
+
+</DIV>
+
 <H3>
-    Building a Spring Security Sign In Form
+    Re-Building Our Sign In Functionality
 </H3>
 
 <p>
@@ -1267,6 +1323,34 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </p>
 
 <div class="todo">todo show the code of the Spring MVC signin controller again, with the old login functionlity</div>
+
+<h3>
+    Adding Sign Out Functionality
+</h3>
+
+<P>
+
+</P>
+
+<h3>
+    Securing Access to Resources
+</h3>
+
+<P>
+
+</P>
+
+<h3>
+    Supporting
+</h3>
+
+<P>
+
+</P>
+
+<h2>
+    Using Spring Security to Secure Access to our REST API
+</h2>
 
 
 <script type="text/javascript" language="JavaScript"> $(function () {

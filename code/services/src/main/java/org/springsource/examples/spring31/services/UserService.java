@@ -167,9 +167,16 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.username = :username", User.class)
                 .setParameter("username", user)
                 .getResultList();
-        if (customers.size() > 0)
-            return customers.iterator().next();
-        return null;
+        return firstOrNull(customers);
+    }
+
+    public User loginByUsernameAndPassword(String user, String pw) {
+        Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.username = :u and u.password = :p", User.class)
+                .setParameter("u", user)
+                .setParameter("p", pw)
+                .getResultList();
+        return firstOrNull(customers);
+
     }
 
     public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, byte[] bytes) throws Throwable {
@@ -179,7 +186,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
     public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, InputStream inputStream) throws Throwable {
         writeUserProfilePhoto(userId, ogFileName, inputStream);
     }
-
 
     public void writeUserProfilePhoto(long userId, String ogFileName, InputStream inputStream) throws Throwable {
         final String ext = deriveFileExtension(ogFileName);
@@ -193,6 +199,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         usr.setProfilePhotoImported(true);
         entityManager.merge(usr);
     }
+
 
     public InputStream readUserProfilePhoto(long userId) {
         User user = getUserById(userId);
@@ -275,12 +282,13 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
         public static final String SCOPE_READ = "read";
         public static final String SCOPE_WRITE = "write";
+
         public static final String ROLE_USER = "ROLE_USER";
 
         private Collection<String> roles;
+
         private Collection<GrantedAuthority> grantedAuthorities;
         private User user;
-
         public CrmUserDetails(User user) {
             assert user != null : "the provided user reference can't be null";
             this.user = user;
@@ -346,12 +354,16 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return null;
     }
 
-
     private String fileNameForUserIdProfilePhoto(long userId) {
         return String.format("user%sprofilePhoto", Long.toString(userId));
     }
 
+
     private boolean ensureRemovalOfFile(File file) {
         return null != file && (!file.exists() || file.delete());
+    }
+
+    private <T> T firstOrNull(Collection<T> t) {
+        return t.size() > 0 ? t.iterator().next() : null;
     }
 }
