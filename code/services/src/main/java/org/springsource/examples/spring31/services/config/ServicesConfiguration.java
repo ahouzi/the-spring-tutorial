@@ -3,6 +3,7 @@ package org.springsource.examples.spring31.services.config;
 import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.hibernate.dialect.H2Dialect;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.ejb.HibernatePersistence;
 import org.springframework.amqp.core.*;
@@ -89,11 +90,9 @@ public class ServicesConfiguration {
     public Map<String, String> contributeJpaEntityManagerProperties() {
         Map<String, String> p = new HashMap<String, String>();
         p.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, resetDatabaseOnReset ? "create" : "create-update");
-        p.put(org.hibernate.cfg.Environment.DIALECT, PostgreSQLDialect.class.getName());
+        p.put(org.hibernate.cfg.Environment.DIALECT, H2Dialect.class.getName());
         p.put(org.hibernate.cfg.Environment.SHOW_SQL, "true");
-        if (this.resetDatabaseOnReset) {
-            p.put(org.hibernate.cfg.Environment.HBM2DDL_IMPORT_FILES, "import_psql.sql");
-        }
+
         return p;
     }
 
