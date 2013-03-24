@@ -33,9 +33,9 @@
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript"> var StringUtils = { a:function (label, url) {
+    <script type="text/javascript" lang="javascript"> var StringUtils = { a: function (label, url) {
         return '<a href="' + url + '">' + label + '</a>';
-    }, code:function (inp) {
+    }, code: function (inp) {
         var lt = '<', gt = '>';
         while (inp.indexOf(lt) != -1) {
             inp = inp.replace(lt, '&lt;');
@@ -44,13 +44,13 @@
             inp = inp.replace(gt, '&gt;');
         }
         return "<PRE><CODE>" + inp + "</CODE></PRE>";
-    }, encodeFullyQualifiedPath:function (ref) {
+    }, encodeFullyQualifiedPath: function (ref) {
         var url = ref;
         while (url.indexOf('.') != -1) {
             url = url.replace('.', '/');
         }
         return url;
-    }, classForFullyQualifiedClass:function (ref) {
+    }, classForFullyQualifiedClass: function (ref) {
         var lastPeriod = ref.lastIndexOf('.');
         if (lastPeriod == -1) return ref;
         return ref.substring(lastPeriod + 1);
@@ -1429,21 +1429,34 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
             class="wikipedia">Basic access authentication</CODE>.
     </li>
 </UL>
-<P> Inside of our <CODE>http</CODE> stanza,  we first enable <CODE>anonymous</CODE> access using the <CODE>sec:anonymous</CODE> element. Then,  using the <CODE>sec:intercept-url</CODE> element,
-    we declaratively  restrict access to certain URLs. The conditions upon which access are granted are specified by the <CODE>access</CODE> attribute, which in this case
+<P> Inside of our <CODE>http</CODE> stanza, we first enable <CODE>anonymous</CODE> access using the
+    <CODE>sec:anonymous</CODE> element. Then, using the <CODE>sec:intercept-url</CODE> element,
+    we declaratively restrict access to certain URLs. The conditions upon which access are granted are specified by the
+    <CODE>access</CODE> attribute, which in this case
     is evaluating method calls against an instance of <CODE class="class-reference" module="spring-security">org.springframework.security.access.expression.SecurityExpressionRoot</CODE>,
-    which can answer questions about the authentication in the current request: is the request <EM>anonymous</EM>; does the request
-        come from someone who has been authenticated?
+    which can answer questions about the authentication in the current request: is the request <EM>anonymous</EM>; does
+    the request
+    come from someone who has been authenticated?
 
 </P>
 
-<P> Finally, we establish that we want Spring Security to handle HTTP sign in requests for us using the <Code>sec:form-login</Code> element.
-    We specify which page a user (<CODE>/crm/signin.html</CODE>) should be presented with when accessing a resource to which the user does not currently have access.
-    We specify the URL to which a successfully authenticated user is redirected after authentication (<CODE>/crm/profile.html</CODE>) and then we specify
-    what resource (<CODE>/crm/signin.html?error=true</code>) should be displayed when there is an error attempting to sign in.
+<P> Finally, we establish that we want Spring Security to handle HTTP sign in requests for us using the <Code>sec:form-login</Code>
+    element.
+    We specify which page a user (<CODE>/crm/signin.html</CODE>) should be presented with when accessing a resource to
+    which the user does not currently have access.
+    We specify the URL to which a successfully authenticated user is redirected after authentication (<CODE>/crm/profile.html</CODE>)
+    and then we specify
+    what resource (<CODE>/crm/signin.html?error=true</code>) should be displayed when there is an error attempting to
+    sign in.
+
+    Now, should any one attempt to access a resource that requires an
+    authenticated user, Spring Security will redirect the request to the sign in form.
+
+
     Let's look a little deeper at Spring Security's support for sign in forms.
 
 </P>
+
 <H3>
     Re-Building Our Sign In Functionality
 </H3>
@@ -1454,41 +1467,53 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     a match in the database for the specified username and password, and then stored the authenticated user in a freshly
     created HTTP session. From the client side, the only thing of note was that we named our HTML <CODE>input</CODE>
     fields and those names had to match server request parameters expected in the Spring MVC controller.
+    While it was relatively easy, it's still something that you'll find yourself re-creating a lot over various
+    applications.
+    Instead
 </p>
- <P> Now that we've installed Spring Security, we can throw away the code in our custom Spring MVC controller request handler inside of <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.ViewController</CODE>.
- You can simply remove the class, as we won't be needing it.
- </P>
 
-<div class="todo">todo show the code of the Spring MVC sign in controller again, with the old login functionality</div>
+<P> We can simply remove the <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.ViewController</CODE>
+    class
+    as we won't need it to handle the sign in. We also need to change our <Code>signin.jsp</Code> a little bit to
+    embrace the support Spring Security provides.
+    Here's the reworked <CODE>signin.jsp</CODE> that simply detects the presence of the error variable  in the request and presents feedback
+    accordingly. This is different from the previous version  because it doesn't enumerate errors.
+</P>
 
-<h3>
-    Adding Sign Out Functionality
-</h3>
+<div module="web" q="tut_security" class="git-code" extension="jsp"> src/main/webapp/WEB-INF/views/signin/signin.jsp
+</div>
 
-<P>
+
+<H3>
+       Displaying Dynamic Menu Options for Authenticated Users
+
+</H3>
+<P>  Earlier, in our <CODE>/WEB-INF/layouts/template.jsp</CODE> code we simply tested for the
+      <CODE>user</CODE>  object in our HTTP session. We'll replace that test with the Spring Security JSP tag library.
+      In particular, we'll use Spring Security
+    tags to check access using the same expressions that we used in our earlier configuration of the various HTTP resources.
+
+ We can also finally   provide a URL for the sign out
+    link in our navigation. In this example we use  a JSP snippet (<code>&lt;c:url value="/j_spring_security_logout" var="logoutUrl"/&gt;</code>) to calculate the context root for the
+    URL that Spring Security provides to handle sign out requests. The resulting value is stored as a page attribute under the name <CODE>logoutUrl</CODE>, which is substituted into the
+    <CODE>href</CODE> attribute for the sign out URL.
+
 
 </P>
 
-<h3>
-    Securing Access to Resources
-</h3>
+ <DIV class="git-gist" gist="5230487">
+      spring security tags
 
-<P>
+ </DIV>
 
-</P>
 
-<h3>
-    Supporting
-</h3>
-
-<P>
-
-</P>
 
 <h2>
     Using Spring Security to Secure Access to our REST API
 </h2>
+         <p>
 
+         </p>
 
 <script type="text/javascript" language="JavaScript"> $(function () {
     setTimeout(function () {

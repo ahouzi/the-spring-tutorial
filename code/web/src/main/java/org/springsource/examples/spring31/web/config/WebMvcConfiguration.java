@@ -14,7 +14,6 @@ import org.springframework.http.converter.json.MappingJacksonHttpMessageConverte
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.LocaleResolver;
@@ -26,10 +25,8 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles2.TilesView;
 import org.springsource.examples.spring31.services.CustomerService;
-import org.springsource.examples.spring31.services.UserService;
 import org.springsource.examples.spring31.web.ViewController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
-import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import javax.xml.transform.Source;
@@ -109,7 +106,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
 
-
     // file uploads
     @Bean
     public CommonsMultipartResolver filterMultipartResolver() {
@@ -133,19 +129,9 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
         MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
         mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList( MediaType.APPLICATION_JSON ));
+        mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON));
 
         messageConverters.add(mappingJacksonHttpMessageConverter);
-
     }
-
-
-
-    // added for tut_security
-    @Bean
-    public UserSignInUtilities userSignInUtilities(UserService userService) {
-        return new UserSignInUtilities(userService);
-    }
-
 
 }

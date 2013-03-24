@@ -69,7 +69,9 @@
             <A href="${pageContext.request.contextPath}/crm/signin.html">Sign In</a>
         </security:authorize>
         <security:authorize access="isAuthenticated()">
+
             <c:url value="/j_spring_security_logout" var="logoutUrl"/>
+
             Welcome <strong><security:authentication property="principal.username"/></strong> |
             <span>
                 <a href="${pageContext.request.contextPath}/crm/profile.html">My Profile</a> |
