@@ -7,7 +7,7 @@
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
 
-            <form:form class="form-horizontal" id="form" name="form" method="POST"  action="j_spring_security_check">
+            <form:form class="form-horizontal" id="form" name="form" method="POST" action="j_spring_security_check">
 
                 <div class="panel">
                     <fieldset>
@@ -20,7 +20,7 @@
                         <div class="control-group error">
                             <UL>
                                 <c:if test="${param.error == 'true'}">
-                                    <li><spring:message code="login.invalid" /></li>
+                                    <li><spring:message code="login.invalid"/></li>
                                 </c:if>
                             </UL>
                         </div>
@@ -30,16 +30,21 @@
                                 <spring:message code="login.email"/>:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge"  id="j_username" name="j_username" type="text" ng-model="user.username" required="required"/>
-                                <span ng-show="${error}" class="help-inline"><spring:message code="login.email.prompt"/></span>
+                                <input class="input-xlarge" id="j_username" name="j_username" type="text"
+                                       ng-model="user.username" required="required"/>
+                                <span ng-show="${error}" class="help-inline"><spring:message
+                                        code="login.email.prompt"/></span>
                             </div>
                         </div>
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="j_password"><spring:message code="login.password"/>:</label>
+                            <label class="control-label" for="j_password"><spring:message
+                                    code="login.password"/>:</label>
 
                             <div class="controls">
-                                <input class="input-xlarge" id="j_password" name="j_password" type="password" ng-model="user.password" required="required"/>
-                                <span ng-show="${error}" class="help-inline">  <spring:message code="login.password.prompt"/> </span>
+                                <input class="input-xlarge" id="j_password" name="j_password" type="password"
+                                       ng-model="user.password" required="required"/>
+                                <span ng-show="${error}" class="help-inline">  <spring:message
+                                        code="login.password.prompt"/> </span>
                             </div>
                         </div>
 
@@ -67,15 +72,6 @@
                     </fieldset>
                 </div>
             </form:form>
-
-
         </tiles:putAttribute>
-
     </tiles:insertTemplate>
-
-
 </div>
-
-
-
-
