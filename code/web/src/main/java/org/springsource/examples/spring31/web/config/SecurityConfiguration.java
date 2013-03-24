@@ -1,20 +1,7 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.access.vote.RoleVoter;
-import org.springframework.security.access.vote.UnanimousBased;
-import org.springframework.security.crypto.encrypt.Encryptors;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.vote.ScopeVoter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -25,16 +12,9 @@ import java.util.List;
 @Configuration
 @ImportResource({"classpath:/security.xml"})
 public class SecurityConfiguration {
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
 
-    @Bean
-    public TextEncryptor textEncryptor() {
-        return Encryptors.noOpText();
-    }
 
+    /*
     @Bean
     public UnanimousBased accessDecisionManager() {
         List<AccessDecisionVoter> decisionVoters = new ArrayList<AccessDecisionVoter>();
@@ -44,8 +24,14 @@ public class SecurityConfiguration {
         return new UnanimousBased(decisionVoters);
     }
 
-
-    /*
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+  @Bean
+    public TextEncryptor textEncryptor() {
+        return Encryptors.noOpText();
+    }
     @Bean
     public InMemoryTokenStore tokenStore() {
         return new InMemoryTokenStore();
