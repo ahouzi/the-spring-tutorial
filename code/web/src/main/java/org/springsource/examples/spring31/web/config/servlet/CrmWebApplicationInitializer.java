@@ -48,24 +48,6 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
 
     }
 
-    public class SessionAttributeDisplayingHttpSessionListener implements HttpSessionListener {
-
-        // Notification that a new session was created
-        public void sessionCreated(HttpSessionEvent event) {
-            HttpSession session = event.getSession();
-
-            System.out.println("New session created  : " + session.getId());
-            System.out.println("Session creation time: " + new Date(session.getCreationTime()));
-        }
-
-        // Notification that a session was invalidated
-        public void sessionDestroyed(HttpSessionEvent event) {
-            HttpSession session = event.getSession();
-
-            System.out.println("Session destroyed  : " + session.getId());
-        }
-    }
-
     protected void registerFilter(ServletContext servletContext, String name, Filter filter) {
         FilterRegistration.Dynamic filterRegistration = servletContext.addFilter(name, filter);
         filterRegistration.setAsyncSupported(true);
