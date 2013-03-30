@@ -1025,6 +1025,18 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 </DIV>
 <h1> Securing An Application with Spring Security </h1>
 
+<!--
+things ive added:
+ -security.xlm
+ - the spring security delegating filter to the initializer
+ - the signin utils to the web configuration
+ - the security configuration (including an added config reference on the         servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, WebMvcConfiguration.class, SecurityConfiguration.class)));
+ - security and oauth packages
+- changing signin.jsp to use the correct form field names
+ - change the web-inf/layouts/components/template.jsp to reflect ht euse of the sec:* namespace tags
+- you can completely delete ViewController, couldn't you?
+
+-->
 <h2> An Insecure Application </h2>
 
 <P> We've come a long way. Already our application works well enough and - to the untrained eye - the application would
@@ -1140,7 +1152,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
                                                                                   q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>,
     that will be loaded when the application starts up. It in turn imports security configuration defined in XML using
     the Spring Security XML namespace in a file called <CODE>security.xml</CODE>. For now, our configuration class is
-    empty - just a standard configuration class. </p>
+    empty - just a standard configuration class.
+ The XML file (<CODE>security.xml</CODE>) on the other hand will use the Spring Security XML namespace to handle securing our resources for us.
+
+</p>
 
 <div class="git-gist" gist="5226788"> public class SecurityConfiguration { ... }</div>
 <h3> Securing Access to Resources </h3>
@@ -1326,9 +1341,6 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     OAuth prescribes the following basic flow of interaction between a user, a client, and a service provider like Facebook:
 </P>
 
-<div class="todo"> Insert a  sequence diagram here
-</div>
-
 
 <OL>
     <LI>
@@ -1350,6 +1362,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI> The client keeps the access token and transmits it on each subsequent request.
     </LI>
 </OL>
+<div class="todo"> Insert a  sequence diagram here
+</div>
+
+
 <P>
 
     The result of this process is that the client is left with a password that is still secret.
