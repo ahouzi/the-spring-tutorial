@@ -1,9 +1,6 @@
-<html xmlns="http://www.w3.org/1999/html" xmlns="http: //www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-      xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
-    <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code  todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
+    <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .todo {
         color: red;
     }
@@ -33,28 +30,7 @@
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
     } </style>
-    <script type="text/javascript" lang="javascript"> var StringUtils = { a: function (label, url) {
-        return '<a href="' + url + '">' + label + '</a>';
-    }, code: function (inp) {
-        var lt = '<', gt = '>';
-        while (inp.indexOf(lt) != -1) {
-            inp = inp.replace(lt, '&lt;');
-        }
-        while (inp.indexOf(gt) != -1) {
-            inp = inp.replace(gt, '&gt;');
-        }
-        return "<PRE><CODE>" + inp + "</CODE></PRE>";
-    }, encodeFullyQualifiedPath: function (ref) {
-        var url = ref;
-        while (url.indexOf('.') != -1) {
-            url = url.replace('.', '/');
-        }
-        return url;
-    }, classForFullyQualifiedClass: function (ref) {
-        var lastPeriod = ref.lastIndexOf('.');
-        if (lastPeriod == -1) return ref;
-        return ref.substring(lastPeriod + 1);
-    }}; </script>
+    <script type="text/javascript" lang="javascript"></script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/github-files.js"></script>
     <script src="js/tutorial.js"></script>
@@ -241,8 +217,6 @@
     to a Java configuration class that the previously installed <CODE>ContextLoaderListener</CODE> imports. </p>
 
 <div class="git-gist" gist="4726096"> @Configuration @EnableWebMvc public class WebMvcConfiguration {}</div>
-
-
 <P> By default, this will activate many things based on conventions and the availability of certain libraries on the
     class path. Some of the things supported out of the box: </P>
 <uL>
@@ -804,8 +778,7 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     argument to our controller method. Of course, path variables are just as naturally used with regular Spring MVC and
     <EM>classic</EM> web applications. </P>
 
-<h3>Content Negotiation and HTTP Message Conversion
-</h3>
+<h3>Content Negotiation and HTTP Message Conversion </h3>
 
 <P> The return value is annotated with the <CODE class="class-reference" module="spring-webmvc">org.springframework.web.bind.annotation.ResponseBody</CODE>
     annotation. When Spring MVC sees this annotation, it short circuits the view resolution process that's normally at
@@ -816,11 +789,10 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 
 <P> On the server side, Spring MVC uses the <EM>strategy pattern</EM> to delegate the conversion to a configured <CODE
         class="class-reference" module="spring-webmvc">org.springframework.http.converter.HttpMessageConverter</CODE>
-    instance. Depending on what is
-    available on your CLASSPATH, Spring MVC will automatically support marshalling XML with a JAXB implementation and
-    JAXB-annotated POJOs, JSON through the Jackson JSON library, multipart file data through the <A
-            href="http://commons.apache.org/proper/commons-fileupload/">Apache Commons FileUpload </A> library or the
-    Servlet 3 Part API, RSS and ATOM feeds with the ROME library, and images using the <code>java.awt.image.BufferedImage</code>
+    instance. Depending on what is available on your CLASSPATH, Spring MVC will automatically support marshalling XML
+    with a JAXB implementation and JAXB-annotated POJOs, JSON through the Jackson JSON library, multipart file data
+    through the <A href="http://commons.apache.org/proper/commons-fileupload/">Apache Commons FileUpload </A> library or
+    the Servlet 3 Part API, RSS and ATOM feeds with the ROME library, and images using the <code>java.awt.image.BufferedImage</code>
     API and more. Thus, if a client requests the data in one of these URLs and species that it will only
     <CODE>Accept</CODE> data of the type <CODE>application/json</CODE>, then the server will attempt to convert the
     results into JSON and send it in the response body. </p>
@@ -840,66 +812,42 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     </TABLE>
     <span class="caption"> I use the command line tool <CODE>curl</CODE> to call the REST service, like this: <br/> <STRONG><code>$
         curl --header "Accept: application/xml" http://localhost:8080/api/users/58 </code></STRONG> </span></div>
+<h3> Serializing Hibernate Objects over HTTP </h3>
 
-<h3> Serializing Hibernate Objects over HTTP
-</h3>
+<P> You don't often have to override the configured <CODE>HttpMessageConverters</CODE>, but it's nice to know that you
+    can. You simply override the <code>configureMessageConverters</code> method in the configuration class. In this
+    method, you're given a reference to a list of <CODE>HttpMessageConverters</CODE>, which you may populate however you
+    like. However, if you don't provide anything, then Spring MVC will install the default converters. </p>
 
-<P>
-    You don't often have to override the configured <CODE>HttpMessageConverters</CODE>, but it's nice to know that you
-    can.
-    You simply override the <code>configureMessageConverters</code> method in the configuration class.
-
-    In this method, you're given a reference to a list of <CODE>HttpMessageConverters</CODE>, which you may populate
-    however you like. However,
-    if you don't provide anything, then Spring MVC will install the default converters.
-</p>
-
-<P>
-    Our application works with domain model objects that describe a <CODE>User</CODE> and a <CODE>Customer</CODE> data.
+<P> Our application works with domain model objects that describe a <CODE>User</CODE> and a <CODE>Customer</CODE> data.
     These domain model objects are plain old POJOs that work with <A href="http://hibernate.org">Hibernate</A>, a
-    popular object-relational mapping framework.
-    Our domain model objects are annotated with JPA and JAXB annotations. JPA annotations describe the layout of the
-    object to a JPA provider
-    like Hibernate so that it can effectively pick apart the important values in the object and save them to a database
-    table.
-    JAXB annotations describe the layout of the object to a JAXB provider so that it can effectively pick apart the
-    important values in the object and write them out
-    as an XML document. Our POJOs don't need any changes to work with Jackson, which converts objects to and from JSON.
-</P>
+    popular object-relational mapping framework. Our domain model objects are annotated with JPA and JAXB annotations.
+    JPA annotations describe the layout of the object to a JPA provider like Hibernate so that it can effectively pick
+    apart the important values in the object and save them to a database table. JAXB annotations describe the layout of
+    the object to a JAXB provider so that it can effectively pick apart the important values in the object and write
+    them out as an XML document. Our POJOs don't need any changes to work with Jackson, which converts objects to and
+    from JSON. </P>
 
 <P> Unfortunately, there's still a small fly in our ointment. Our <CODE>User</CODE> objects maintain a collection of
     <CODE>Customer</CODE> records. This is a typical <EM>master-detail</EM>, or <EM>one-to-many</EM> arrangement.
     Unfortunately, these <CODE>User</CODE> entities in turn have a reference to the <CODE>User</CODE> objects to which
-    they belong creating a circular reference.
-    Circular references are easy to manage in Hibernate, but the Jackson library that handles the conversion of an
-    object to and from JSON for Spring MVC doesn't like it so much. It ultimately leads to a stack overflow.
-    There are a few well known solutions. One of them is to tailor the
-    <CODE>ObjectMapper</CODE> used by the registered
-    <CODE class="class-reference" module="spring-web">org.springframework.http.converter.json.MappingJacksonHttpMessageConverter</CODE>.
-
+    they belong creating a circular reference. Circular references are easy to manage in Hibernate, but the Jackson
+    library that handles the conversion of an object to and from JSON for Spring MVC doesn't like it so much. It
+    ultimately leads to a stack overflow. There are a few well known solutions. One of them is to tailor the <CODE>ObjectMapper</CODE>
+    used by the registered <CODE class="class-reference" module="spring-web">org.springframework.http.converter.json.MappingJacksonHttpMessageConverter</CODE>.
     We'll rely on a third party library that provides a <CODE>ObjectMapper</CODE> implementation that knows how to
-    simply ignore relationships that could cause a circular relationship. This also has the benefit of not
-    sending all the <CODE>Customer</CODE> data on each request.
+    simply ignore relationships that could cause a circular relationship. This also has the benefit of not sending all
+    the <CODE>Customer</CODE> data on each request. </P>
 
-
-</P>
-
-<DIV class="git-gist" gist="5157555">
-
-    MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJacksonHttpMessageConverter();
-    mappingJacksonHttpMessageConverter.setObjectMapper(new HibernateAwareObjectMapper());
-    mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList( MediaType.APPLICATION_JSON ));
-
-    messageConverters.add(mappingJacksonHttpMessageConverter);
+<DIV class="git-gist" gist="5157555"> MappingJacksonHttpMessageConverter mappingJacksonHttpMessageConverter = new
+    MappingJacksonHttpMessageConverter(); mappingJacksonHttpMessageConverter.setObjectMapper(new
+    HibernateAwareObjectMapper()); mappingJacksonHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
+    MediaType.APPLICATION_JSON )); messageConverters.add(mappingJacksonHttpMessageConverter);
 </DIV>
-
 <P> The <CODE class="class-reference" module="web">org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper</CODE>
-    class simply installs the <CODE>HibernateObjectMapper</CODE> provided by the third party library.
-    And, just like that, we can serialize Hibernate POJOs using JSON. This is yet another example where Spring makes
-    possible the impossible possible, and easier the difficult chores of enterprise application development.
-
-</P>
-
+    class simply installs the <CODE>HibernateObjectMapper</CODE> provided by the third party library. And, just like
+    that, we can serialize Hibernate POJOs using JSON. This is yet another example where Spring makes possible the
+    impossible possible, and easier the difficult chores of enterprise application development. </P>
 
 <h3>HTTP Verbs</h3>
 
@@ -986,94 +934,61 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <P> Writing a user's profile photo is easy because of Spring's great support for file uploads. Our controller simply
     declares an argument of type <CODE class="class-reference" module="spring-webmvc">org.springframework.web.multipart.MultipartFile</CODE>.
     <COde>MultipartFile</COde> is an interface. There are two implementations supported out of the box: one that
-    delegates to <A href="http://commons.apache.org/proper/commons-fileupload//">Apache Commons
-        FileUpload library </A> and one that works via the Servlet 3 <CODE class="class-reference" module="servlets">javax.servlet.http.Part</CODE>
-    API.
-    Earlier, when we configured our Spring MVC application, we registered a <CODE class="class-reference"
-                                                                                  module="spring-web">org.springframework.web.multipart.commons.CommonsMultipartResolver</CODE>
+    delegates to <A href="http://commons.apache.org/proper/commons-fileupload//">Apache Commons FileUpload library </A>
+    and one that works via the Servlet 3 <CODE class="class-reference" module="servlets">javax.servlet.http.Part</CODE>
+    API. Earlier, when we configured our Spring MVC application, we registered a <CODE class="class-reference"
+                                                                                       module="spring-web">org.springframework.web.multipart.commons.CommonsMultipartResolver</CODE>
     that works with Apache Commons Fileupload. This has the benefit of working on any application server, not just one
-    that supports Servlet 3.
-    When Spring MVC receives a multipart encoded HTTP <CODE>POST</CODE>, it extracts the file data and makes it
-    available via the <CODE>MultipartFile</CODE> argument.
-    The <CODE>MultipartFile</CODE> argument provides access to everything you'd expect from the client about a file: the
-    file name, the bytes for the file, its size, etc.
-</P>
+    that supports Servlet 3. When Spring MVC receives a multipart encoded HTTP <CODE>POST</CODE>, it extracts the file
+    data and makes it available via the <CODE>MultipartFile</CODE> argument. The <CODE>MultipartFile</CODE> argument
+    provides access to everything you'd expect from the client about a file: the file name, the bytes for the file, its
+    size, etc. </P>
 
-<DIV class="git-gist" gist="5156244">
-    @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST) @ResponseBody
-    public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file)
-    throws Throwable { }
+<DIV class="git-gist" gist="5156244"> @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method =
+    RequestMethod.POST) @ResponseBody public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId,
+    @RequestParam("file") MultipartFile file) throws Throwable { }
 </DIV>
-<P>
-    Reading a file is even easier.
-    Our request handler simply retrieves the <CODE>byte</CODE>s from our MongoDB GridFS-powered file repository, copies
-    the <CODE>byte</CODE>s to a buffer,
-    and then sends the whole thing with an HTTP <CODE>200</CODE> status code to the client.
-
-    Earlier, we registered a <CODE class="class-reference" module="spring-web">
-    org.springframework.http.converter.ByteArrayHttpMessageConverter</CODE> that handles converting <CODE>byte[]</CODE>
-    payloads to and from an HTTP request for us, so we're done!
-
-</P>
-
+<P> Reading a file is even easier. Our request handler simply retrieves the <CODE>byte</CODE>s from our MongoDB
+    GridFS-powered file repository, copies the <CODE>byte</CODE>s to a buffer, and then sends the whole thing with an
+    HTTP <CODE>200</CODE> status code to the client. Earlier, we registered a <CODE class="class-reference"
+                                                                                    module="spring-web">
+        org.springframework.http.converter.ByteArrayHttpMessageConverter</CODE> that handles converting
+    <CODE>byte[]</CODE> payloads to and from an HTTP request for us, so we're done! </P>
 
 <DIv class="git-gist" gist="5156263"> renderMedia(HttpServletResponse, OutputStream, @PathVariable..)</DIv>
-
-
 <h2> Exercising RESTful Web Services </h2>
 
-<P>
-    To familiarize yourself with an API, it can be helpful to interact with the endpoints and make calls against it and
-    verify payloads.
-    One of the nice things about REST is that it's basic HTTP so any modern day HTTP client will suffice
-    as a way to exercise the service. Here are some of my favorite options.
-</P>
+<P> To familiarize yourself with an API, it can be helpful to interact with the endpoints and make calls against it and
+    verify payloads. One of the nice things about REST is that it's basic HTTP so any modern day HTTP client will
+    suffice as a way to exercise the service. Here are some of my favorite options. </P>
 
 <h3>The Spring REST Shell </h3>
 
-<P>
-    The Spring REST Shell is a shell environment that lets you interact with RESTful resources in an interactive manner,
-    much as though you were sitting at a <SPAN class="wikipedia">REPL</SPAN> for a scripting language.
-</P>
+<P> The Spring REST Shell is a shell environment that lets you interact with RESTful resources in an interactive manner,
+    much as though you were sitting at a <SPAN class="wikipedia">REPL</SPAN> for a scripting language. </P>
 
-<P>
-    Releases of the <A href="https://github.com/SpringSource/rest-shell">Spring REST Shell</A> can be downloaded from
+<P> Releases of the <A href="https://github.com/SpringSource/rest-shell">Spring REST Shell</A> can be downloaded from
     the GitHub <A href="https://github.com/jbrisbin/rest-shell/downloads"> rest-shell downloads </a> page or built from
-    source.
-    If you're using Mac OS X and <a href="http://mxcl.github.com/homebrew/">Homebrew</a>, you can install the <code>rest-shell</code>
-    using <code>brew install</code>
-</P>
+    source. If you're using Mac OS X and <a href="http://mxcl.github.com/homebrew/">Homebrew</a>, you can install the
+    <code>rest-shell</code> using <code>brew install</code></P>
 
-
-<P> Using the <CODE>rest-shell</CODE> to navigate your REST resources is
-    very similar to traversing a directory structure in your system terminal. The <CODE>rest-shell</CODE> always
-    maintains a <CODE>baseUri</CODE> that is considered the
-    root to which all other path references are considered relative. If you have a REST service exposed at <CODE>http://localhost:8080/api/crm</CODE>,
-    then you'd consider that your <CODE>baseUri</CODE>.
-
-</P>
+<P> Using the <CODE>rest-shell</CODE> to navigate your REST resources is very similar to traversing a directory
+    structure in your system terminal. The <CODE>rest-shell</CODE> always maintains a <CODE>baseUri</CODE> that is
+    considered the root to which all other path references are considered relative. If you have a REST service exposed
+    at <CODE>http://localhost:8080/api/crm</CODE>, then you'd consider that your <CODE>baseUri</CODE>. </P>
 
 <P> Once you have it running, it's easy to interact with it. Hit <CODE>TAB</CODE> to see more commands available.
     There's a lot more to be learned, and I won't endeavour to cover it all here, but let's look at an interactive
-    session to understand more.
-</P>
+    session to understand more. </P>
 
-<P>
-    Once you've installed the <code>rest-shell</code>, simply launch the shell by invoking <CODE>rest-shell</CODE>. Once
-    you're in the shell, you can
-    get assistance on what to do next by typing <CODE>TAB</CODE>.
-
-</P>
+<P> Once you've installed the <code>rest-shell</code>, simply launch the shell by invoking <CODE>rest-shell</CODE>. Once
+    you're in the shell, you can get assistance on what to do next by typing <CODE>TAB</CODE>. </P>
 
 <DIV class="git-gist" gist="5183821"></DIV>
-
 <P> It's a simple matter to save typing by setting session-global directives, like the <CODE>baseUri</CODE> command.
-    This sets the base URI relative to which all
-    subsequent queries will build.
-</P>
+    This sets the base URI relative to which all subsequent queries will build. </P>
 
 <DIV class="git-gist" gist="5183823"></DIV>
-
 <P> with the current <CODE>baseUri</CODE> set, you can simply issue queries, using intuitively named commands named
     after the HTTP versbs. </P>
 
@@ -1083,138 +998,86 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <DIV class="git-gist" gist="5183825"></DIV>
 <P> You can further customize your session by setting a header to be applied to all subsequent requests. Here we specify
     a <CODE>Accept</CODE> header value of <CODE>application/json</CODE> and then re-issue the same request as above,
-    resuling in data in a different mime type.
-
-</P>
+    resuling in data in a different mime type. </P>
 
 <DIV class="git-gist" gist="5183827"></DIV>
-
 <P> For a more comprehensive look at the Spring <CODE>rest-shell</CODE>, consult the <A
         href="https://github.com/SpringSource/rest-shell/wiki/Getting-Started"><EM>Getting Started</EM></a> guide.</P>
 
 <h3> Another Option: <CODE>curl</CODE></h3>
 
-<P>
-
-    <CODE>curl</CODE> is a command line tool that ships on most Unix systems and can be used from Windows with the
-    support of a Unix-emulation layer like <A href="http://cygwin.org">Cygwin</A>.
-    <CODE>curl</CODE> can be installed on OSX using the <CODE>brew</CODE> package manager, like this: <CODE>brew install
-    curl</CODE>. Once you've installed it, you can make requests on the command line,
-    like this:
-
-</P>
+<P><CODE>curl</CODE> is a command line tool that ships on most Unix systems and can be used from Windows with the
+    support of a Unix-emulation layer like <A href="http://cygwin.org">Cygwin</A>. <CODE>curl</CODE> can be installed on
+    OSX using the <CODE>brew</CODE> package manager, like this: <CODE>brew install curl</CODE>. Once you've installed
+    it, you can make requests on the command line, like this: </P>
 
 <DIV class="git-gist" gist="5184517"></DIV>
 <h3> Another Option: the Firefox Poster plugin</h3>
 
 <P> The Firefox <A href="https://addons.mozilla.org/en-us/firefox/addon/poster/">Poster</A> plugin is a very capable
-    little HTTP client, as well.
-    You must install it from the Firefox market.
-</p>
+    little HTTP client, as well. You must install it from the Firefox market. </p>
 
-<div class="diagram">
-    <img src="images/poster%20-%20poster-icon.png"/>
-    <span class="caption">Once installed, it appears as a little yellow icon in the bottom of the Firefox browser window. You can use it to
-    interact with RESTful resources, as well. </span>
+<div class="diagram"><img src="images/poster%20-%20poster-icon.png"/> <span class="caption">Once installed, it appears as a little yellow icon in the bottom of the Firefox browser window. You can use it to interact with RESTful resources, as well. </span>
 </div>
-
-
-<DIV class="diagram">
-    <img src="images/poster%20-%20poster%20request%20setup.png"/>
-    <span class="caption">    Here, we make the same request as we did in the <CODE>curl</CODE> command above, this time by making a request and
-    specifying a custom header in the <CODE>Header</CODE> tab. </span>
+<DIV class="diagram"><img src="images/poster%20-%20poster%20request%20setup.png"/> <span class="caption"> Here, we make the same request as we did in the <CODE>curl</CODE> command above, this time by making a request and specifying a custom header in the <CODE>Header</CODE> tab. </span>
 </div>
-
-
-<div class="diagram">
-    <img src="images/poster%20-%20poster-results.png"/><span class="caption">The content returned from the request will be displayed in a dialog, like this.  </span>
+<div class="diagram"><img src="images/poster%20-%20poster-results.png"/><span class="caption">The content returned from the request will be displayed in a dialog, like this. </span>
 </DIV>
+<h1> Securing An Application with Spring Security </h1>
 
+<h2> An Insecure Application </h2>
 
-<h1>
-    Securing An Application with Spring Security
-</h1>
-
-<h2>
-    An Insecure Application
-</h2>
-
-<P>
-
-    We've come a long way. Already our application works well enough and - to the untrained eye - the application would
-    appear to be done.
-    But, pull back the covers of the various screens in the application - particularly forms that transmit data and
-    screens that read data from the server -
-    and you'll see that the HTTP calls go unprotected without even the most basic of access checks.
-    This doesn't bode well for our users who've trusted us with their confidential data.
-</p>
+<P> We've come a long way. Already our application works well enough and - to the untrained eye - the application would
+    appear to be done. But, pull back the covers of the various screens in the application - particularly forms that
+    transmit data and screens that read data from the server - and you'll see that the HTTP calls go unprotected without
+    even the most basic of access checks. This doesn't bode well for our users who've trusted us with their confidential
+    data. </p>
 
 <P> Our application is functional, but not secure. Security is one of the hardest things to get right in an application.
     The conventional wisdom is that you shouldn't delay security until later in the application development cycle,
     because it needs to be grafted into the architecture and because - discipline under deadlines being what it is -
-    people tend to do a poor job with security when they're in a hurry.
-</p>
+    people tend to do a poor job with security when they're in a hurry. </p>
 
-<P>
-    "Security" refers to many different concerns (including, but not limited to) the following: </p>
+<P> "Security" refers to many different concerns (including, but not limited to) the following: </p>
 <uL>
-    <LI>
-        <B>authentication </B> verification that a user is who she says she is
+    <LI><B>authentication </B> verification that a user is who she says she is</LI>
+    <LI><B>authorization </b> - verification that a user has the permissions required to access or work with a resource
     </LI>
-    <LI>
-        <B>authorization </b> - verification that a user has the permissions required to access or work with a resource
-    </LI>
-
     <LI><B>encryption </B> refers to encoding data - particularly data transmitted over the network - in such a way that
         the data can't be read by unknown third parties.
     </LI>
 </uL>
-
-<P>
-    Spring Security can help with all of those things. Spring Security is built on top of Spring, and through
+<P> Spring Security can help with all of those things. Spring Security is built on top of Spring, and through
     common-sense and elegance, makes short work of the common cases and makes the hitherto impossible things possible.
     It's fairly easy to see where our application could use better security, and we can build on Spring Security to
-    improve our application.
-</p>
+    improve our application. </p>
 <OL>
-    <LI>
-
-        First, our sign in form is hand-rolled. Sign in functionality is something that almost all
-        applications have to support, so why should we recreate that functionality each time?
+    <LI> First, our sign in form is hand-rolled. Sign in functionality is something that almost all applications have to
+        support, so why should we recreate that functionality each time?
     </LI>
-    <LI>
-        The pages in the application behind the sign-in form are completely unprotected: anyone could -
-        given the URL - bring the page up in the browser, even if there is no logged in user session.
+    <LI> The pages in the application behind the sign-in form are completely unprotected: anyone could - given the URL -
+        bring the page up in the browser, even if there is no logged in user session.
     </LI>
-    <LI>
-        Additionally, the client-side JavaScript code makes calls to unprotected REST resources that in turn do no
+    <LI> Additionally, the client-side JavaScript code makes calls to unprotected REST resources that in turn do no
         authorization.
     </LI>
-    <LI>
-        No care is taken to prevent certain types of attacks intended to manipulate or steal a user's session.
-    </LI>
+    <LI> No care is taken to prevent certain types of attacks intended to manipulate or steal a user's session.</LI>
     <LI> As a practical matter, our application doesn't currently support a <EM>sign out</EM> operation, and that's
-        pretty important.
-        It would be nice to have that, and do as little work as possible to get it.
+        pretty important. It would be nice to have that, and do as little work as possible to get it.
     </LI>
 </OL>
-
 <P> Our application doesn't have <EM>roles</EM>, at the moment, but it's easy to see where they slot in. Suppose we let
     customers log into the system. The customers should not be able to update the profile information of the system user
     that manages the customer's account. That would be a bit presumptuous! With <EM>roles</EM> we could block access to
     certain parts of the application, based on the role assigned to that user. Conceptually, this separates the concept
     of access privileges from the user classes in your application. If we think ahead a little, it wouldn't be hard to
     imagine scenarios where it would be mighty useful to limit access to parts of our REST API based on roles as well,
-    perhaps
-    limiting access to resources for other users, creating a tier of users - <EM>administrative</EM> users, and <EM>regular</EM>
-    users.
-</P>
+    perhaps limiting access to resources for other users, creating a tier of users - <EM>administrative</EM> users, and
+    <EM>regular</EM> users. </P>
 
-<P> As we look at our application we'll go through several mental exercises to improve the application.
-</P>
+<P> As we look at our application we'll go through several mental exercises to improve the application. </P>
 
 <div class="todo"> these steps come from Rob Winch's awesome Packt book on Spring Security</div>
-
 <ul>
     <LI>Segment users of the system into user classes</LI>
     <LI> Assign levels of authorization to user roles</LI>
@@ -1223,62 +1086,38 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI> Apply authorization rules at all levels of the application architecture</LI>
     <LI>Prevent common types of attacks intended to manipulate or steal a user's session</LI>
 </ul>
-<h2>
-    Using Spring Security to Secure Access to Our Web Application
-</h2>
+<h2> Using Spring Security to Secure Access to Our Web Application </h2>
 
-<P>
-    We'll use Spring Security.
-    Spring Security makes short work of most of these concerns. We can easily <EM>adapt</EM> our system's notion of
-    users to the common SPIs exposed by Spring Security. Once we've done this, Spring Security will happily provide a
-    lot of services for us,
-    including sign in functionality, sign out functionality, and support for protecting insecure resources.
-</P>
+<P> We'll use Spring Security. Spring Security makes short work of most of these concerns. We can easily <EM>adapt</EM>
+    our system's notion of users to the common SPIs exposed by Spring Security. Once we've done this, Spring Security
+    will happily provide a lot of services for us, including sign in functionality, sign out functionality, and support
+    for protecting insecure resources. </P>
 
+<h3> Introducing Spring Security in our Application </h3>
 
-<h3> Introducing Spring Security in our Application
-</h3>
-
-
-<P>
-    Currently, all functionality for working users lives inside a service bean.
-    This service bean (<span q="tut_security" class="class-reference" module="services">org.springsource.examples.spring31.services.UserService</span>)
+<P> Currently, all functionality for working users lives inside a service bean. This service bean (<span
+        q="tut_security" class="class-reference" module="services">org.springsource.examples.spring31.services.UserService</span>)
     provides the ability to read, update and delete <code>user</code> data. It can also be used to authenticate that the
-    user is who we think it is by taking a username and a password and
-    searching for any users that have the given credentials.
-</p>
+    user is who we think it is by taking a username and a password and searching for any users that have the given
+    credentials. </p>
 
-<P>
-    Spring Security will need the ability to authenticate an identity given credentials to handle common functionality
+<P> Spring Security will need the ability to authenticate an identity given credentials to handle common functionality
     like the sign in and sign out forms. Our <COde>UserService</COde> can provide this functionality for our
-    application, but we need
-    to adapt it to Spring Security by implementing an interface, <SPAN module="spring-security" class="class-reference">org.springframework.security.core.userdetails.UserDetailsService</SPAN>.
-
+    application, but we need to adapt it to Spring Security by implementing an interface, <SPAN module="spring-security"
+                                                                                                class="class-reference">org.springframework.security.core.userdetails.UserDetailsService</SPAN>.
     <SPAN class="todo"> The full explanation of the <CODE>UserService</CODE> is beyond the scope of this text, but refer to the data access tutorial and the core tutorial</SPAN>.
     Let's focus on the implementation of <CODE>UserDetailsService</CODE>. First, the <CODE>loadUserByUsername</CODE>
-    method:
-</P>
+    method: </P>
 
-<div class="git-gist" gist="5226077">
-    loadUserByUsername(String username)
-</div>
-
-<P>
-    This method loads the record for the <CODE>User</CODE> from the database and then adapts it to the Spring
-    Security
+<div class="git-gist" gist="5226077"> loadUserByUsername(String username)</div>
+<P> This method loads the record for the <CODE>User</CODE> from the database and then adapts it to the Spring Security
     <CODE class="class-reference">org.springframework.security.core.userdetails.UserDetails</CODE> contract, the
-    implementation of which is as follows:
+    implementation of which is as follows: </P>
 
-</P>
-
-<div class="git-gist" gist="5226079">
-    class CrmUserDetails { .. }
-</div>
-
+<div class="git-gist" gist="5226079"> class CrmUserDetails { .. }</div>
 <P>The <code>CrmUserDetails</code> implementation simply stores information about the user along with a few other pieces
-    of hardcoded data
-    used to satisfy the Spring Security contract. Broadly, this implementation can answer questions such as:
-</P>
+    of hardcoded data used to satisfy the Spring Security contract. Broadly, this implementation can answer questions
+    such as: </P>
 <UL>
     <LI> What <EM>authorities</EM> does this user have? (can he make changes to the data, or can he only read data)</LI>
     <LI> What <EM>role</EM> does this user have? In our application the user is not further distinguished.</LI>
@@ -1289,50 +1128,32 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
     <LI>What <EM>password</EM> does the user have?</LI>
     <LI> Is the user's account <EM>locked</EM>, or has it <EM>expired</EM>, requiring that access be revoked?</LI>
 </UL>
-<P>We can now use the <CODE>UserService</CODE> bean anywhere that
-    Spring Security expects an implementation of <CODE>UserDetailsService</CODE>.
-    Our <CODE>UserService</CODE> lives in the <CODE>services</CODE> module,
-    and our <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>
-    configuration class imports it when it imports
-    <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.services.config.ServicesConfiguration</CODE>.
-    The id of the bean is <CODE>userService</CODE>.
-
+<P>We can now use the <CODE>UserService</CODE> bean anywhere that Spring Security expects an implementation of <CODE>UserDetailsService</CODE>.
+    Our <CODE>UserService</CODE> lives in the <CODE>services</CODE> module, and our <CODE class="class-reference"
+                                                                                          module="web" q="tut_security">org.springsource.examples.spring31.web.config.WebMvcConfiguration</CODE>
+    configuration class imports it when it imports <CODE class="class-reference" module="web" q="tut_security">org.springsource.examples.spring31.services.config.ServicesConfiguration</CODE>.
+    The <code>id</code> of the bean is <CODE>userService</CODE>.
 </P>
 
 <P> As before when we configured Spring MVC, we want to customize the way Spring Security works a little, so we'll
-    provide the definition for
-    common objects in a new configuration class,
-    <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>,
-    that will be
-    loaded when the application starts up. It in turn imports security configuration defined in XML using the Spring
-    Security XML namespace in a file called <CODE>security.xml</CODE>.
+    provide the definition for common objects in a new configuration class, <CODE class="class-reference"
+                                                                                  q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>,
+    that will be loaded when the application starts up. It in turn imports security configuration defined in XML using
+    the Spring Security XML namespace in a file called <CODE>security.xml</CODE>. For now, our configuration class is
+    empty - just a standard configuration class. </p>
 
-  For now, our configuration class is empty - just a standard configuration class.
-
-
-</p>
-
-<div class="git-gist" gist="5226788">
-    public class SecurityConfiguration { ... }
-</div>
-
-<h3> Securing Access to Resources
-</h3>
+<div class="git-gist" gist="5226788"> public class SecurityConfiguration { ... }</div>
+<h3> Securing Access to Resources </h3>
 
 <P> A typical first step in securing an application is ensuring that requests to resources are secure, requiring
-    authentication to succeed.
-    To do this, we will use Spring Security's XML namespace to cordon off certain URLs from prying eyes. Here is the
-    definition of first cut at <CODE>security.xml</CODE>,
-    an XML file that uses the Spring Security namespace to secure resources.
-    Let's examine some of the application URLs and examine which parts need to be secured.
-</P>
-
-
+    authentication to succeed. To do this, we will use Spring Security's XML namespace to cordon off certain URLs from
+    prying eyes. Here is the definition of first cut at <CODE>security.xml</CODE>, an XML file that uses the Spring
+    Security namespace to secure resources. Let's examine some of the application URLs and examine which parts need to
+    be secured. </P>
 <TABLE>
     <thead>
     <TR>
         <th> URL Pattern</th>
-
         <th> Restrictions</th>
     </TR>
     </thead>
@@ -1342,14 +1163,11 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
             user. Requests made by an <EM>anonymous</EM> or untrusted request will be shown the sign in form.
         </TD>
     </tr>
-
     <tr>
         <TD><CODE>/crm/customers.html</CODE></TD>
         <TD> All requests should only be made to a user that has authenticated and that has the <EM>authority</EM> of a
-            user.
-            Requests made by an <EM>anonymous</EM> or untrusted request will be shown the sign in form.
+            user. Requests made by an <EM>anonymous</EM> or untrusted request will be shown the sign in form.
         </TD>
-
     </tr>
     <TR>
         <td><code>/**</code></TD>
@@ -1361,171 +1179,197 @@ driving HTTP, HTML and the web in general. </P><P> To keep pace, the client-side
 <P> To implement these rules, we'll setup HTTP resource protection using the Spring Security XML namespace, as
     demonstrated below. </P>
 
-
 <DIV class="git-gist" gist="5226793">
-    <!-- <?xml version="1.0" encoding="UTF-8" ?>
-    <beans xmlns="http://www.springframework.org/schema/beans"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:sec="http://www.springframework.org/schema/security"
-           xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
-
-
-        <sec:authentication-manager alias="authenticationManager">
-            <sec:authentication-provider user-service-ref="userService"/>
-        </sec:authentication-manager>
-
-        <sec:http use-expressions="true" auto-config="true">
-
-            <sec:anonymous enabled="true"/>
-
-            <sec:intercept-url pattern="/crm/profile.html" access="hasRole('ROLE_USER')"/>
-            <sec:intercept-url pattern="/crm/customers.html" access="hasRole('ROLE_USER')"/>
-            <sec:intercept-url pattern="/**" access="isAnonymous()"/>
-
-            <sec:form-login login-page="/crm/signin.html" default-target-url="/crm/profile.html" authentication-failure-url="/crm/signin.html?error=true"/>
-
-        </sec:http>
-
-    </beans>-->
-
-</DIV>
+    <!-- <?xml version="1.0" encoding="UTF-8" ?> <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://www.springframework.org/schema/security" xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"> <sec:authentication-manager alias="authenticationManager"> <sec:authentication-provider user-service-ref="userService"/> </sec:authentication-manager> <sec:http use-expressions="true" auto-config="true"> <sec:anonymous enabled="true"/> <sec:intercept-url pattern="/crm/profile.html" access="hasRole('ROLE_USER')"/> <sec:intercept-url pattern="/crm/customers.html" access="hasRole('ROLE_USER')"/> <sec:intercept-url pattern="/**" access="isAnonymous()"/> <sec:form-login login-page="/crm/signin.html" default-target-url="/crm/profile.html" authentication-failure-url="/crm/signin.html?error=true"/> </sec:http> </beans>--> </DIV>
 <p> The first thing that you notice is that we've used the <code>sec:authentication-manager</code> element to define an
     instance of <CODE module="spring-security" class="class-reference">org.springframework.security.authentication.AuthenticationManager</code>,
-    which in
-    turn delegates to configured instances of <CODE module="spring-security" class="class-reference">org.springframework.security.authentication.AuthenticationProvider</CODE>.
+    which in turn delegates to configured instances of <CODE module="spring-security" class="class-reference">org.springframework.security.authentication.AuthenticationProvider</CODE>.
     As configured, Spring Security will create an <CODE>AuthenticationProvider</CODE> which delegates to our <CODE>userService</CODE>
-    bean.
-    The <Code>AuthenticationManager</Code> is used by practically <EM>everything</EM> in the Spring Security framework,
-    in one way or another, so get in the habit of setting this element up whenever you start with Spring Security.
+    bean. The <Code>AuthenticationManager</Code> is used by practically <EM>everything</EM> in the Spring Security
+    framework, in one way or another, so get in the habit of setting this element up whenever you start with Spring
+    Security. </p>
 
-
-</p>
-
-<P>
-    Next up, we define a <CODE>http</CODE> stanza, which helps define rules for access to HTTP resources.
-    We tell it that we want to use the Spring Expression Language expressions in our configuration by enabling the
-    <CODE>use-expressions</CODE> attribute.
-    By setting the <CODE>auto-config</CODE> attribute to true, we automatically enable several niceties, including:
-
-</P>
+<P> Next up, we define a <CODE>http</CODE> stanza, which helps define rules for access to HTTP resources. We tell it
+    that we want to use the Spring Expression Language expressions in our configuration by enabling the <CODE>use-expressions</CODE>
+    attribute. By setting the <CODE>auto-config</CODE> attribute to true, we automatically enable several niceties,
+    including: </P>
 <UL>
     <li><B>a login form</B> Specifically, Spring Security exposes an endpoint that can handle authentication of a
-        username and password from a form of our own design.
-        If the authentication is successful, Spring Security will persist the user's <CODE>authentication</CODE> in the
-        HTTP session where other Spring Security related functionality will
-        know to find it.
+        username and password from a form of our own design. If the authentication is successful, Spring Security will
+        persist the user's <CODE>authentication</CODE> in the HTTP session where other Spring Security related
+        functionality will know to find it.
     </li>
     <LI><B>anonymous authentication</B> Some resources can be accessed by so-called <EM>anonymous</EM> users, or users
         that have made requests of the web site without being signed in.
     </LI>
-    <LI><B>logout services</B>
-        An HTTP endpoint that when invoked will clear the session of any user <CODE>authentication</CODE> information,
-        which should have the effect of disabling all the functionality
-        that's protected by Spring Security checks for a valid user.
+    <LI><B>logout services</B> An HTTP endpoint that when invoked will clear the session of any user <CODE>authentication</CODE>
+        information, which should have the effect of disabling all the functionality that's protected by Spring Security
+        checks for a valid user.
     </LI>
     <LI><B>remember-me support</B> Spring Security can persist (using an HTTP cookie) and pre-fill a username in the
-        sign in form, necessitating only that the password
-        be entered. This is a convenience to spare users from having to constantly remember a username.
+        sign in form, necessitating only that the password be entered. This is a convenience to spare users from having
+        to constantly remember a username.
     </LI>
-    <li>
-        <B>basic authentication</B> Spring Security will respond to, and handle, requests made using HTTP <CODE
+    <li><B>basic authentication</B> Spring Security will respond to, and handle, requests made using HTTP <CODE
             class="wikipedia">Basic access authentication</CODE>.
     </li>
 </UL>
-<P> Inside of our <CODE>http</CODE> stanza, we first enable <CODE>anonymous</CODE> access using the
-    <CODE>sec:anonymous</CODE> element. Then, using the <CODE>sec:intercept-url</CODE> element,
-    we declaratively restrict access to certain URLs. The conditions upon which access are granted are specified by the
-    <CODE>access</CODE> attribute, which in this case
+<P> Inside of our XML <CODE>http</CODE> stanza, we first enable <CODE>anonymous</CODE> access using the <CODE>sec:anonymous</CODE>
+    element. Then, using the <CODE>sec:intercept-url</CODE> element, we declaratively restrict access to certain URLs.
+    The conditions upon which access are granted are specified by the <CODE>access</CODE> attribute, which in this case
     is evaluating method calls against an instance of <CODE class="class-reference" module="spring-security">org.springframework.security.access.expression.SecurityExpressionRoot</CODE>,
     which can answer questions about the authentication in the current request: is the request <EM>anonymous</EM>; does
-    the request
-    come from someone who has been authenticated?
-
-</P>
+    the request come from someone who has been authenticated? </P>
 
 <P> Finally, we establish that we want Spring Security to handle HTTP sign in requests for us using the <Code>sec:form-login</Code>
-    element.
-    We specify which page a user (<CODE>/crm/signin.html</CODE>) should be presented with when accessing a resource to
-    which the user does not currently have access.
-    We specify the URL to which a successfully authenticated user is redirected after authentication (<CODE>/crm/profile.html</CODE>)
-    and then we specify
-    what resource (<CODE>/crm/signin.html?error=true</code>) should be displayed when there is an error attempting to
-    sign in.
+    element. We specify which page a user (<CODE>/crm/signin.html</CODE>) should be presented with when accessing a
+    resource to which the user does not currently have access. We specify the URL to which a successfully authenticated
+    user is redirected after authentication (<CODE>/crm/profile.html</CODE>) and then we specify what resource (<CODE>/crm/signin.html?error=true</code>)
+    should be displayed when there is an error attempting to sign in. Now, should any one attempt to access a resource
+    that requires an authenticated user, Spring Security will redirect the request to the sign in form. Let's look a
+    little deeper at Spring Security's support for sign in forms. </P>
 
-    Now, should any one attempt to access a resource that requires an
-    authenticated user, Spring Security will redirect the request to the sign in form.
+<H3> Re-Building Our Sign In Functionality </H3>
 
-
-    Let's look a little deeper at Spring Security's support for sign in forms.
-
-</P>
-
-<H3>
-    Re-Building Our Sign In Functionality
-</H3>
-
-<p>
-    Earlier, we built a form to handle signing in. The sign in form had a few text fields and submitted values to the
-    server where a Spring MVC controller received the values, attempted to find
-    a match in the database for the specified username and password, and then stored the authenticated user in a freshly
-    created HTTP session. From the client side, the only thing of note was that we named our HTML <CODE>input</CODE>
-    fields and those names had to match server request parameters expected in the Spring MVC controller.
-    While it was relatively easy, it's still something that you'll find yourself re-creating a lot over various
-    applications.
-    Instead
-</p>
+<p> Earlier, we built a form to handle signing in. The sign in form had a few text fields and submitted values to the
+    server where a Spring MVC controller received the values, attempted to find a match in the database for the
+    specified username and password, and then stored the authenticated user in a freshly created HTTP session. From the
+    client side, the only thing of note was that we named our HTML <CODE>input</CODE> fields and those names had to
+    match server request parameters expected in the Spring MVC controller. While it was relatively easy, it's still
+    something that you'll find yourself re-creating a lot over various applications. Instead </p>
 
 <P> We can simply remove the <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.ViewController</CODE>
-    class
-    as we won't need it to handle the sign in. We also need to change our <Code>signin.jsp</Code> a little bit to
-    embrace the support Spring Security provides.
-    Here's the reworked <CODE>signin.jsp</CODE> that simply detects the presence of the error variable  in the request and presents feedback
-    accordingly. This is different from the previous version  because it doesn't enumerate errors.
-</P>
+    class as we won't need it to handle the sign in. We also need to change our <Code>signin.jsp</Code> a little bit to
+    embrace the support Spring Security provides. Here's the reworked <CODE>signin.jsp</CODE> that simply detects the
+    presence of the error variable in the request and presents feedback accordingly. This is different from the previous
+    version because it doesn't enumerate errors. </P>
 
 <div module="web" q="tut_security" class="git-code" extension="jsp"> src/main/webapp/WEB-INF/views/signin/signin.jsp
 </div>
+<H3> Displaying Dynamic Menu Options for Authenticated Users </H3>
 
+<P> Earlier, in our <CODE>/WEB-INF/layouts/template.jsp</CODE> code we simply tested for the <CODE>user</CODE> object in
+    our HTTP session. We'll replace that test with the Spring Security JSP tag library. In particular, we'll use Spring
+    Security tags to check access using the same expressions that we used in our earlier configuration of the various
+    HTTP resources. We can also finally provide a URL for the sign out link in our navigation. In this example we use a
+    JSP snippet (<code>&lt;c:url value="/j_spring_security_logout" var="logoutUrl"/&gt;</code>) to calculate the context
+    root for the URL that Spring Security provides to handle sign out requests. The resulting value is stored as a page
+    attribute under the name <CODE>logoutUrl</CODE>, which is substituted into the <CODE>href</CODE> attribute for the
+    sign out URL. </P>
 
-<H3>
-       Displaying Dynamic Menu Options for Authenticated Users
+<DIV class="git-gist" gist="5230487"> spring security tags</DIV>
+<h2> Using Spring Security OAuth to Secure Access to our REST API </h2>
 
-</H3>
-<P>  Earlier, in our <CODE>/WEB-INF/layouts/template.jsp</CODE> code we simply tested for the
-      <CODE>user</CODE>  object in our HTTP session. We'll replace that test with the Spring Security JSP tag library.
-      In particular, we'll use Spring Security
-    tags to check access using the same expressions that we used in our earlier configuration of the various HTTP resources.
+<p> Thus far, we've secured all access to our web application, but <EM>not</EM> the RESTful endpoints. A natural first
+    step might be to secure the endpoints from access using the <CODE>http</CODE> elements in our Spring Security XML
+    configuration. This would certainly restrict access, but would oblige the client of the REST endpoints to sign in
+    using the HTML form. This would trigger the creation of an HTTP session that the client would need to perpetuate.
+    The client would need to transmit some piece of data that the server could use to correlate the client requests to
+    the session on the server. Typically, this is the <CODE>JSESSIONID</CODE> cookie. At the very least, such an
+    approach would require the client to use the same HTTP endpoints as the sign in form, and somehow work with the same
+    error validation feedback loop generated by the HTML form. </p>
 
- We can also finally   provide a URL for the sign out
-    link in our navigation. In this example we use  a JSP snippet (<code>&lt;c:url value="/j_spring_security_logout" var="logoutUrl"/&gt;</code>) to calculate the context root for the
-    URL that Spring Security provides to handle sign out requests. The resulting value is stored as a page attribute under the name <CODE>logoutUrl</CODE>, which is substituted into the
-    <CODE>href</CODE> attribute for the sign out URL.
+<P> Let's consider the use cases for our REST endpoints. We know that we want to be able to use the REST APIs from
+    processes running outside the application: browser-based JavaScript code, applications running on phone or tablets,
+    perhaps a desktop application. </P>
 
-
+<P> If you think about it, this sort of arrangement is very common. For example, each time you install a game on
+    Facebook which may or may not
+    post on your wall and invite others to join you, that game is using your Facebook data on your behalf. Each time you
+    trust another website to
+    authenticate you using your Facebook data ("Sign In With Facebook"), you're entrusting that application to use your
+    Facebook data on your behalf.
 </P>
 
- <DIV class="git-gist" gist="5230487">
-      spring security tags
+<P> There are a lot of ways we might imagine developing such a solution for our own application.
+    One approach might be to expose a RESTful API for <EM>signing in</EM> a user with a username and password. This
+    strategy has a few flaws, however.
+    First, it's common security practice to prompt users to change passwords at a frequent interval - perhaps every few
+    months. This would immediately break any
+    clients accessing the API on your behalf as their cached password would be invalid.
+    If you trust a client, then you probably don't expect it to stop working each time you change your password.</p>
 
- </DIV>
+<P>
+    When we use a client running out of process - be it a third party
+    application or simply an application running in another process and over the network, we establish that we trust the
+    client to
+    work with our data, but this does not necessarily mean we trust the client with our password.
+    A password's a far more sensitive matter. In the worst case, a password might be the same for a user across multiple
+    services. This is bad security practice, of course,
+    but it's still very common. Just because you trust one client to access your Facebook data, for example, that does
+    not mean you trust it to access your email on GMail, or your photos on Flickr.
+    Some services are less
+    scrupulous than others.
+
+    Let's suppose the user entrusted his or her password with an errant, malicious application. Let's suppose the client
+    immediately changes the password,
+    effectively hijacking the user's account. What recourse does that user - now locked out of his account - have?
+</P>
+<P> If the user did decide to revoke permissions to the client, she would have to change the password, effectively breaking all the other clients <EM>and</EM> forcing
+    the user to remember a <EM>new</EM> password.
+</P>
+<P>
+    Finally, such a scheme is hard to protect against man-in-the-middle attacks unless we specifically request, and
+    verify, that all clients transmit authentication credentials over something like SSL, which is tedious at best.
+</P>
+
+<h3>Introducing OAuth
+</h3>
+
+<DIV class="todo">
+
+ Insert the OAuth logo here
+</DIV>
+<P>
+    Clearly, we can do better. One very common approach employed by Facebook, Twitter, GitHub, Google+, LinkedIn and
+    innumerable many other service providers is <span class="wikipedia">OAuth</span>.
+    OAuth prescribes the following basic flow of interaction between a user, a client, and a service provider like Facebook:
+</P>
+
+<div class="todo"> Insert a  sequence diagram here
+</div>
 
 
+<OL>
+    <LI>
+        The client - intending to act on the user's behalf - requests certain permissions from a service provider's API for a given user.
+    </LI>
+    <LI> The client   then prompts the user to authorize these permissions by redirecting to a page on the service providers known, trusted, secured, website.
+        If there user is not currently authenticated and does not have a valid session,
+        the user signs in (again, on the service providers web site where care can
+        be taken to secure the transport of the credentials between the user and the service provider).
 
-<h2>
-    Using Spring Security to Secure Access to our REST API
-</h2>
-         <p>
-              Thus far, we've secured all access to our web application, but <EM>not</EM> the RESTful endpoints.
+    </LI>
+    <LI>
+       Once the user is signed in, he or she is prompted to authorize certain permissions ("Read my profile information," "update my profile photo," "post to my wall," "Tweet on my behalf," etc.)
+    </LI>
+    <LI>
+     If the user authorizes the permissions, the service provider  redirects <EM>back</EM> to the client's HTTP endpoint, transmitting with it an <CODE>access token</CODE>, perhaps as part of the request parameters,
+        or as part of the URL query (the part of the URL after the "<EM>#</EM>" character).
+    </LI>
+    <LI> The client keeps the access token and transmits it on each subsequent request.
+    </LI>
+</OL>
+<P>
 
+    The result of this process is that the client is left with a password that is still secret.
+    Access for individual clients may be revoked independent of each other by simply invalidating individual access tokens.
+    The user may change the password without breaking clients  since they will just use the access token.
+    As the user only transmits a password on the service providers domain, the security and integrity of the credentials may be ensured.
+    Not bad, right?
+</P>
+<h3> Adding Spring Security OAuth to our Application
+</h3>
+<!--
+Steps for SS OAuth :
+ * add the clientuserdetails api
+ * add OAuth endpoints to handle the various coordination calls
+ * secure the OAuth endpoints
+ *
 
-
-         </p>
-
-<script type="text/javascript" language="JavaScript"> $(function () {
-    setTimeout(function () {
-        window.scrollTo(0, document.body.scrollHeight);
-    }, 1000);
-}) </script>
-<A name="eof"/></body>
+-->
+<P>
+    connect the client
+</P>
+<a name="eof"></a></body>
 </html>

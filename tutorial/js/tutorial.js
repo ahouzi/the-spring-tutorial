@@ -1,3 +1,26 @@
+var StringUtils = { a: function (label, url) {
+    return '<a href="' + url + '">' + label + '</a>';
+}, code: function (inp) {
+    var lt = '<', gt = '>';
+    while (inp.indexOf(lt) != -1) {
+        inp = inp.replace(lt, '&lt;');
+    }
+    while (inp.indexOf(gt) != -1) {
+        inp = inp.replace(gt, '&gt;');
+    }
+    return "<PRE><CODE>" + inp + "</CODE></PRE>";
+}, encodeFullyQualifiedPath: function (ref) {
+    var url = ref;
+    while (url.indexOf('.') != -1) {
+        url = url.replace('.', '/');
+    }
+    return url;
+}, classForFullyQualifiedClass: function (ref) {
+    var lastPeriod = ref.lastIndexOf('.');
+    if (lastPeriod == -1) return ref;
+    return ref.substring(lastPeriod + 1);
+}};
+
 $(function () {
 
     var mapOfModulesToLinks = {};
@@ -132,5 +155,15 @@ $(function () {
         node.html(StringUtils.a(val, url));
 
     });
+
+
+    // finally, make sure we auto scroll to the bottom of the HTML document
+
+
+    setTimeout(function () {
+        window.scrollTo(0, document.body.scrollHeight);
+    }, 1000);
+
+
 })
 ;
