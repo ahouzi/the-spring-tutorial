@@ -29,12 +29,8 @@ import javax.sql.DataSource;
 @Configuration
 public class ServicesConfiguration {
 
-    // @Inject
-    //   private DataSourceConfiguration dataSourceConfiguration;
 
-    private String queueName = "photos";
-
-    @Bean // nb it's static because it's a BeanFactoryPostProcessor implementation.
+    @Bean // NB this bean is static because it's a BeanFactoryPostProcessor implementation.
     public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
@@ -70,44 +66,5 @@ public class ServicesConfiguration {
     public GridFsTemplate gridFsTemplate(MongoDbFactory mongoDbFactory, MongoTemplate mongoTemplate) throws Exception {
         return new GridFsTemplate(mongoDbFactory, mongoTemplate.getConverter());
     }
-
-/*
-    @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter rabbitTemplateMessageConverter) throws Throwable {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(rabbitTemplateMessageConverter);
-        return rabbitTemplate;
-    }
-
-    @Bean
-    public MessageConverter rabbitTemplateMessageConverter() {
-        return new JsonMessageConverter();
-    }
-
-    @Bean
-    public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) throws Throwable {
-        return new RabbitAdmin(connectionFactory);
-    }
-
-    @Bean
-    public Queue photosQueue(AmqpAdmin amqpAdmin) throws Throwable {
-        Queue q = new Queue(this.queueName);
-        amqpAdmin.declareQueue(q);
-        return q;
-    }
-
-    @Bean
-    public DirectExchange photosExchange(AmqpAdmin amqpAdmin) throws Throwable {
-        DirectExchange directExchange = new DirectExchange(queueName);
-        amqpAdmin.declareExchange(directExchange);
-        return directExchange;
-    }
-
-    @Bean
-    public Binding marketDataBinding(@Qualifier("photosQueue") Queue photosQueue, @Qualifier("photosExchange") DirectExchange photosExchange) throws Throwable {
-        return BindingBuilder.bind(photosQueue).to(photosExchange).with(this.queueName);
-    }
-*/
-
 
 }
