@@ -18,17 +18,13 @@
             <organizationUrl>http://www.springsource.org</organizationUrl>
         </contributor>
     </contributors>
-    <properties>
-
-        <!--1.0.2.RELEASE-->
+    <properties> <!--1.0.2.RELEASE-->
         <spring-social.version>1.1.0.BUILD-SNAPSHOT</spring-social.version>
-        <org.springframework-integration-version>2.1.0.RELEASE</org.springframework-integration-version>
-        <springframework-version>3.2.0.RELEASE</springframework-version>
+         <springframework-version>3.2.0.RELEASE</springframework-version>
         <!--<springframework-version>3.1.1.RELEASE</springframework-version>-->
         <cloudfoundry.version>0.8.2</cloudfoundry.version>
         <spring-security.version>3.1.3.RELEASE</spring-security.version>
-        <spring-integration.version>2.1.1.RELEASE</spring-integration.version>
-    </properties>
+     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,7 +32,6 @@
                 <artifactId>tiles-jsp</artifactId>
                 <version>2.2.2</version>
             </dependency>
-
             <dependency>
                 <groupId>com.fasterxml</groupId>
                 <artifactId>jackson-module-hibernate</artifactId>
@@ -73,7 +68,6 @@
                 <artifactId>rome</artifactId>
                 <version>1.0</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.tiles</groupId>
                 <artifactId>tiles-el</artifactId>
@@ -88,11 +82,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
                 <version>1.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <artifactId>spring-integration-amqp</artifactId>
-                <version>${spring-integration.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.social</groupId>
@@ -113,21 +102,6 @@
                 <groupId>org.springframework.social</groupId>
                 <artifactId>spring-social-twitter</artifactId>
                 <version>${spring-social.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <version>${spring-integration.version}</version>
-                <artifactId>spring-integration-jdbc</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <version>${spring-integration.version}</version>
-                <artifactId>spring-integration-twitter</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.integration</groupId>
-                <version>${spring-integration.version}</version>
-                <artifactId>spring-integration-core</artifactId>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -170,22 +144,11 @@
                 <artifactId>spring-orm</artifactId>
                 <version>${springframework-version}</version>
             </dependency>
-         <!--   <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>3.0.20100224</version>
-                <scope>provided</scope>
-            </dependency>-->
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib-nodep</artifactId>
                 <version>2.2.2</version>
             </dependency>
-            <!--     <dependency>
-                     <groupId>cglib</groupId>
-                     <artifactId>cglib</artifactId>
-                     <version>2.2.2</version>
-                 </dependency>-->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
@@ -196,7 +159,6 @@
                 <artifactId>spring-oxm</artifactId>
                 <version>${springframework-version}</version>
             </dependency>
-            <!-- OLD DEPS-->
             <dependency>
                 <groupId>org.cloudfoundry</groupId>
                 <artifactId>cloudfoundry-runtime</artifactId>
@@ -237,11 +199,6 @@
                 <artifactId>commons-logging</artifactId>
                 <version>1.1.1</version>
             </dependency>
-        <!--    <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.2.2</version>
-            </dependency>-->
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
@@ -332,7 +289,6 @@
                 <artifactId>antlr-runtime</artifactId>
                 <version>3.1.2</version>
             </dependency>
-
             <!-- <dependency> <groupId>org.hibernate.javax.persistence</groupId> <artifactId>hibernate-jpa-2.0-api</artifactId> <version>1.0.0.Final</version> </dependency>-->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -351,7 +307,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <repositories> <!-- For testing against latest Spring snapshots -->
+    <repositories>
         <repository>
             <id>org.springframework.maven.snapshot</id>
             <name>Spring Maven Snapshot Repository</name>
@@ -363,7 +319,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <!-- For developing against latest Spring milestones -->
         <repository>
             <id>org.springframework.maven.milestone</id>
             <name>Spring Maven Milestone Repository</name>
@@ -372,14 +327,10 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!-- For JPA and Hibernate artifacts -->
         <repository>
             <id>JBoss repository</id>
             <url>http://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
-        <!--	<repositories>
-
-	</repositories>-->
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -390,7 +341,6 @@
     </pluginRepositories>
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
