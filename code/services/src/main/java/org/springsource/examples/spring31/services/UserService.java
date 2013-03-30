@@ -283,20 +283,18 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         public static final String SCOPE_WRITE = "write";
         public static final String ROLE_USER = "ROLE_USER";
 
-        private Collection<String> roles;
+
         private Collection<GrantedAuthority> grantedAuthorities;
         private User user;
 
         public CrmUserDetails(User user) {
             assert user != null : "the provided user reference can't be null";
             this.user = user;
-            this.roles = Arrays.asList(ROLE_USER, SCOPE_READ, SCOPE_WRITE);
-            this.grantedAuthorities = Collections2.transform(this.roles, new Function<String, GrantedAuthority>() {
-                @Override
-                public GrantedAuthority apply(String input) {
-                    return new SimpleGrantedAuthority(input);
-                }
-            });
+            this.grantedAuthorities = new ArrayList<GrantedAuthority>();
+
+            for (String ga : Arrays.asList(ROLE_USER, SCOPE_READ, SCOPE_WRITE))
+                this.grantedAuthorities.add(new SimpleGrantedAuthority(ga));
+
         }
 
         @Override
