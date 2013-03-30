@@ -6,11 +6,9 @@ import org.cloudfoundry.runtime.service.AbstractServiceCreator;
 import org.cloudfoundry.runtime.service.document.CloudMongoConfiguration;
 import org.cloudfoundry.runtime.service.document.MongoServiceCreator;
 import org.cloudfoundry.runtime.service.keyvalue.RedisServiceCreator;
-import org.cloudfoundry.runtime.service.messaging.RabbitServiceCreator;
 import org.cloudfoundry.runtime.service.relational.RdbmsServiceCreator;
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.PostgreSQLDialect;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,20 +50,15 @@ public class CloudFoundryDataSourceConfiguration implements DataSourceConfigurat
     private CloudEnvironment cloudEnvironment = new CloudEnvironment();
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory ) throws Exception {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws Exception {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory );
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         return redisTemplate;
     }
 
     @Bean
-    public CacheManager cacheManager( RedisTemplate<String, Object>  rt ) throws Exception {
-        return new RedisCacheManager( rt);
-    }
-
-    @Bean
-    public ConnectionFactory rabbitMqConnectionFactory() throws Exception {
-        return lookupCloudFoundryService(DEFAULT_RABBITMQ_SERVICE_NAME, RabbitServiceInfo.class, RabbitServiceCreator.class);
+    public CacheManager cacheManager(RedisTemplate<String, Object> rt) throws Exception {
+        return new RedisCacheManager(rt);
     }
 
     @Bean

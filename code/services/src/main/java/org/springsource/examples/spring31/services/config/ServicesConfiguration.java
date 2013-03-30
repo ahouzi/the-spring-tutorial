@@ -1,13 +1,6 @@
 package org.springsource.examples.spring31.services.config;
 
 import org.hibernate.ejb.HibernatePersistence;
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,6 +71,7 @@ public class ServicesConfiguration {
         return new GridFsTemplate(mongoDbFactory, mongoTemplate.getConverter());
     }
 
+/*
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter rabbitTemplateMessageConverter) throws Throwable {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -113,6 +107,7 @@ public class ServicesConfiguration {
     public Binding marketDataBinding(@Qualifier("photosQueue") Queue photosQueue, @Qualifier("photosExchange") DirectExchange photosExchange) throws Throwable {
         return BindingBuilder.bind(photosQueue).to(photosExchange).with(this.queueName);
     }
+*/
 
 
 }

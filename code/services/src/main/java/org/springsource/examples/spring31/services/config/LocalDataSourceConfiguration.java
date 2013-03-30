@@ -5,8 +5,6 @@ import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.hibernate.dialect.PostgreSQLDialect;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -18,7 +16,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.Driver;
 import java.util.ArrayList;
@@ -52,6 +49,7 @@ import java.util.Map;
 @Profile("default")
 public class LocalDataSourceConfiguration implements DataSourceConfiguration {
     private boolean resetDatabaseOnReset = false;
+/*
 
 
     @Bean
@@ -66,6 +64,7 @@ public class LocalDataSourceConfiguration implements DataSourceConfiguration {
         }
         return cachingConnectionFactory;
     }
+*/
 
     @Bean(destroyMethod = "close")
     public DataSource dataSource(Environment environment) throws Exception {

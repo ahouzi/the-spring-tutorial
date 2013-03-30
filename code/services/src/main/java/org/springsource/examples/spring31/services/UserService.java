@@ -272,7 +272,6 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         public CrmUserDetails getUserDetails() {
             return this.userDetails;
         }
-
     }
 
     /**
@@ -282,13 +281,12 @@ public class UserService implements ClientDetailsService, UserDetailsService {
 
         public static final String SCOPE_READ = "read";
         public static final String SCOPE_WRITE = "write";
-
         public static final String ROLE_USER = "ROLE_USER";
 
         private Collection<String> roles;
-
         private Collection<GrantedAuthority> grantedAuthorities;
         private User user;
+
         public CrmUserDetails(User user) {
             assert user != null : "the provided user reference can't be null";
             this.user = user;
