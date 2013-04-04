@@ -81,13 +81,6 @@ public class ViewController {
         return "signup";
     }
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ResponseBody
-    public FacebookProfile test() {
-        FacebookProfile facebookProfile = facebook.userOperations().getUserProfile();
-        System.out.println(ToStringBuilder.reflectionToString(facebookProfile));
-        return facebookProfile;
-    }
 
     @RequestMapping(value = "/crm/signin.html", method = RequestMethod.GET)
     public String showSignInPage(Model model, @RequestParam(value = "error", required = false, defaultValue = "false") String err) {
