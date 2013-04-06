@@ -58,6 +58,7 @@ public class ViewController {
     // todo redirect to a signup page with most information pre-filled out.
     @RequestMapping(value = "/crm/signup.html")
     public String signup(HttpSession session) {
+
         String providerSignInAttemptSessionAttribute =ProviderSignInAttempt.class.getName() ;
         ProviderSignInAttempt signInAttempt = (ProviderSignInAttempt) session.getAttribute(providerSignInAttemptSessionAttribute);
         if (null != signInAttempt) {

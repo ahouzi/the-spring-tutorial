@@ -186,7 +186,7 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         final User usr = getUserById(userId);
         String fileName = fileNameForUserIdProfilePhoto(userId);
         entityManager.refresh(usr);
-        Query q = new Query(Criteria.where("filename").is(fileName));
+        Query q = query(userId);
         gridFsTemplate.delete(q);
         gridFsTemplate.store(inputStream, fileName);
         usr.setProfilePhotoExt(ext);
@@ -194,14 +194,16 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         entityManager.merge(usr);
     }
 
+    protected Query query(long userId) {
+        String fileName = fileNameForUserIdProfilePhoto(userId);
+        return ((new Query(Criteria.where("filename").is(fileName))));
+    }
+
     public InputStream readUserProfilePhoto(long userId) {
         User user = getUserById(userId);
         assert user != null : "you must specify a valid userId";
-        String fileName = fileNameForUserIdProfilePhoto(userId);
-        if (logger.isInfoEnabled())
-            logger.info("looking for file '" + fileName + "'");
         GridFSDBFile gridFSFile;
-        if ((gridFSFile = gridFsTemplate.findOne((new Query().addCriteria(Criteria.where("filename").is(fileName))))) == null) {
+        if ((gridFSFile = gridFsTemplate.findOne(query(userId))) == null) {
             logger.debug("couldn't find the user profile byte[]s for user #" + userId);
             return null;
         }

@@ -12,6 +12,7 @@ import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.social.facebook.config.annotation.EnableFacebook;
+import org.springframework.social.twitter.config.annotation.EnableTwitter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springsource.examples.spring31.web.security.UserSignInUtilities;
 
