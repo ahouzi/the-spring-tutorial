@@ -1341,7 +1341,8 @@ things ive added:
 
 <OL>
     <LI>
-        The client - intending to act on the user's behalf - requests certain permissions from a service provider's API for a given user.
+        The client - intending to act on the user's behalf - requests certain permissions from a service provider  for a given user (effectively, the <EM>AuthServer</EM> for the RESTful resources in the
+        <EM>ResourceServer</EM>, and they both - taken together - represent the service provider, for our purposes).
     </LI>
     <LI> The client   then prompts the user to authorize these permissions by redirecting to a page on the service providers known, trusted, secured, website.
         If there user is not currently authenticated and does not have a valid session,
@@ -1359,9 +1360,20 @@ things ive added:
     <LI> The client keeps the access token and transmits it on each subsequent request.
     </LI>
 </OL>
-<div class="todo"> Insert a  sequence diagram here
-</div>
+<div class="todo">
 
+
+</div>
+<div class="diagram">
+
+    <img src="images/oauth-cdraw.png"/>
+    <span class="caption">
+      This image was taken from the <A href="http://blog.cloudfoundry.org/2012/10/09/oauth-rest/">Dr. David Syer's
+        amazing blog introducing OAuth2</A> on
+        the Cloud Foundry blog.
+    </span>
+
+</div>
 
 <P>
 
@@ -1370,9 +1382,18 @@ things ive added:
     The user may change the password without breaking clients  since they will just use the access token.
     As the user only transmits a password on the service providers domain, the security and integrity of the credentials may be ensured.
     Not bad, right?
+
+    In our application, our AuthServer and our ResourceServer live together in the same application, to keep things simple. But, they do not need to.
+    In our application, the user is the person driving the client (in the browser) to act on her behalf.
+
+
 </P>
 <h3> Adding Spring Security OAuth to our Application
 </h3>
+<P>
+
+
+</P>
 <!--
 Steps for SS OAuth :
  * add the clientuserdetails api

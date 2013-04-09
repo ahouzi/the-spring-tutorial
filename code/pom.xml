@@ -24,7 +24,8 @@
         <!--<springframework-version>3.1.1.RELEASE</springframework-version>-->
         <cloudfoundry.version>0.8.2</cloudfoundry.version>
         <spring-security.version>3.1.3.RELEASE</spring-security.version>
-     </properties>
+        <spring-security-oauth2.version>1.0.2.RELEASE</spring-security-oauth2.version>
+    </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -51,7 +52,7 @@
             <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
-                <version>1.0.0.RC3</version>
+                <version>${spring-security-oauth2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>

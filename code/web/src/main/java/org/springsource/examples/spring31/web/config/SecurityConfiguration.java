@@ -1,7 +1,27 @@
 package org.springsource.examples.spring31.web.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.*;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.access.vote.RoleVoter;
+import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter;
+import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.vote.ScopeVoter;
+import org.springsource.examples.spring31.web.security.RoleAwareOAuthTokenServicesUserApprovalHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -13,8 +33,15 @@ import org.springframework.context.annotation.ImportResource;
 @ImportResource({"classpath:/security.xml"})
 public class SecurityConfiguration {
 
+    private String applicationName = "crm";
 
-    /*
+    @Bean
+    public OAuth2AuthenticationEntryPoint oauthAuthenticationEntryPoint() {
+        OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
+        oAuth2AuthenticationEntryPoint.setRealmName(this.applicationName);
+        return oAuth2AuthenticationEntryPoint;
+    }
+
     @Bean
     public UnanimousBased accessDecisionManager() {
         List<AccessDecisionVoter> decisionVoters = new ArrayList<AccessDecisionVoter>();
@@ -28,14 +55,17 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
-  @Bean
+
+    @Bean
     public TextEncryptor textEncryptor() {
         return Encryptors.noOpText();
     }
+
     @Bean
     public InMemoryTokenStore tokenStore() {
         return new InMemoryTokenStore();
     }
+
     @Bean
     public DefaultTokenServices tokenServices(InMemoryTokenStore tokenStore, ClientDetailsService jpaUserCredentialsService) {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
@@ -46,23 +76,15 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public OAuth2AuthenticationEntryPoint oauthAuthenticationEntryPoint() {
-        OAuth2AuthenticationEntryPoint oAuth2AuthenticationEntryPoint = new OAuth2AuthenticationEntryPoint();
-        oAuth2AuthenticationEntryPoint.setRealmName("crm");
-        return oAuth2AuthenticationEntryPoint;
-    }
-
-    @Bean
     public OAuth2AccessDeniedHandler oauthAccessDeniedHandler() {
         return new OAuth2AccessDeniedHandler();
     }
 
     @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter(AuthenticationManager authenticationManager) {
-        ClientCredentialsTokenEndpointFilter endpointFilter = new ClientCredentialsTokenEndpointFilter() {
-        }; // todo fix this so that the class isnt loaded by subclassing. this is gross.
+    public ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter(AuthenticationManager authenticationManager, OAuth2AuthenticationEntryPoint entryPoint) {
+        ClientCredentialsTokenEndpointFilter endpointFilter = new ClientCredentialsTokenEndpointFilter();
         endpointFilter.setAuthenticationManager(authenticationManager);
+        endpointFilter.setAuthenticationEntryPoint(entryPoint);
         return endpointFilter;
 
     }
@@ -73,7 +95,7 @@ public class SecurityConfiguration {
         approvalHandler.setUseTokenServices(true);
         approvalHandler.setTokenServices(tokenServices);
         return approvalHandler;
-    }*/
+    }
 
 }
 
