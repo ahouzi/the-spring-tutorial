@@ -40,6 +40,11 @@ $(function () {
         GenericModule(this, 'http://static.springsource.org/spring-data/data-mongodb/docs/current/api/');
     }
 
+    /* Specifically for Spring Security OAuth project */
+    function SpringSecurityOAuthModule() {
+        GenericModule(this, 'http://static.springsource.org/spring-security/oauth/apidocs//');
+    }
+
     function GitHubProjectModule(mod) {
 
         var self = this;
@@ -106,6 +111,7 @@ $(function () {
     mapOfModulesToLinks['java'] = new JavaModule();
     mapOfModulesToLinks['spring-data-mongodb'] = new SpringDataMongoDbModule();
     mapOfModulesToLinks['spring-security'] = new SpringSecurityModule();
+    mapOfModulesToLinks['spring-security-oauth'] = new SpringSecurityOAuthModule();
 
     var codeModules = 'services,web'.split(',');
     for (var i = 0; i < codeModules.length; i++) {

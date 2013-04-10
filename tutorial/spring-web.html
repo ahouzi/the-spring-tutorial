@@ -1392,6 +1392,18 @@ things ive added:
 </h3>
 <P>
 
+    There are a few requirements for working with Spring Security OAuth.
+
+    First, we must must adapt our notion of users to the <SPAN class="class-reference" module="spring-security-oauth" q="tut_web" class="class-reference">
+                                org.springframework.security.oauth2.provider.ClientDetailsService</SPAN> interface. The interface has one chore:
+    given a particular <EM>client</EM> name, load the appropriate
+    <SPAN class="class-reference" module="spring-security-oauth" q="tut_web" class="class-reference">org.springframework.security.oauth2.provider.ClientDetails</SPAN>
+    object.
+
+
+ It's important to note that the <CODE>ClientDetails</CODE> class is simply an object that knows how to handle requests coming from a given client.
+
+
 
 </P>
 <!--
