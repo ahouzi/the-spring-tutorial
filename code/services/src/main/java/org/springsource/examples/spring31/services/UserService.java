@@ -2,6 +2,7 @@ package org.springsource.examples.spring31.services;
 
 
 import com.mongodb.gridfs.GridFSDBFile;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Scope;
@@ -9,8 +10,12 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,7 +50,17 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Transactional
-public class UserService implements /*ClientDetailsService, */UserDetailsService {
+public class UserService implements UserDetailsService {
+
+    public boolean isCorrectUser(long userId) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        CrmUserDetails crmUserDetails = (CrmUserDetails) authentication.getPrincipal();
+        return userId == crmUserDetails.getUser().getId();
+    }
+
+    public static final String USER_ID_IS_PRINCIPAL_ID = " authentication.principal.user.id == #userId " ;
+//            " T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.principal.user.id == #userId   "; //
 
     public static final String SCOPE_READ = "read";
     public static final String SCOPE_WRITE = "write";
@@ -56,9 +71,6 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    // variables for the file resizing
-    private long imageWidth = 300;
-    private String convertCommandPath = "/usr/local/bin/convert";
     private Map<String, Set<String>> multiMapOfExtensionsToVariants = new ConcurrentHashMap<String, Set<String>>();
 
     private GridFsTemplate gridFsTemplate;
@@ -90,20 +102,12 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
                 logger.debug(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
     }
 
-    public void setConvertCommandPath(String cmd) {
-        this.convertCommandPath = cmd;
-    }
-
-
-    public void setImageWidth(long imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-
     @Inject
     public void setGridFsTemplate(GridFsTemplate gridFsTemplate) {
         this.gridFsTemplate = gridFsTemplate;
     }
 
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public User updateUser(long userId, String un, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User user = getUserById(userId);
         String oldUserName = user.getUsername();
@@ -145,7 +149,6 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
     }
 
     public User createUser(String username, String pw, String fn, String ln, boolean imported) {
-        // first make sure it doesn't already exist
         assert StringUtils.hasText(username) : "the 'username' can't be null";
         assert StringUtils.hasText(pw) : "the 'password' can't be null";
         assert loginByUsername(username) == null : "there is already an existing User with the username '" + username + "'";
@@ -179,17 +182,12 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
 
     }
 
-    public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, byte[] bytes) throws Throwable {
-        writeUserProfilePhotoAndQueueForConversion(userId, ogFileName, new ByteArrayInputStream(bytes));
-    }
 
-    public void writeUserProfilePhotoAndQueueForConversion(long userId, String ogFileName, InputStream inputStream) throws Throwable {
-        writeUserProfilePhoto(userId, ogFileName, inputStream);
-    }
-
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public void writeUserProfilePhoto(long userId, String ogFileName, InputStream inputStream) throws Throwable {
-        final String ext = deriveFileExtension(ogFileName);
+
         final User usr = getUserById(userId);
+        final String ext = deriveFileExtension(ogFileName);
         String fileName = fileNameForUserIdProfilePhoto(userId);
         entityManager.refresh(usr);
         Query q = new Query(Criteria.where("filename").is(fileName));
@@ -200,7 +198,18 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
         entityManager.merge(usr);
     }
 
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
+    public void writeUserProfilePhoto(long userId, String ogFileName, byte[] bytes) throws Throwable {
+        ByteArrayInputStream byteArrayInputStream = null;
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(bytes);
+            writeUserProfilePhoto(userId, ogFileName, bytes);
+        } finally {
+            IOUtils.closeQuietly(byteArrayInputStream);
+        }
+    }
 
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public InputStream readUserProfilePhoto(long userId) {
         User user = getUserById(userId);
         assert user != null : "you must specify a valid userId";
@@ -215,13 +224,15 @@ public class UserService implements /*ClientDetailsService, */UserDetailsService
         return gridFSFile.getInputStream();
     }
 
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public void removeUser(long userId) {
         User user = getUserById(userId);
         entityManager.remove(user);
     }
 
-    public User getUserById(long id) {
-        return this.entityManager.find(User.class, id);
+    @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
+    public User getUserById(long userId) {
+        return this.entityManager.find(User.class, userId);
     }
 
     @Override

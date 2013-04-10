@@ -26,7 +26,7 @@ import java.io.InputStream;
  * @author Josh Long
  */
 @Controller
-public class UserApiController  implements ApplicationListener<HttpSessionCreatedEvent  > {
+public class UserApiController implements ApplicationListener<HttpSessionCreatedEvent> {
 
     /**
      * Root URL template for all modifications to a {@link User}
@@ -35,6 +35,8 @@ public class UserApiController  implements ApplicationListener<HttpSessionCreate
     public static final String USER_COLLECTION_USERNAMES_URL = USER_COLLECTION_URL + "/usernames";
     static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
     static public final String USER_COLLECTION_ENTRY_PHOTO_URL = USER_COLLECTION_ENTRY_URL + "/photo";
+
+  //  static public final String PRINCIPAL_IS_REQUESTED_USER = "#userId == principal.id";
 
     private Logger log = Logger.getLogger(getClass());
     private UserService userService;
@@ -46,18 +48,21 @@ public class UserApiController  implements ApplicationListener<HttpSessionCreate
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
     @ResponseBody
-    public User getUserById(@PathVariable("userId") Long userId) {
+    public User getUserById(  @PathVariable("userId") Long userId) {
         return this.userService.getUserById(userId);
     }
 
+
+
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
     @ResponseBody
-    public User updateUserById(@PathVariable("userId") Long userId,
+    public User updateUserById(
+                               @PathVariable("userId") Long userId,
                                @RequestParam("username") String username,
                                @RequestParam("password") String password,
                                @RequestParam("firstname") String fn,
                                @RequestParam("lastname") String ln) {
-        User existingUser = this.getUserById(userId);
+        User existingUser = this.getUserById( userId);
         return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
@@ -87,12 +92,13 @@ public class UserApiController  implements ApplicationListener<HttpSessionCreate
         return new ResponseEntity<User>(user, httpHeaders, HttpStatus.CREATED);
     }
 
-
-    @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST)
+     @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST)
     @ResponseBody
-    public Long uploadBasedOnPathVariable(@PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) throws Throwable {
-        byte[] bytesForImage = file.getBytes();
-        userService.writeUserProfilePhotoAndQueueForConversion(userId, file.getName(), bytesForImage);
+    public Long uploadBasedOnPathVariable(
+            @PathVariable("userId") Long userId,
+            @RequestParam("file") MultipartFile file) throws Throwable {
+
+        userService.writeUserProfilePhoto(userId, file.getName(), file.getInputStream());
         return userId;
     }
 
@@ -107,6 +113,6 @@ public class UserApiController  implements ApplicationListener<HttpSessionCreate
 
     @Override
     public void onApplicationEvent(HttpSessionCreatedEvent event) {
-         System.out.println( "Event: " + ToStringBuilder.reflectionToString(  event));
+        System.out.println("Event: " + ToStringBuilder.reflectionToString(event));
     }
 }

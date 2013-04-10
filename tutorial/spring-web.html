@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/html">
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head><title>The Spring Tutorial: Web </title>
     <!-- todo jquery logic to make all class-reference spans links to the javadocs for the code todo jquery logic to make all wikipedia spans links to the wikipedia entry for the text therein. -->
     <style type="text/css"> .todo {
@@ -1153,7 +1153,8 @@ things ive added:
     that will be loaded when the application starts up. It in turn imports security configuration defined in XML using
     the Spring Security XML namespace in a file called <CODE>security.xml</CODE>. For now, our configuration class is
     empty - just a standard configuration class.
- The XML file (<CODE>security.xml</CODE>) on the other hand will use the Spring Security XML namespace to handle securing our resources for us.
+    The XML file (<CODE>security.xml</CODE>) on the other hand will use the Spring Security XML namespace to handle
+    securing our resources for us.
 
 </p>
 
@@ -1320,9 +1321,12 @@ things ive added:
     immediately changes the password,
     effectively hijacking the user's account. What recourse does that user - now locked out of his account - have?
 </P>
-<P> If the user did decide to revoke permissions to the client, she would have to change the password, effectively breaking all the other clients <EM>and</EM> forcing
+
+<P> If the user did decide to revoke permissions to the client, she would have to change the password, effectively
+    breaking all the other clients <EM>and</EM> forcing
     the user to remember a <EM>new</EM> password.
 </P>
+
 <P>
     Finally, such a scheme is hard to protect against man-in-the-middle attacks unless we specifically request, and
     verify, that all clients transmit authentication credentials over something like SSL, which is tedious at best.
@@ -1331,30 +1335,36 @@ things ive added:
 <h3>Introducing OAuth
 </h3>
 
-<div class="diagram"><img src="images/oauth.png" style="width: 300px"/> <span class="caption"> The OAuth logo</span></div>
+<div class="diagram"><img src="images/oauth.png" style="width: 300px"/> <span class="caption"> The OAuth logo</span>
+</div>
 <P>
     Clearly, we can do better. One very common approach employed by Facebook, Twitter, GitHub, Google+, LinkedIn and
     innumerable many other service providers is <span class="wikipedia">OAuth</span>.
-    OAuth prescribes the following basic flow of interaction between a user, a client, and a service provider like Facebook:
+    OAuth prescribes the following basic flow of interaction between a user, a client, and a service provider like
+    Facebook:
 </P>
 
 
 <OL>
     <LI>
-        The client - intending to act on the user's behalf - requests certain permissions from a service provider  for a given user (effectively, the <EM>AuthServer</EM> for the RESTful resources in the
+        The client - intending to act on the user's behalf - requests certain permissions from a service provider for a
+        given user (effectively, the <EM>AuthServer</EM> for the RESTful resources in the
         <EM>ResourceServer</EM>, and they both - taken together - represent the service provider, for our purposes).
     </LI>
-    <LI> The client   then prompts the user to authorize these permissions by redirecting to a page on the service providers known, trusted, secured, website.
+    <LI> The client then prompts the user to authorize these permissions by redirecting to a page on the service
+        providers known, trusted, secured, website.
         If there user is not currently authenticated and does not have a valid session,
         the user signs in (again, on the service providers web site where care can
         be taken to secure the transport of the credentials between the user and the service provider).
 
     </LI>
     <LI>
-       Once the user is signed in, he or she is prompted to authorize certain permissions ("Read my profile information," "update my profile photo," "post to my wall," "Tweet on my behalf," etc.)
+        Once the user is signed in, he or she is prompted to authorize certain permissions ("Read my profile
+        information," "update my profile photo," "post to my wall," "Tweet on my behalf," etc.)
     </LI>
     <LI>
-     If the user authorizes the permissions, the service provider  redirects <EM>back</EM> to the client's HTTP endpoint, transmitting with it an <CODE>access token</CODE>, perhaps as part of the request parameters,
+        If the user authorizes the permissions, the service provider redirects <EM>back</EM> to the client's HTTP
+        endpoint, transmitting with it an <CODE>access token</CODE>, perhaps as part of the request parameters,
         or as part of the URL query (the part of the URL after the "<EM>#</EM>" character).
     </LI>
     <LI> The client keeps the access token and transmits it on each subsequent request.
@@ -1378,31 +1388,68 @@ things ive added:
 <P>
 
     The result of this process is that the client is left with a password that is still secret.
-    Access for individual clients may be revoked independent of each other by simply invalidating individual access tokens.
-    The user may change the password without breaking clients  since they will just use the access token.
-    As the user only transmits a password on the service providers domain, the security and integrity of the credentials may be ensured.
+    Access for individual clients may be revoked independent of each other by simply invalidating individual access
+    tokens.
+    The user may change the password without breaking clients since they will just use the access token.
+    As the user only transmits a password on the service providers domain, the security and integrity of the credentials
+    may be ensured.
     Not bad, right?
 
-    In our application, our AuthServer and our ResourceServer live together in the same application, to keep things simple. But, they do not need to.
+    In our application, our AuthServer and our ResourceServer live together in the same application, to keep things
+    simple. But, they do not need to.
     In our application, the user is the person driving the client (in the browser) to act on her behalf.
 
 
 </P>
-<h3> Adding Spring Security OAuth to our Application
+
+<h3> The Spring Security OAuth Client
 </h3>
+
 <P>
 
-    There are a few requirements for working with Spring Security OAuth.
+    Spring Security OAuth manages relationships of <EM>clients</EM> to <em>access tokens</em>.
 
-    First, we must must adapt our notion of users to the <SPAN class="class-reference" module="spring-security-oauth" q="tut_web" class="class-reference">
-                                org.springframework.security.oauth2.provider.ClientDetailsService</SPAN> interface. The interface has one chore:
-    given a particular <EM>client</EM> name, load the appropriate
-    <SPAN class="class-reference" module="spring-security-oauth" q="tut_web" class="class-reference">org.springframework.security.oauth2.provider.ClientDetails</SPAN>
-    object.
+    In Spring Security OAuth, <b>client</b> refers to the <EM>client program</EM>, not the <EM>users</EM> using the
+    clients.
+
+    You might thus have a client for your Android application, for your iOS application, for your Windows 8 application
+    and for your
+    HTML5-based ajax-client, as in our case.
+
+    A given client has a set of (optional) <B>scopes</B>. Scopes are arbitrary strings that you can use - if you want -
+    to carve up permissions
+    for the client. Perhaps one client may <CODE>read</CODE> data, while the other may <CODE>write</CODE>, or do both!
+
+    A client may have different <B>authorization grant types</b>.
+    There are four different types of <em>authorization grant types</em>:
+
+    <CODE>authorization_code</CODE>, <CODE>password</CODE>, <CODE>assertion</CODE>,
+    and <CODE>refresh_token</CODE>. If left unspecified, Spring Security wil handle
+    both <CODE>authorization_code</CODE> and <CODE>refresh_token</CODE> grant types by default.
+    An authorization grant type
+    specifies how the client is to exchange information with the server. The various options mostly relate to how
+    much you trust the environment the client is running in.
+
+    For more, refer to this <A href="http://tutorials.jenkov.com/oauth2/authorization.html">great writeup of the various
+    grant types</a>.
+
+    Since our client is running in the browser, and only manipulating his own data, we
 
 
- It's important to note that the <CODE>ClientDetails</CODE> class is simply an object that knows how to handle requests coming from a given client.
+</p>
 
+<P>
+
+    All requests handled by Spring Security OAuth have both a specified <EM>client</EM>
+    as well as a specified <em>access token</EM>.
+
+    If a program makes a request of the server with just a client, but no access token, Spring Security OAuth triggers
+    an HTTP redirect to
+    the URL of the provider of the
+
+    <!--   So, for example, you might today build the HTML5 and Ajax-based web application for
+        our OAuth service, and tomorrow you might build an iOS client, an Android client, a Windows Mobile client, a BlackBerry client, etc. Each one of these client
+       programs is modeled by  <CODE>ClientDetails</CODE>.-->
 
 
 </P>
