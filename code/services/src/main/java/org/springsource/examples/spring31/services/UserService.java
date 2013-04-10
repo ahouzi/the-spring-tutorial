@@ -1,8 +1,6 @@
 package org.springsource.examples.spring31.services;
 
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,9 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
-import org.springframework.security.oauth2.provider.BaseClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +45,12 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Service
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Transactional
-public class UserService implements ClientDetailsService, UserDetailsService {
+public class UserService implements /*ClientDetailsService, */UserDetailsService {
+
+    public static final String SCOPE_READ = "read";
+    public static final String SCOPE_WRITE = "write";
+
+    public static final String ROLE_USER = "ROLE_USER";
 
     public static final String USER_CACHE_REGION = "users";
 
@@ -232,56 +232,11 @@ public class UserService implements ClientDetailsService, UserDetailsService {
         return new CrmUserDetails(user);
     }
 
-    @Override
-    public ClientDetails loadClientByClientId(String clientId) throws OAuth2Exception {
-        // clientId is the ID of the user
-        Long userId = Long.parseLong(clientId);
-        User usr = getUserById(userId);
-
-        CrmUserDetails crmUserDetails = loadUserByUsername(usr.getUsername());
-
-        return new CrmClientDetails(
-                crmUserDetails.getUsername(),
-                "crm",   // tmpDir
-                CrmUserDetails.SCOPE_READ + "," + CrmUserDetails.SCOPE_WRITE, // scope
-                "authorization_code,implicit", // grant types
-                org.apache.commons.lang.StringUtils.join(Collections2.transform(crmUserDetails.getAuthorities(), new Function<GrantedAuthority, String>() {
-                    @Override
-                    public String apply(GrantedAuthority input) {
-                        return input.getAuthority();
-                    }
-                }), ','),
-                null,
-                crmUserDetails);
-    }
-
-    /**
-     * Implementation of Spring Security OAuth's
-     * {@link org.springframework.security.oauth2.provider.ClientDetails ClientDetails}
-     * contract.
-     */
-    public static class CrmClientDetails extends BaseClientDetails {
-
-        private CrmUserDetails userDetails;
-
-        public CrmClientDetails(String clientId, String resourceIds, String scopes, String grantTypes, String authorities, String redirectUris, CrmUserDetails userDetails) {
-            super(clientId, resourceIds, scopes, grantTypes, authorities, redirectUris);
-            this.userDetails = userDetails;
-        }
-
-        public CrmUserDetails getUserDetails() {
-            return this.userDetails;
-        }
-    }
 
     /**
      * Implementation of Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails} contract
      */
     public static class CrmUserDetails implements UserDetails {
-
-        public static final String SCOPE_READ = "read";
-        public static final String SCOPE_WRITE = "write";
-        public static final String ROLE_USER = "ROLE_USER";
 
 
         private Collection<GrantedAuthority> grantedAuthorities;

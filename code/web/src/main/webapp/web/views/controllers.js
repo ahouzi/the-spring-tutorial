@@ -11,7 +11,7 @@ $.ajaxSetup({
     cache: false
 });
 
-var appName = 'crm';
+var appName = 'crm', clientId = 'html5-crm';
 var module = angular.module(appName, ['ngResource', 'ui']);
 
 
@@ -38,7 +38,7 @@ module.factory('ajaxUtils', function () {
     var scopes = ['read', 'write'];
     var resources = {};
     resources[oauthResource] = {
-        client_id: crmSession.getUserId() + '',
+        client_id:clientId ,// crmSession.getUserId() + '',
         isDefault: true,
         redirect_uri: window.location.href + '',
         authorization: '/oauth/authorize',

@@ -9,10 +9,9 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 
-    <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+<authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
         <authentication-provider user-service-ref="userService"/>
     </authentication-manager>
-
 
 
     <http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="authenticationManager"
@@ -25,7 +24,7 @@
     </http>
 
 
-     <http pattern="/oauth/(users|clients)/.*" request-matcher="regex" create-session="stateless"
+    <http pattern="/oauth/(users|clients)/.*" request-matcher="regex" create-session="stateless"
           entry-point-ref="oauthAuthenticationEntryPoint"
           use-expressions="true" xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false"/>
@@ -74,7 +73,18 @@
         <anonymous/>
     </http>
 
-    <beans:alias name="userService" alias="clientDetailsService"/>
+    <!--
+        <beans:alias name="userService" alias="clientDetailsService"/>
+    -->
+
+    <oauth:client-details-service id="clientDetailsService">
+        <oauth:client
+                client-id="html5-crm"
+                scope="read,write"
+                authorities="ROLE_USER"
+                authorized-grant-types="authorization_code,implicit"
+                resource-ids="crm"/>
+    </oauth:client-details-service>
 
     <oauth:authorization-server client-details-service-ref="clientDetailsService"
                                 token-services-ref="tokenServices"
