@@ -1414,7 +1414,8 @@ things ive added:
     First, we must configure an authorization server. The
     authorization server lives on the service provider side and handles inbound OAuth requests.
 
-    It knows what to do when a request is made asking for permission to connect using OAuth. It delegates to a <span  class="class-reference" module="spring-security-oauth" q="tut_security">org.springframework.security.oauth2.provider.ClientDetailsService</span>
+    It knows what to do when a request is made asking for permission to connect using OAuth. It delegates to a <span
+        class="class-reference" module="spring-security-oauth" q="tut_security">org.springframework.security.oauth2.provider.ClientDetailsService</span>
     instance -
     which we'll configure below - to figure out how specifically to resolve requests made by <CODE>client</CODE>s.
     Here's our configuration for the authorization server.
@@ -1423,30 +1424,92 @@ things ive added:
 
 <div class="git-gist" gist="5422069">
 
-   <!-- <oauth:authorization-server client-details-service-ref="clientDetailsService"
-                                token-services-ref="tokenServices"
-                                user-approval-handler-ref="oauthTokenServicesUserApprovalHandler">
-        <oauth:authorization-code/>-->
+    <!-- <oauth:authorization-server client-details-service-ref="clientDetailsService"
+                                 token-services-ref="tokenServices"
+                                 user-approval-handler-ref="oauthTokenServicesUserApprovalHandler">
+         <oauth:authorization-code/>-->
 </div>
 
 <P> The
- <Code>client-details-service-ref</Code> references an instance of the <CODE>ClientDetailsService</CODE>. The <CODE>token-services-ref</CODE> references an instance of
-    <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.token.DefaultTokenServices</CODE>, which keeps information about
-    configured tokens in-memory so that tokens for clients that have already authenticated can be re-issued quickly.  The <CODE>user-approval-handler</CODE> attribute references an instance of
-      <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler</CODE>, which is a custom class
-    that I've written to give special treatment to requests being made of this application. In particular, this implementation simply adds one more check to the authentication flow
-    than the out-of-the-box solution - <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler</CODE>
-    provides to check to see if we already have an authenticated Spring Security user in the Spring Security context.  This will only happen if the user has successfully authenticated through the sign in form in the web application, and has been authenticated.
-     If the user is already authenticated, then there is hardly any need to force them to re-authenticate, so we skip that step altogether and simply approve the authentication request.
+    <Code>client-details-service-ref</Code> references an instance of the <CODE>ClientDetailsService</CODE>. The <CODE>token-services-ref</CODE>
+    references an instance of
+    <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.token.DefaultTokenServices</CODE>,
+    which keeps information about
+    configured tokens in-memory so that tokens for clients that have already authenticated can be re-issued quickly.
+    Here is the configuration for the bean in our <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.config.SecurityConfiguration</CODE>.
+
+
+</p>
+
+<div gist="5422227" class="git-gist">
+    @Bean public DefaultTokenServices
+</div>
+
+<P>
+
+    The <CODE>user-approval-handler</CODE> attribute references an instance of
+    <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler</CODE>,
+    which is a custom class
+    that I've written to give special treatment to requests being made of this application. In particular, this
+    implementation simply extends <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler</CODE>
+    and
+    adds to the authentication flow a check for any existing Spring Security users in the context.
+    This will only happen if the user has successfully authenticated through the sign in form in the web application,
+    and has been authenticated.
+    If the user is already authenticated, then there is hardly any need to force them to re-authenticate, so we skip
+    that step altogether and simply approve the authentication request.
 
 
 </P>
+
 <div module="web" q="tut_security" extension="java" class="git-code">
     org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler
 </div>
 
+<P> The configuration for our <CODE>RoleAwareOAuthTokenServicesUserApprovalHandler</CODE> looks like this in our
+    configuration class: </P>
+
+<DIV class="git-gist" gist="5422285"></DIV>
+
 <h3> The Resource Server
 </h3>
+
+<P> The resource server simply stands up a filter that can be applied and that responds to requests for a
+    <EM>resource</EM> of a given type.
+    A resource describes a set of HTTP endpoints that are protected by OAuth. In our application, our
+    <code>resource</code> is called
+    <CODE>crm</CODE>. Any client that connects to our application will need to present the resource it wants to connect
+    to, as well
+    as its client ID, and - ultimately - it will need to present a valid access token.
+    To do its work, the resource server needs a reference to our token services instance and it needs to be plugged into
+    any standard Spring Security HTTP pipeline for resources that are to be protected as part of the <EM>resource</EM>
+    it represents. Here is the configuration for the resource server.
+</P>
+
+
+<DIV class="git-gist" gist="5422360"></DIV>
+<P> This filter is useless unless it's used. Let's look at our new <CODE>security:http</CODE> stanza to protect the REST
+    API itself. </P>
+
+<DIV class="git-gist" gist="5422369"></DIV>
+<P> We plugin the resource server filter towards the bottom, when we establish a <CODE>security:custom-filter</CODE>
+    element that is to be applied on all requests to the described resources.
+    You'll note that we've specified different rules for different parts of the API, limiting or opening access as the
+    API requires. For example, we want to be able to display user profile images.
+    These images should be available to all clients, whether they're authenticated or not, so we open up access to that
+    HTTP endpoint by stipulating that HTTP GET requests against the pattern matched by the expression <CODE>/api/users/**/photo</CODE>
+    are to be permitted. Later on in the same stanza, however, we specifically disallow any POSTs to the same resources,
+    because users need to be authenticated to modify profile image data.
+    Since these are not normal HTTP endpoints to be displayed in the browser, it's important that we serve up a more
+    RESTful
+    error response when access is denied. We configure this using the
+    <CODE>security:access-denied-handler</CODE> element towards the bottom, specifying a bean - <CODE>oauthAccessDeniedHandler</CODE>
+    - that's also configured in our configuration class. Here is the
+    corresponding configuration.
+
+</P>
+
+<DIV class="git-gist" gist="5422439">@Bean public AccessDeniedHandler</DIV>
 
 <h3> The Spring Security OAuth Client
 </h3>
@@ -1519,35 +1582,48 @@ things ive added:
     an HTTP redirect to the URL of the service provider where the user will be prompted to sign in if not already signed
     in, and optionally the user will be prompted to grant permission to the client (if not already specified).
 
-    We're using a
-
-    <!--   So, for example, you might today build the HTML5 and Ajax-based web application for
-        our OAuth service, and tomorrow you might build an iOS client, an Android client, a Windows Mobile client, a BlackBerry client, etc. Each one of these client
-       programs is modeled by  <CODE>ClientDetails</CODE>.-->
-
 
 </P>
-<!--
 
-SSOAuth requires:
+<h3> Resolving Expressions Against the OAuth Context </h3>
 
- - add Spring Security http:* elements
- - add client-details-service
- - decide which kind of client flow u want (implicit for javascript clients, for example)
- - add oauth resource server configuration
- - make sure u have Spring Security so that SSO has some way to prompt users for secrutiy credentials
- - jar coords in gradle / mvn
- - setup a client that successfully interacts with the auth server / resource server and that successfully presents 'Authorization Bearer...' (do it with curl or Spring Rest Shell)
-
--->
 <P>
+    Spring Security needs the ability to answer questions about permissions and roles that are given as Spring
+    Expression Language statements. If you're working with Spring Security OAuth, it's helpful to be able to
+    ask specific questions about the OAuth authentication of any given request. These expressions are common in Spring
+    Security, in general, in the JSP tags used on the pages, in annotations and
+    even in the <CODE>http:intercept-url</CODE> elements designed to cordon off access to a resource based on
+    conditions.
 
-    OAuth defines several different required endpoints for the auth server. These are the endpoints that are called
-    during the authentication handshake. There is one that is already available from the Spring Social examples, and
-    I've simply copied-and-pasted that example below.
-
-    <!--http://tutorials.jenkov.com/oauth2/endpoints.html-->
+    To satisfy all the various use cases, install the Spring Security OAuth machinery for expression resolution, like
+    this:
 
 </P>
+
+<div class="git-gist" gist="5423214">
+    expression-handlers
+</div>
+<P>
+    We're not making much use of this functionality, at the moment, but Spring Security
+    will make use of it, regardless of our specific uses and now we could also use it like this:
+</P>
+
+<DIV class="git-gist" gist="5423243"></DIV>
+
+<h2>
+    Consuming Our OAuth Endpoint from the Client
+</h2>
+
+<P> There are many ways to consume OAuth. In the next section we'll look at a very sophisticated solution for Java-based
+    clients, but for JavaScript clients like our application, there are fewer solutions.
+    One common option is
+    <A href="https://github.com/andreassolberg/jso"><CODE>jso.js</CODE></A>, which integrates with jQuery and makes it
+    easy to make OAuth-secured calls against RESTful resources and automatically handles the OAuth-callback dance for
+    you.
+
+</P>
+
+<DIV class="git-gist" gist="5423280"></DIV>
+
 <a name="eof"></a></body>
 </html>

@@ -28,7 +28,7 @@ import java.io.InputStream;
  * @author Josh Long
  */
 @Controller
-public class UserApiController implements ApplicationListener<HttpSessionCreatedEvent> {
+public class UserApiController  {
 
     /**
      * Root URL template for all modifications to a {@link User}
@@ -108,11 +108,6 @@ public class UserApiController implements ApplicationListener<HttpSessionCreated
         httpHeaders.setContentType(MediaType.IMAGE_JPEG);
         byte buffer[] = IOUtils.toByteArray(is);
         return new ResponseEntity<byte[]>(buffer, httpHeaders, HttpStatus.OK);
-    }
-
-    @Override
-    public void onApplicationEvent(HttpSessionCreatedEvent event) {
-        System.out.println("Event: " + ToStringBuilder.reflectionToString(event));
     }
 }
 
