@@ -8,7 +8,7 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
-<authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+    <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
         <authentication-provider user-service-ref="userService"/>
     </authentication-manager>
 
@@ -23,9 +23,7 @@
     </http>
 
 
-    <sec:http pattern="/oauth/(users|clients)/.*" request-matcher="regex" create-session="stateless"
-              entry-point-ref="oauthAuthenticationEntryPoint"
-              use-expressions="true">
+    <sec:http pattern="/oauth/(users|clients)/.*" request-matcher="regex" create-session="stateless"   entry-point-ref="oauthAuthenticationEntryPoint" use-expressions="true">
         <sec:anonymous enabled="false"/>
         <sec:intercept-url pattern="/oauth/users/([^/].*?)/tokens/.*"
                            access="#oauth2.clientHasRole('ROLE_CLIENT') and (hasRole('ROLE_USER') or #oauth2.isClient()) and #oauth2.hasScope('write')"
@@ -70,10 +68,6 @@
         <sec:intercept-url pattern="/web/views/**" access="ROLE_USER"/>
         <sec:anonymous/>
     </sec:http>
-
-    <!--
-        <beans:alias name="userService" alias="clientDetailsService"/>
-    -->
 
     <oauth:client-details-service id="clientDetailsService">
         <oauth:client

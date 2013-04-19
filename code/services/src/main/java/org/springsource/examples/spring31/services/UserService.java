@@ -1,6 +1,5 @@
 package org.springsource.examples.spring31.services;
 
-
 import com.mongodb.gridfs.GridFSDBFile;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -36,15 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
- * there are several components that need to know and understand this system's notion of users,
- * generally we need an object that knows how to administer users (this class' primary responsibility)
- * and we need an object that can tell Spring Security OAuth how to communicate with the user database
- * (an implementation of {@link UserDetailsService UserDetailsService}, which this class implements,
- * and we need a class that can tell Spring Security OAuth about which rights users have to which
- * resources (an implementation of {@link ClientDetailsService ClientDetailsService}, which this also class
- * implements).
- *
- * @author Josh Long
+ * there are several components that need to know and understand this system's notion of users, * generally we need an object that knows how to administer users (this class' primary responsibility) * and we need an object that can tell Spring Security OAuth how to communicate with the user database * (an implementation of {@link UserDetailsService UserDetailsService}, which this class implements, * and we need a class that can tell Spring Security OAuth about which rights users have to which * resources (an implementation of {@link ClientDetailsService ClientDetailsService}, which this also class * implements). * * @author Josh Long
  */
 @SuppressWarnings("unused")
 @Service
@@ -52,27 +43,13 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Transactional
 public class UserService implements UserDetailsService {
 
-    public boolean isCorrectUser(long userId) {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = securityContext.getAuthentication();
-        CrmUserDetails crmUserDetails = (CrmUserDetails) authentication.getPrincipal();
-        return userId == crmUserDetails.getUser().getId();
-    }
-
-    public static final String USER_ID_IS_PRINCIPAL_ID = " authentication.principal.user.id == #userId " ;
-//            " T(org.springframework.security.core.context.SecurityContextHolder).context.authentication.principal.user.id == #userId   "; //
-
+    public static final String USER_ID_IS_PRINCIPAL_ID = " authentication.principal.user.id == #userId ";
     public static final String SCOPE_READ = "read";
     public static final String SCOPE_WRITE = "write";
-
     public static final String ROLE_USER = "ROLE_USER";
-
     public static final String USER_CACHE_REGION = "users";
-
     private Logger logger = Logger.getLogger(getClass().getName());
-
     private Map<String, Set<String>> multiMapOfExtensionsToVariants = new ConcurrentHashMap<String, Set<String>>();
-
     private GridFsTemplate gridFsTemplate;
     private EntityManager entityManager;
 
@@ -83,23 +60,13 @@ public class UserService implements UserDetailsService {
 
     @PostConstruct
     public void begin() {
-
         String jpg = "jpg", gif = "gif", png = "png";
-
-        // build up base variants collection
         for (String e : new String[]{jpg, gif, png})
             multiMapOfExtensionsToVariants.put(e, new ConcurrentSkipListSet<String>());
-
-        // add each key as a variant, even though its the canonical variant
-        for (String k : this.multiMapOfExtensionsToVariants.keySet())
-            multiMapOfExtensionsToVariants.get(k).add(k);
-
-        // add others
+        for (String k : this.multiMapOfExtensionsToVariants.keySet()) multiMapOfExtensionsToVariants.get(k).add(k);
         multiMapOfExtensionsToVariants.get(jpg).add("jpeg");
-
-        if (logger.isDebugEnabled())
-            for (String k : this.multiMapOfExtensionsToVariants.keySet())
-                logger.debug(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
+        if (logger.isDebugEnabled()) for (String k : this.multiMapOfExtensionsToVariants.keySet())
+            logger.debug(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
     }
 
     @Inject
@@ -141,7 +108,6 @@ public class UserService implements UserDetailsService {
 
     public User login(String username, String password) {
         User user = loginByUsername(username);
-
         if (user != null && user.getPassword().equalsIgnoreCase(password)) {
             return user;
         }
@@ -152,7 +118,6 @@ public class UserService implements UserDetailsService {
         assert StringUtils.hasText(username) : "the 'username' can't be null";
         assert StringUtils.hasText(pw) : "the 'password' can't be null";
         assert loginByUsername(username) == null : "there is already an existing User with the username '" + username + "'";
-
         User user = new User();
         user.setUsername(username);
         user.setFirstName(fn);
@@ -167,25 +132,17 @@ public class UserService implements UserDetailsService {
 
     @Cacheable(value = USER_CACHE_REGION)
     public User loginByUsername(String user) {
-        Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.username = :username", User.class)
-                .setParameter("username", user)
-                .getResultList();
+        Collection<User> customers = entityManager.createQuery("select u from " + User.class.getName() + " u where u.username = :username", User.class).setParameter("username", user).getResultList();
         return firstOrNull(customers);
     }
 
     public User loginByUsernameAndPassword(String user, String pw) {
-        Collection<User> customers = entityManager.createQuery("select u from  " + User.class.getName() + " u where u.username = :u and u.password = :p", User.class)
-                .setParameter("u", user)
-                .setParameter("p", pw)
-                .getResultList();
+        Collection<User> customers = entityManager.createQuery("select u from " + User.class.getName() + " u where u.username = :u and u.password = :p", User.class).setParameter("u", user).setParameter("p", pw).getResultList();
         return firstOrNull(customers);
-
     }
-
 
     @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public void writeUserProfilePhoto(long userId, String ogFileName, InputStream inputStream) throws Throwable {
-
         final User usr = getUserById(userId);
         final String ext = deriveFileExtension(ogFileName);
         String fileName = fileNameForUserIdProfilePhoto(userId);
@@ -214,8 +171,7 @@ public class UserService implements UserDetailsService {
         User user = getUserById(userId);
         assert user != null : "you must specify a valid userId";
         String fileName = fileNameForUserIdProfilePhoto(userId);
-        if (logger.isInfoEnabled())
-            logger.info("looking for file '" + fileName + "'");
+        if (logger.isInfoEnabled()) logger.info("looking for file '" + fileName + "'");
         GridFSDBFile gridFSFile;
         if ((gridFSFile = gridFsTemplate.findOne((new Query().addCriteria(Criteria.where("filename").is(fileName))))) == null) {
             logger.debug("couldn't find the user profile byte[]s for user #" + userId);
@@ -238,18 +194,14 @@ public class UserService implements UserDetailsService {
     @Override
     public CrmUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = loginByUsername(username);
-        if (null == user)
-            return null;
+        if (null == user) return null;
         return new CrmUserDetails(user);
     }
-
 
     /**
      * Implementation of Spring Security's {@link org.springframework.security.core.userdetails.UserDetails UserDetails} contract
      */
     public static class CrmUserDetails implements UserDetails {
-
-
         private Collection<GrantedAuthority> grantedAuthorities;
         private User user;
 
@@ -257,10 +209,8 @@ public class UserService implements UserDetailsService {
             assert user != null : "the provided user reference can't be null";
             this.user = user;
             this.grantedAuthorities = new ArrayList<GrantedAuthority>();
-
             for (String ga : Arrays.asList(ROLE_USER, SCOPE_READ, SCOPE_WRITE))
                 this.grantedAuthorities.add(new SimpleGrantedAuthority(ga));
-
         }
 
         @Override
@@ -301,7 +251,6 @@ public class UserService implements UserDetailsService {
         public User getUser() {
             return this.user;
         }
-
     }
 
     private String deriveFileExtension(final String fileName) {
@@ -309,8 +258,7 @@ public class UserService implements UserDetailsService {
         for (String k : multiMapOfExtensionsToVariants.keySet()) {
             Collection<String> variants = multiMapOfExtensionsToVariants.get(k);
             for (String var : variants) {
-                if (lowerCaseFileName.endsWith(var))
-                    return k;
+                if (lowerCaseFileName.endsWith(var)) return k;
             }
         }
         return null;
@@ -319,7 +267,6 @@ public class UserService implements UserDetailsService {
     private String fileNameForUserIdProfilePhoto(long userId) {
         return String.format("user%sprofilePhoto", Long.toString(userId));
     }
-
 
     private boolean ensureRemovalOfFile(File file) {
         return null != file && (!file.exists() || file.delete());

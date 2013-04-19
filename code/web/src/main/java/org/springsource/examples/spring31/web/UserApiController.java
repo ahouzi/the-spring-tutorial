@@ -3,6 +3,7 @@ package org.springsource.examples.spring31.web;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springsource.examples.spring31.services.User;
 import org.springsource.examples.spring31.services.UserService;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import java.io.InputStream;
 
 /**
@@ -83,12 +85,9 @@ public class UserApiController implements ApplicationListener<HttpSessionCreated
                                              UriComponentsBuilder componentsBuilder) throws Throwable {
 
         User user = this.userService.createOrGet(username, password, fn, ln, importedFromServiceProvider);
-
         UriComponents uriComponents = componentsBuilder.path(USER_COLLECTION_ENTRY_URL).buildAndExpand(user.getId());
-
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(uriComponents.toUri());
-
         return new ResponseEntity<User>(user, httpHeaders, HttpStatus.CREATED);
     }
 
@@ -116,3 +115,6 @@ public class UserApiController implements ApplicationListener<HttpSessionCreated
         System.out.println("Event: " + ToStringBuilder.reflectionToString(event));
     }
 }
+
+
+

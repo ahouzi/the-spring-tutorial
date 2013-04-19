@@ -29,7 +29,10 @@
     code, .git-code, .git-gist, .class-reference {
         font-family: courier, monospace;
         font-size: smaller; /* background-color: #dcdcdc;*/
-    } </style>
+    }
+
+
+    </style>
     <script type="text/javascript" lang="javascript"></script>
     <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/github-files.js"></script>
@@ -1274,7 +1277,8 @@ things ive added:
     sign out URL. </P>
 
 <DIV class="git-gist" gist="5230487"> spring security tags</DIV>
-<h2> Using Spring Security OAuth to Secure Access to our REST API </h2>
+<h1> Securing Our REST Service with Spring Security OAuth
+</h1>
 
 <p> Thus far, we've secured all access to our web application, but <EM>not</EM> the RESTful endpoints. A natural first
     step might be to secure the endpoints from access using the <CODE>http</CODE> elements in our Spring Security XML
@@ -1332,8 +1336,8 @@ things ive added:
     verify, that all clients transmit authentication credentials over something like SSL, which is tedious at best.
 </P>
 
-<h3>Introducing OAuth
-</h3>
+<h2>Introducing OAuth
+</h2>
 
 <div class="diagram"><img src="images/oauth.png" style="width: 300px"/> <span class="caption"> The OAuth logo</span>
 </div>
@@ -1370,10 +1374,7 @@ things ive added:
     <LI> The client keeps the access token and transmits it on each subsequent request.
     </LI>
 </OL>
-<div class="todo">
 
-
-</div>
 <div class="diagram">
 
     <img src="images/oauth-cdraw.png"/>
@@ -1402,6 +1403,51 @@ things ive added:
 
 </P>
 
+<h2>Configuring Spring Security OAuth
+</h2>
+
+<h3> The Authorization Server
+</h3>
+
+<P>
+
+    First, we must configure an authorization server. The
+    authorization server lives on the service provider side and handles inbound OAuth requests.
+
+    It knows what to do when a request is made asking for permission to connect using OAuth. It delegates to a <span  class="class-reference" module="spring-security-oauth" q="tut_security">org.springframework.security.oauth2.provider.ClientDetailsService</span>
+    instance -
+    which we'll configure below - to figure out how specifically to resolve requests made by <CODE>client</CODE>s.
+    Here's our configuration for the authorization server.
+
+</P>
+
+<div class="git-gist" gist="5422069">
+
+   <!-- <oauth:authorization-server client-details-service-ref="clientDetailsService"
+                                token-services-ref="tokenServices"
+                                user-approval-handler-ref="oauthTokenServicesUserApprovalHandler">
+        <oauth:authorization-code/>-->
+</div>
+
+<P> The
+ <Code>client-details-service-ref</Code> references an instance of the <CODE>ClientDetailsService</CODE>. The <CODE>token-services-ref</CODE> references an instance of
+    <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.token.DefaultTokenServices</CODE>, which keeps information about
+    configured tokens in-memory so that tokens for clients that have already authenticated can be re-issued quickly.  The <CODE>user-approval-handler</CODE> attribute references an instance of
+      <CODE class="class-reference" q="tut_security" module="web">org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler</CODE>, which is a custom class
+    that I've written to give special treatment to requests being made of this application. In particular, this implementation simply adds one more check to the authentication flow
+    than the out-of-the-box solution - <CODE class="class-reference" q="tut_security" module="spring-security-oauth">org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler</CODE>
+    provides to check to see if we already have an authenticated Spring Security user in the Spring Security context.  This will only happen if the user has successfully authenticated through the sign in form in the web application, and has been authenticated.
+     If the user is already authenticated, then there is hardly any need to force them to re-authenticate, so we skip that step altogether and simply approve the authentication request.
+
+
+</P>
+<div module="web" q="tut_security" extension="java" class="git-code">
+    org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler
+</div>
+
+<h3> The Resource Server
+</h3>
+
 <h3> The Spring Security OAuth Client
 </h3>
 
@@ -1423,29 +1469,57 @@ things ive added:
     A client may have different <B>authorization grant types</b>.
     There are four different types of <em>authorization grant types</em>:
 
-    <CODE>authorization_code</CODE>, <CODE>password</CODE>, <CODE>assertion</CODE>,
-    and <CODE>refresh_token</CODE>. If left unspecified, Spring Security wil handle
-    both <CODE>authorization_code</CODE> and <CODE>refresh_token</CODE> grant types by default.
-    An authorization grant type
-    specifies how the client is to exchange information with the server. The various options mostly relate to how
-    much you trust the environment the client is running in.
-
-    For more, refer to this <A href="http://tutorials.jenkov.com/oauth2/authorization.html">great writeup of the various
-    grant types</a>.
-
-    Since our client is running in the browser, and only manipulating his own data, we
-
-
+    <CODE>authorization_code</CODE>, <CODE>implicit</CODE>, <CODE>password</CODE>, <CODE>assertion</CODE>,
+    and <CODE>refresh_token</CODE>. If left unspecified, Spring Security wil handle both <CODE>authorization_code</CODE>
+    and <CODE>refresh_token</CODE> grant types by default.
+    An authorization grant type specifies how the client is to exchange information with the server. The various options
+    mostly relate to how
+    much you trust the environment the client is running in. For more, refer to this <A
+        href="http://tutorials.jenkov.com/oauth2/authorization.html">great writeup of the various
+    grant types</a>. Since our client is running in the browser, and only manipulating his own data, we
+    can use the <CODE>implicit</CODE> flow.
+    To configure clients with Spring Security, we need to use the XML namespace DSL, like this:
 </p>
+
+<DIV class="git-gist" gist="5421884">
+
+    client-details-service ...
+    implicit
+</DIV>
+<h3>Why We Chose the <CODE>implicit</CODE> flow
+</h3>
+
+<P>
+    Consuming OAuth services from JavaScript running in the browser - where any one may look at the code -
+    means that we can't have any shared secrets like passwords from the client to the service.
+
+    After all, what's the point of a password if everyone can see it?
+
+    JavaScript runs in the browser. You can easily build applications with rich client-side state. You might for example
+    build an application that handles drawing images and lets you manipulate shapes on the canvas. You've finally
+    finished your master piece, and now you
+    want to "save" it to an image in your account. A traditional OAuth flow requires that the OAuth flow be initiated
+    and - once completed - the service provider is to make an HTTP GET
+    request of the application where the client lives. The HTTP request will ultimately contain the access token our
+    client needs to successfully save the data, but an HTTP GET would cause the page
+    to be reloaded - we'd lose our work and client-side state! An OAuth <CODE>implicit</CODE> flow solves this problem
+    by simply appending a value to the URL's hash segment (of the form <CODE>#foo=bar</CODE>).
+    If a browser is on a certain page, and some code changes the URL's hash segment, this does <EM>not</EM> require a
+    reload: your application state will be preserved.
+    And - as a nice bonus - JavaScript <EM>can</EM> see the changed hash and act on it. In this case, it can retreive
+    the access token from the hash segment and then use that to proceed with the secure operation.
+
+</P>
 
 <P>
 
     All requests handled by Spring Security OAuth have both a specified <EM>client</EM>
-    as well as a specified <em>access token</EM>.
+    as well as a specified <em>access token</EM>. If a program makes a request of the server with just a client, but no
+    access token, Spring Security OAuth triggers
+    an HTTP redirect to the URL of the service provider where the user will be prompted to sign in if not already signed
+    in, and optionally the user will be prompted to grant permission to the client (if not already specified).
 
-    If a program makes a request of the server with just a client, but no access token, Spring Security OAuth triggers
-    an HTTP redirect to
-    the URL of the provider of the
+    We're using a
 
     <!--   So, for example, you might today build the HTML5 and Ajax-based web application for
         our OAuth service, and tomorrow you might build an iOS client, an Android client, a Windows Mobile client, a BlackBerry client, etc. Each one of these client
@@ -1454,15 +1528,26 @@ things ive added:
 
 </P>
 <!--
-Steps for SS OAuth :
- * add the clientuserdetails api
- * add OAuth endpoints to handle the various coordination calls
- * secure the OAuth endpoints
- *
+
+SSOAuth requires:
+
+ - add Spring Security http:* elements
+ - add client-details-service
+ - decide which kind of client flow u want (implicit for javascript clients, for example)
+ - add oauth resource server configuration
+ - make sure u have Spring Security so that SSO has some way to prompt users for secrutiy credentials
+ - jar coords in gradle / mvn
+ - setup a client that successfully interacts with the auth server / resource server and that successfully presents 'Authorization Bearer...' (do it with curl or Spring Rest Shell)
 
 -->
 <P>
-    connect the client
+
+    OAuth defines several different required endpoints for the auth server. These are the endpoints that are called
+    during the authentication handshake. There is one that is already available from the Spring Social examples, and
+    I've simply copied-and-pasted that example below.
+
+    <!--http://tutorials.jenkov.com/oauth2/endpoints.html-->
+
 </P>
 <a name="eof"></a></body>
 </html>
