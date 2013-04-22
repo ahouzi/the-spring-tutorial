@@ -5,8 +5,12 @@
 
 
 <div ng-controller="SignUpController">
+
     <tiles:insertTemplate template="/WEB-INF/layouts/components/box.jsp">
         <tiles:putAttribute name="content">
+            <div ng-show=" imported ">
+                <spring:message code="signup.almostThere"/>
+            </div>
             <form name="form" class="form-horizontal">
 
                 <div class="panel">

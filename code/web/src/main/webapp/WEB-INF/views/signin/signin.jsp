@@ -55,23 +55,26 @@
                                 <spring:message code="login.signin"/>
                             </button>
 
-                            <span>
+
 
                                 <spring:message code="login.buttons.dontHaveAccount"/>
 
+                                <span>
+                                    <a href="${pageContext.request.contextPath}/crm/signup.html"><spring:message
+                                            code="login.buttons.register"/></a>
+                                    |
+                                    <a ng-click="signinWithFacebook()" href="javascript:void(0);"><spring:message
+                                            code="login.buttons.withFacebook"/></a>
+                                </span>
 
-
-                                <a href="${pageContext.request.contextPath}/crm/signup.html">
-                                    <spring:message code="login.buttons.register"/>
-                                </a>
-
-                            </span>
-
-
-                        </div>
                     </fieldset>
                 </div>
             </form:form>
+            <c:url var="signinWithProvider" value="/signin/facebook"/>
+            <form method="POST" id="signinWithFacebook" action="${signinWithProvider}">
+            </form>
+
+
         </tiles:putAttribute>
     </tiles:insertTemplate>
 </div>

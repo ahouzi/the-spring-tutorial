@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -74,6 +75,7 @@ public class UserService implements UserDetailsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
+
     @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public User updateUser(long userId, String un, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User user = getUserById(userId);
@@ -130,6 +132,13 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+   public Authentication establishSpringSecurityLogin(String localUserId) {
+        UserService.CrmUserDetails details = loadUserByUsername(localUserId);
+        String pw = org.apache.commons.lang.StringUtils.defaultIfBlank(details.getPassword(), "");
+        Authentication toAuthenticate = new UsernamePasswordAuthenticationToken(details, pw, details.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(toAuthenticate);
+        return toAuthenticate;
+    }
     @Cacheable(value = USER_CACHE_REGION)
     public User loginByUsername(String user) {
         Collection<User> customers = entityManager.createQuery("select u from " + User.class.getName() + " u where u.username = :username", User.class).setParameter("username", user).getResultList();

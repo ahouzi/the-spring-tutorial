@@ -9,6 +9,8 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.multipart.support.MultipartFilter;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springsource.examples.spring31.web.config.SecurityConfiguration;
+import org.springsource.examples.spring31.web.config.SocialConfiguration;
 import org.springsource.examples.spring31.web.config.WebMvcConfiguration;
 
 import javax.servlet.*;
@@ -25,9 +27,9 @@ import java.util.Date;
 @SuppressWarnings("unused")
 public class CrmWebApplicationInitializer implements WebApplicationInitializer {
 
-    private String patternAll = "/";
+    private final String patternAll = "/";
 
-    private String springServletName = "spring";
+    private final String springServletName = "spring";
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
@@ -37,7 +39,8 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
         servletContext.addListener(new HttpSessionEventPublisher());
-        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, WebMvcConfiguration.class)));
+        servletContext.addListener(new ContextLoaderListener(
+                buildWebApplicationContext(servletContext, SocialConfiguration.class, SecurityConfiguration.class,  WebMvcConfiguration.class)));
 
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
@@ -50,9 +53,9 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
 
     protected void registerFilter(ServletContext servletContext, String name, Filter filter) {
         FilterRegistration.Dynamic filterRegistration = servletContext.addFilter(name, filter);
-        filterRegistration.setAsyncSupported(true);
         filterRegistration.addMappingForUrlPatterns(null, true, this.patternAll);
         filterRegistration.addMappingForServletNames(null, true, this.springServletName);
+        filterRegistration.setAsyncSupported(true);
     }
 
     protected WebApplicationContext buildWebApplicationContext(ServletContext servletContext, Class... configClasses) {

@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.vote.ScopeVoter;
+import org.springsource.examples.spring31.services.UserService;
 import org.springsource.examples.spring31.web.oauth.RoleAwareOAuthTokenServicesUserApprovalHandler;
 
 import java.util.ArrayList;
@@ -96,6 +97,8 @@ public class SecurityConfiguration {
         approvalHandler.setTokenServices(tokenServices);
         return approvalHandler;
     }
+
+
 
 }
 

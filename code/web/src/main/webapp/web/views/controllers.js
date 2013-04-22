@@ -38,7 +38,7 @@ module.factory('ajaxUtils', function () {
     var scopes = ['read', 'write'];
     var resources = {};
     resources[oauthResource] = {
-        client_id:clientId ,// crmSession.getUserId() + '',
+        client_id: clientId,// crmSession.getUserId() + '',
         isDefault: true,
         redirect_uri: window.location.href + '',
         authorization: '/oauth/authorize',
@@ -209,7 +209,7 @@ module.factory('userService', function (ajaxUtils) {
             return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
         },
         isUserNameTaken: function (username, cb) {
-            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames/' + username);
+            var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames?username=' + username);
             console.log('url for isUserNameTaken is ' + url);
             ajaxUtils.get(url, {}, cb);
         },
@@ -463,7 +463,7 @@ function CustomerController($scope, customerService, ajaxUtils) {
 
             customerService.deleteCustomerById(userId, customer.id, function () {
                 $scope.refreshCustomers()
-            })
+            });
             //$scope.customers[arrIndx].remove();
         });
         console.log('deleteCustomer() does not currently actually delete a resource on the server...');
@@ -483,8 +483,7 @@ function CustomerController($scope, customerService, ajaxUtils) {
                 console.log('refreshed customers result = ' + customers.length)
             });
         })
-    }
-    ;
+    }  ;
 
     $scope.addCustomer = function () {
         var fn = $scope.firstName, ln = $scope.lastName;
@@ -514,7 +513,11 @@ function CustomerController($scope, customerService, ajaxUtils) {
  * @constructor
  */
 function SignUpController($rootScope, $scope, $q, $timeout, ajaxUtils, userService, $location) {
-    $scope.user = {username: null, firstName: null, lastName: null };
+    $scope.user = {
+        username: null,
+        firstName: null,
+        lastName:  null
+    };
 
     $scope.loadUser = function () {
     }; // noop
