@@ -96,7 +96,9 @@
 --%>
 
 <div id="copyright">
+<%--
     <spring:message code="brought-to-you-by"/> <A href="http://www.springsource.org">SpringSource</a>.
+--%>
 </div>
 </body>
 </html>
