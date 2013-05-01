@@ -24,10 +24,6 @@ public class RoleAwareOAuthTokenServicesUserApprovalHandler extends TokenService
     }
 
 
-    @Override
-    public AuthorizationRequest updateBeforeApproval(AuthorizationRequest authorizationRequest, Authentication userAuthentication) {
-        return super.updateBeforeApproval(authorizationRequest, userAuthentication);
-    }
 
     /**
      * Allows automatic approval for a white list of clients in the implicit grant case.
