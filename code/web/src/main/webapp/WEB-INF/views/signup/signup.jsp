@@ -23,7 +23,7 @@
 
 
                         <div class="control-group ${cgClass}">
-                            <label class="control-label" for="username"><spring:message code="signup.email"/>:</label>
+                            <label class="control-label" for="username"><spring:message code="signup.username"/>:</label>
 
                             <div class="controls"><input class="input-xlarge"
                                                          id="username"
@@ -34,14 +34,14 @@
                                                          required="required"
                                                          ng-model="user.username"/>
                                 <span ng-show="${error}" class="help-block">
-                                <spring:message code="signup.email.prompt"/>
+                                <spring:message code="signup.username.prompt"/>
                                 </span>
                                 <span ng-show="form.username.$error.validUsername" class="help-block">
 
-                                     <spring:message code="profile.email.error.invalid"/>
+                                     <spring:message code="profile.username.error.invalid"/>
                                 </span>
                                 <span ng-show="usernameTaken" class="help-block"> <spring:message
-                                        code="profile.email.error.taken"/>  </span>
+                                        code="profile.username.error.taken"/>  </span>
                             </div>
                         </div>
 

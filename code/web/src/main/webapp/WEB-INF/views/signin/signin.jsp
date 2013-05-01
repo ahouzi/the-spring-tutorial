@@ -27,7 +27,7 @@
 
                         <div class="control-group ${cgClass}">
                             <label class="control-label" for="j_username">
-                                <spring:message code="login.email"/>:</label>
+                                <spring:message code="login.username"/>:</label>
 
                             <div class="controls">
                                 <input class="input-xlarge" id="j_username" name="j_username" type="text"

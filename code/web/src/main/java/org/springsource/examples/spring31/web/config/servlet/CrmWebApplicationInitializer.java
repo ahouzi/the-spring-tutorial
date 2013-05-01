@@ -2,25 +2,19 @@ package org.springsource.examples.spring31.web.config.servlet;
 
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.*;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.filter.*;
 import org.springframework.web.multipart.support.MultipartFilter;
 import org.springframework.web.servlet.DispatcherServlet;
-import org.springsource.examples.spring31.web.config.SecurityConfiguration;
-import org.springsource.examples.spring31.web.config.SocialConfiguration;
-import org.springsource.examples.spring31.web.config.WebMvcConfiguration;
+import org.springsource.examples.spring31.web.config.*;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-import java.util.Date;
 
 /**
  * Simple replacement for <CODE>web.xml</CODE> that is constructed entirely in Java code.
+ * This class is picked up at runtime and then given a chance to run when the container starts up,
+ * exactly as the <CODE>web.xml</CODE> would be consulted at startup.
  *
  * @author Josh Long
  */
@@ -28,7 +22,6 @@ import java.util.Date;
 public class CrmWebApplicationInitializer implements WebApplicationInitializer {
 
     private final String patternAll = "/";
-
     private final String springServletName = "spring";
 
     @Override
@@ -39,9 +32,7 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
         servletContext.addListener(new HttpSessionEventPublisher());
-        servletContext.addListener(new ContextLoaderListener(
-                buildWebApplicationContext(servletContext, SocialConfiguration.class, SecurityConfiguration.class,  WebMvcConfiguration.class)));
-
+        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, SocialConfiguration.class, SecurityConfiguration.class, WebMvcConfiguration.class)));
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);

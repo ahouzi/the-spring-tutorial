@@ -4,21 +4,16 @@ import com.mongodb.gridfs.GridFSDBFile;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.context.annotation.*;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +21,10 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import javax.persistence.*;
+import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.*;
 
 /**
  * there are several components that need to know and understand this system's notion of users, * generally we need an object that knows how to administer users (this class' primary responsibility) * and we need an object that can tell Spring Security OAuth how to communicate with the user database * (an implementation of {@link UserDetailsService UserDetailsService}, which this class implements, * and we need a class that can tell Spring Security OAuth about which rights users have to which * resources (an implementation of {@link ClientDetailsService ClientDetailsService}, which this also class * implements). * * @author Josh Long
@@ -139,6 +130,7 @@ public class UserService implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(toAuthenticate);
         return toAuthenticate;
     }
+
     @Cacheable(value = USER_CACHE_REGION)
     public User loginByUsername(String user) {
         Collection<User> customers = entityManager.createQuery("select u from " + User.class.getName() + " u where u.username = :username", User.class).setParameter("username", user).getResultList();
@@ -169,7 +161,7 @@ public class UserService implements UserDetailsService {
         ByteArrayInputStream byteArrayInputStream = null;
         try {
             byteArrayInputStream = new ByteArrayInputStream(bytes);
-            writeUserProfilePhoto(userId, ogFileName, bytes);
+            writeUserProfilePhoto(userId, ogFileName, byteArrayInputStream);
         } finally {
             IOUtils.closeQuietly(byteArrayInputStream);
         }

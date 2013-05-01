@@ -1,25 +1,15 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.session.HttpSessionCreatedEvent;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springsource.examples.spring31.services.User;
-import org.springsource.examples.spring31.services.UserService;
+import org.springframework.web.util.*;
+import org.springsource.examples.spring31.services.*;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.io.InputStream;
 
 /**
@@ -33,10 +23,10 @@ public class UserApiController  {
     /**
      * Root URL template for all modifications to a {@link User}
      */
-    static public final String USER_COLLECTION_URL = "/api/users";
+    public static final String USER_COLLECTION_URL = "/api/users";
     public static final String USER_COLLECTION_USERNAMES_URL = USER_COLLECTION_URL + "/usernames";
-    static public final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
-    static public final String USER_COLLECTION_ENTRY_PHOTO_URL = USER_COLLECTION_ENTRY_URL + "/photo";
+    public static final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
+    public static final String USER_COLLECTION_ENTRY_PHOTO_URL = USER_COLLECTION_ENTRY_URL + "/photo";
 
   //  static public final String PRINCIPAL_IS_REQUESTED_USER = "#userId == principal.id";
 
@@ -71,9 +61,7 @@ public class UserApiController  {
     @RequestMapping(value = USER_COLLECTION_USERNAMES_URL, method = RequestMethod.GET)
     @ResponseBody
     public boolean isUserNameTaken(@RequestParam("username") String username) {
-        boolean taken = this.userService.isUserNameAlreadyTaken(username);
-        log.debug("the username " + username + " is taken? " + taken + ".");
-        return taken;
+        return this.userService.isUserNameAlreadyTaken(username);
     }
 
     @RequestMapping(value = USER_COLLECTION_URL, method = RequestMethod.POST)
