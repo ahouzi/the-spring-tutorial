@@ -32,7 +32,7 @@ public class CrmWebApplicationInitializer implements WebApplicationInitializer {
         registerFilter(servletContext, "multipartFilter", new MultipartFilter());
 
         servletContext.addListener(new HttpSessionEventPublisher());
-        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, SocialConfiguration.class, SecurityConfiguration.class, WebMvcConfiguration.class)));
+        servletContext.addListener(new ContextLoaderListener(buildWebApplicationContext(servletContext, SocialConfiguration.class, SecurityConfiguration.class, MobileConfiguration.class, WebMvcConfiguration.class)));
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet();
         dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);

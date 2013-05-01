@@ -3,13 +3,13 @@
         "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 
 <tiles-definitions>
-
+          <!--templateExpression="/WEB-INF/layouts/${currentDevice.mobile ? 'mobile/' : 'standard/'}page.jsp">-->
 
     <definition name="oops" extends="page">
 
         <put-attribute name="navigation" value=" "/>
 
-        <put-attribute name="content" value="/WEB-INF/views/oops/oops.jsp"/>
+        <put-attribute name="content" expression ="/WEB-INF/views/oops/${clientPlatform}/oops.jsp"/>
     </definition>
 
 </tiles-definitions>

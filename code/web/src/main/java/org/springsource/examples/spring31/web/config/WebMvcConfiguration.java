@@ -1,43 +1,32 @@
 package org.springsource.examples.spring31.web.config;
 
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.*;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
-import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
-import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+import org.springframework.http.converter.xml.*;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.*;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.i18n.*;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
-import org.springframework.web.servlet.view.tiles2.TilesView;
+import org.springframework.web.servlet.view.tiles2.*;
 import org.springsource.examples.spring31.services.CustomerService;
 import org.springsource.examples.spring31.web.UserApiController;
 import org.springsource.examples.spring31.web.interceptors.CrmHttpServletRequestEnrichingInterceptor;
 import org.springsource.examples.spring31.web.util.HibernateAwareObjectMapper;
 
 import javax.xml.transform.Source;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackageClasses = {  UserApiController.class, CustomerService.class})
+@ComponentScan(basePackageClasses = {UserApiController.class, CustomerService.class})
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     private int maxUploadSizeInMb = 5 * 1024 * 1024; // 5 MB
@@ -61,14 +50,13 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         return tilesConfigurer;
     }
 
-
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/web*").addResourceLocations("/web/");
     }
 
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("signin");
-        for (String p : new String[]{/*"signup", */"signin", "profile", "customers", "home", "oops"})
+        for (String p : new String[]{"signin", "profile", "customers", "home", "oops"})
             registry.addViewController(String.format("/crm/%s.html", p)).setViewName(p);
     }
 
@@ -82,7 +70,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         simpleMappingExceptionResolver.setDefaultStatusCode(404);
         exceptionResolvers.add(simpleMappingExceptionResolver);
     }
-
 
     // i18n
     @Override
@@ -104,7 +91,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         resourceBundleMessageSource.setBasename("messages");
         return resourceBundleMessageSource;
     }
-
 
     // file uploads
     @Bean

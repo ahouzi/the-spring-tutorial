@@ -4,7 +4,7 @@
 
 <tiles-definitions>
     <definition name="profile" extends="page">
-        <put-attribute name="content" value="/WEB-INF/views/profile/profile.jsp"/>
+        <put-attribute name="content" expression ="/WEB-INF/views/profile/${clientPlatform}/profile.jsp"/>
     </definition>
 
 </tiles-definitions>

@@ -5,7 +5,7 @@
 <tiles-definitions>
 
     <definition name="customers" extends="page">
-        <put-attribute name="content" value="/WEB-INF/views/customers/customers.jsp"/>
+         <put-attribute name="content" expression ="/WEB-INF/views/customers/${clientPlatform}/customers.jsp"/>
         <put-attribute name="navigation" value=" "/>
     </definition>
 

@@ -4,7 +4,7 @@
 
 <tiles-definitions>
     <definition name="signin"   extends="page">
-        <put-attribute name="content" value="/WEB-INF/views/signin/signin.jsp"/>
+        <put-attribute name="content" value="/WEB-INF/views/signin/desktop/signin.jsp"/>
     </definition>
 
 </tiles-definitions>

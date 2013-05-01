@@ -11,6 +11,10 @@
     <packaging>war</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.mobile</groupId>
+            <artifactId>spring-mobile-device</artifactId>
+         </dependency>
 
         <dependency>
             <groupId>com.fasterxml</groupId>

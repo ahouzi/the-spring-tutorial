@@ -1,17 +1,14 @@
 package org.springsource.examples.spring31.web.interceptors;
 
+import org.springframework.mobile.device.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.context.request.WebRequestInterceptor;
+import org.springframework.web.context.request.*;
 import org.springsource.examples.spring31.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * We need a place to store common attributes if they're available.
@@ -22,6 +19,7 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
 
     private String usernameAttribute = "username";
     private String userIdAttribute = "userId";
+    private String clientPlatformAttribute = "clientPlatform";
     private String fullUrlAttribute = "fullUrl";
 
     public void setFullUrlAttribute(String u) {
@@ -47,14 +45,20 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
     private Map<String, Object> buildAttributesToContributeToRequest(ServletWebRequest swr) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+
         Map<String, Object> kvs = new HashMap<String, Object>();
-        kvs.put( this.fullUrlAttribute, buildFullUrlAttribute(swr));
+        kvs.put(this.fullUrlAttribute, buildFullUrlAttribute(swr));
 
         // let's see if the 'username' attribute is available
         HttpServletRequest httpServletRequest = swr.getNativeRequest(HttpServletRequest.class);
+
+
+        if (null != this.clientPlatformAttribute)
+            kvs.put(this.clientPlatformAttribute, deriveCurrentClientPlatform(httpServletRequest))   ;
+
         String usernameValue = httpServletRequest.getParameter(this.usernameAttribute);
 
-        if (null !=  this.usernameAttribute)
+        if (null != this.usernameAttribute)
             kvs.put(this.usernameAttribute, usernameValue);
 
         // not authenticated? principal is an AnonymousPrincipal
@@ -67,6 +71,13 @@ public class CrmHttpServletRequestEnrichingInterceptor implements WebRequestInte
         return kvs;
     }
 
+    private String deriveCurrentClientPlatform(HttpServletRequest httpServletRequest) {
+        Device device = DeviceUtils.getCurrentDevice(httpServletRequest);
+        String platform = "desktop";
+        if (device.isMobile() || device.isTablet())
+            platform = "mobile";
+        return platform;
+    }
 
     private long buildUserIdAttribute(UserService.CrmUserDetails userDetails) {
         return userDetails.getUser().getId();
