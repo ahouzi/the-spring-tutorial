@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<LinearLayout android:padding="10px" xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout android:padding="10dp" xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/load" android:orientation="vertical" android:layout_width="fill_parent"
               android:layout_height="fill_parent">
 

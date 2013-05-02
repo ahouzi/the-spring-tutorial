@@ -12,11 +12,22 @@ import org.springsource.examples.sawt.web.android.R;
 import org.springsource.examples.sawt.web.android.Utils;
 import org.springsource.examples.sawt.web.android.model.Customer;
 
+/**
+ * this is the main entry point into the application, by default.
+ *
+ * @author Josh Long
+ */
 public class Welcome extends Activity {
 
     private Button newBtn;
     private Button editBtn;
     private EditText customerIdText;
+
+    /**
+     * spin off the new screen using an {@link Activity}. share state using the
+     * application context of sorts, the {@link CrmApplication#crmApplicationInstance(android.content.Context)}.
+     * @param c
+     */
 
     private void showEditorFor(Customer c) {
         CrmApplication.crmApplicationInstance(this).setCustomer(c);

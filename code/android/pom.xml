@@ -1,35 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springsource.examples.crm</groupId>
-        <artifactId>core</artifactId>
-        <version>1.0.0</version>
-    </parent>
-    <!--    <parent>
-        <groupId>org.springsource.examples.sawt</groupId>
-        <artifactId>core</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>-->
 
-
+    <groupId>org.springsource.examples.crm</groupId>
+    <version>1.0.0</version>
     <artifactId>android</artifactId>
-
-
     <packaging>apk</packaging>
-
     <properties>
-        <android.sdk.path>/Users/jlong/bin/android-sdk-macosx</android.sdk.path>
-        <android-platform>10</android-platform>
-        <android-emulator>nexus</android-emulator>
-        <maven-android-plugin-version>2.8.4</maven-android-plugin-version>
+        <android.sdk.path>${user.home}/bin/android-sdk-macosx</android.sdk.path>
+        <android.platform>17</android.platform>
+        <android.emulator>crm</android.emulator>
+        <maven.android.plugin.version>2.8.4</maven.android.plugin.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-        <android.version>2.3.1</android.version>
-        <spring.android.version>1.0.0.M4</spring.android.version>
+        <android.version>4.1.1.4</android.version>
+        <spring.android.version>1.0.1.RELEASE</spring.android.version>
         <!--<spring-social-version>1.0.0.M2</spring-social-version>-->
-        <simple-version>2.4.1</simple-version>
-        <android-rome-version>1.0.0-r2</android-rome-version>
+        <simple.version>2.4.1</simple.version>
+        <android.rome.version>1.0.0-r2</android.rome.version>
     </properties>
 
     <build>
@@ -43,8 +31,7 @@
                 <configuration>
 
                     <sdk>
-
-                        <platform>10</platform>
+                        <platform>17</platform>
                     </sdk>
                     <dex>
                         <jvmArguments>
@@ -58,46 +45,66 @@
                 <extensions>true</extensions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
-                </configuration>
-            </plugin>
+
         </plugins>
     </build>
 
 
     <dependencies>
 
+
+        <!--    <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version></version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.simpleframework</groupId>
+                <artifactId>simple-xml</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>stax</artifactId>
+                        <groupId>stax</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>stax-api</artifactId>
+                        <groupId>stax</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+    -->
+
+        <!--<dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+            <version>2.6.9</version>
+         </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
+            <version>1.9.11</version>
+         </dependency>
+
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2</version>
+          </dependency>
         <dependency>
-            <groupId>org.simpleframework</groupId>
-            <artifactId>simple-xml</artifactId>
-
-            <exclusions>
-                <exclusion>
-                    <artifactId>stax</artifactId>
-                    <groupId>stax</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>stax</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.1.2</version>
+          </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
@@ -111,6 +118,63 @@
         </dependency>
 
 
+
+        -->
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+            <version>2.6.9</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>stax</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>${android.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.android</groupId>
+            <artifactId>spring-android-auth</artifactId>
+            <version>${spring.android.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId><artifactId>spring-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.android</groupId>
+            <artifactId>spring-android-rest-template</artifactId>
+            <version>${spring.android.version}</version>
+        </dependency>
+        <!--
+spring-android-auth-{version}.jar
+spring-android-rest-template-{version}.jar
+spring-android-core-{version}.jar
+spring-security-crypto-{version}.jar
+spring-social-core-{version}.jar
+Each Spring Social provider may have additional dependencies. For example, to use Spring Social Twitter, the following jars are required.
+
+spring-social-twitter-{version}.jar
+spring-social-core-{version}.jar
+spring-security-crypto-{version}.jar
+jackson-mapper-asl-{version}.jar
+jackson-core-asl-{version}.jar
+-->
     </dependencies>
 
     <repositories>
