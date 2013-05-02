@@ -27,9 +27,9 @@ abstract public class ImageUtils {
     }
 
     public static MediaType deriveImageMediaType(byte imgBytes[]) throws Throwable {
-        byte[] first20Bytes = new byte[maximumHeaderCodeLength];
-        System.arraycopy(imgBytes, 0, first20Bytes, 0, first20Bytes.length);
-        char[] hexRepresentationOfFile = Hex.encodeHex(first20Bytes);
+        byte[] firstNBytes = new byte[maximumHeaderCodeLength];
+        System.arraycopy(imgBytes, 0, firstNBytes, 0, firstNBytes.length);
+        char[] hexRepresentationOfFile = Hex.encodeHex(firstNBytes);
         String headerCode = new String(hexRepresentationOfFile).toUpperCase();
         for (String headerCodeOption : mapOfHeaderCodesToTypes.keySet())
             if (headerCode.toLowerCase().startsWith(headerCodeOption.toLowerCase()))
@@ -37,21 +37,4 @@ abstract public class ImageUtils {
         return null;
     }
 
-  /*  public static void main(String[] args) throws Throwable {
-        File desktop = new File(SystemUtils.getUserHome(), "Desktop");
-        File[] file = {
-                new File(desktop, "foo.png"),
-                new File(desktop, "doggy.jpg"),
-                new File(desktop, "doggy.gif"),
-                new File(desktop, "doggy.tif"),
-                new File(desktop, "doggy.bmp")
-        };
-        for (File f : file) {
-            InputStream inputStream = new FileInputStream(f);
-            byte[] bytesForImage = IOUtils.toByteArray(inputStream);
-            System.out.println(StringUtils.repeat("-", 100));
-            System.out.println("file:" + f.getAbsolutePath());
-            System.out.println("media type " + deriveImageMediaType(bytesForImage));
-        }
-    }*/
 }
