@@ -55,8 +55,12 @@ public class UserService implements UserDetailsService {
         String jpg = "jpg", gif = "gif", png = "png";
         for (String e : new String[]{jpg, gif, png})
             multiMapOfExtensionsToVariants.put(e, new ConcurrentSkipListSet<String>());
-        for (String k : this.multiMapOfExtensionsToVariants.keySet()) multiMapOfExtensionsToVariants.get(k).add(k);
+
+        for (String k : this.multiMapOfExtensionsToVariants.keySet())
+            multiMapOfExtensionsToVariants.get(k).add(k);
+
         multiMapOfExtensionsToVariants.get(jpg).add("jpeg");
+
         if (logger.isDebugEnabled()) for (String k : this.multiMapOfExtensionsToVariants.keySet())
             logger.debug(k + "=" + this.multiMapOfExtensionsToVariants.get(k));
     }
