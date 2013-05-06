@@ -2,7 +2,7 @@ package org.springsource.examples.sawt.web.android;
 
 import android.text.Editable;
 import android.widget.EditText;
-
+@Deprecated
 public class Utils {
 
     public static String stringValueFor(Editable editable) {

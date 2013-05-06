@@ -208,6 +208,10 @@ module.factory('userService', function (ajaxUtils) {
         buildBaseUserApiUrl: function (userId) {
             return ajaxUtils.url(usersCollectionEntryUrl + '/' + userId);
         },
+        self : function(cb){
+            var url = ajaxUtils.url( '/api/self') ;
+             ajaxUtils.oauthGet( url, {}, cb);
+        },
         isUserNameTaken: function (username, cb) {
             var url = ajaxUtils.url(usersCollectionEntryUrl + '/usernames?username=' + username);
             console.log('url for isUserNameTaken is ' + url);
@@ -241,6 +245,8 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
     var profilePhotoUploadedEvent = 'profilePhotoUploadedEvent';  // broadcast when the profile photo's been changed
     var userLoadedEvent = 'userLoadedEvent'; // broadcast when the user being edited is loaded
     var profilePhotoNode = $('#profilePhoto');
+
+
 
     function setupFileDropZoneForUser(userId) {
 
@@ -367,8 +373,13 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
         }
     });
 
+
+
     $scope.loadUser = $scope.loadUser || function (userId) {
         userService.getUserById(userId, function (u) {
+
+
+
             $scope.$apply(function () {
                 $scope.user = u;
                 $scope.user.passwordConfirmation = u.password; // set it to the be the same thing initially
@@ -388,6 +399,7 @@ function ProfileController($rootScope, $scope, $q, $timeout, ajaxUtils, userServ
 
 
     $scope.loadUser(crmSession.getUserId());
+
 
 
 }

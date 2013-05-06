@@ -6,8 +6,8 @@ import org.simpleframework.xml.Attribute;
  * simple object to represent the server-side Customer entity
  *
  * @author Josh Long
- */
-public class Customer {
+ */    @Deprecated
+       public class Customer {
 
     @Attribute(required = false)
     private long id;

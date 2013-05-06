@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.*;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Service;
@@ -70,7 +70,6 @@ public class UserService implements UserDetailsService {
         this.gridFsTemplate = gridFsTemplate;
     }
 
-
     @PreAuthorize(USER_ID_IS_PRINCIPAL_ID)
     public User updateUser(long userId, String un, String pw, String fn, String ln, boolean importedFromServiceProvider) {
         User user = getUserById(userId);
@@ -127,7 +126,16 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-   public Authentication establishSpringSecurityLogin(String localUserId) {
+    // todo figure out why this method is being intercepted as not authorized when i call it and present a cached bearer token.
+    // might be easier
+    public User self() {
+        SecurityContext ctx = SecurityContextHolder.getContext();
+        Authentication authentication = ctx.getAuthentication();
+        UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) authentication.getDetails();
+        return crmUserDetails.getUser();
+    }
+
+    public Authentication establishSpringSecurityLogin(String localUserId) {
         UserService.CrmUserDetails details = loadUserByUsername(localUserId);
         String pw = org.apache.commons.lang.StringUtils.defaultIfBlank(details.getPassword(), "");
         Authentication toAuthenticate = new UsernamePasswordAuthenticationToken(details, pw, details.getAuthorities());
@@ -199,8 +207,33 @@ public class UserService implements UserDetailsService {
     @Override
     public CrmUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = loginByUsername(username);
-        if (null == user) return null;
+        if (null == user)
+            return null;
+
         return new CrmUserDetails(user);
+    }
+
+    private String deriveFileExtension(final String fileName) {
+        String lowerCaseFileName = fileName.toLowerCase();
+        for (String k : multiMapOfExtensionsToVariants.keySet()) {
+            Collection<String> variants = multiMapOfExtensionsToVariants.get(k);
+            for (String var : variants) {
+                if (lowerCaseFileName.endsWith(var)) return k;
+            }
+        }
+        return null;
+    }
+
+    private String fileNameForUserIdProfilePhoto(long userId) {
+        return String.format("user%sprofilePhoto", Long.toString(userId));
+    }
+
+    private boolean ensureRemovalOfFile(File file) {
+        return null != file && (!file.exists() || file.delete());
+    }
+
+    private <T> T firstOrNull(Collection<T> t) {
+        return t.size() > 0 ? t.iterator().next() : null;
     }
 
     /**
@@ -256,28 +289,5 @@ public class UserService implements UserDetailsService {
         public User getUser() {
             return this.user;
         }
-    }
-
-    private String deriveFileExtension(final String fileName) {
-        String lowerCaseFileName = fileName.toLowerCase();
-        for (String k : multiMapOfExtensionsToVariants.keySet()) {
-            Collection<String> variants = multiMapOfExtensionsToVariants.get(k);
-            for (String var : variants) {
-                if (lowerCaseFileName.endsWith(var)) return k;
-            }
-        }
-        return null;
-    }
-
-    private String fileNameForUserIdProfilePhoto(long userId) {
-        return String.format("user%sprofilePhoto", Long.toString(userId));
-    }
-
-    private boolean ensureRemovalOfFile(File file) {
-        return null != file && (!file.exists() || file.delete());
-    }
-
-    private <T> T firstOrNull(Collection<T> t) {
-        return t.size() > 0 ? t.iterator().next() : null;
     }
 }

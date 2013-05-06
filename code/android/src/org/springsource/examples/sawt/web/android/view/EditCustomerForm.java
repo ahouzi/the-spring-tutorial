@@ -1,25 +1,12 @@
 package org.springsource.examples.sawt.web.android.view;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import org.springframework.util.StringUtils;
-import org.springsource.examples.sawt.web.android.CrmApplication;
-import org.springsource.examples.sawt.web.android.R;
-import org.springsource.examples.sawt.web.android.Utils;
-import org.springsource.examples.sawt.web.android.model.Customer;
-import org.springsource.examples.sawt.web.android.service.CustomerService;
-import org.springsource.examples.sawt.web.android.service.CustomerServiceClient;
-
 /**
  * Android UI designed to support editing a single {@link org.springsource.examples.sawt.web.android.model.Customer} entity.
  */
-public class EditCustomerForm extends Activity implements View.OnClickListener {
+@Deprecated
+      public class EditCustomerForm /*extends Activity implements View.OnClickListener*/ {
 
-    private CustomerService customerService;
+  /*  private CustomerService customerService;
     private Button saveCustomer;
     private String baseServiceUrl;
     private TextView customerId;
@@ -33,7 +20,7 @@ public class EditCustomerForm extends Activity implements View.OnClickListener {
 
 
     private void setCustomer(Customer c) {
-        this.customerId.setText((c.getId() > 0) ? "#" + c.getId() + "" : getString(R.string.new_customer));
+//        this.customerId.setText((c.getId() > 0) ? "#" + c.getId() + "" : getString(R.string.new_customer));
         this.firstNameTextField.setText((StringUtils.hasText(c.getFirstName())) ? c.getFirstName() : "");
         this.lastNameTextField.setText((StringUtils.hasText(c.getLastName())) ? c.getLastName() : "");
         this.customer = c;
@@ -69,7 +56,7 @@ public class EditCustomerForm extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_customer);
 
-        this.baseServiceUrl = getString(R.string.base_uri);
+        this.baseServiceUrl = getString(R.string.base_url);
         this.customerService = new CustomerServiceClient(this.baseServiceUrl);
 
         // load UI components
@@ -81,5 +68,5 @@ public class EditCustomerForm extends Activity implements View.OnClickListener {
         saveCustomer.setOnClickListener(this);
 
     }
-
+*/
 }

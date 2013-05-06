@@ -3,7 +3,7 @@ package org.springsource.examples.sawt.web.android.service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springsource.examples.sawt.web.android.model.Customer;
-
+@Deprecated
 public class CustomerServiceClient implements CustomerService {
 
     private String baseServiceUrl;

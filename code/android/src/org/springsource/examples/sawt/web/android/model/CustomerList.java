@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * wrapper object for a collection of {@link Customer} entities
  */
-
+@Deprecated
 @Root(name = "customers")
 public class CustomerList {
 

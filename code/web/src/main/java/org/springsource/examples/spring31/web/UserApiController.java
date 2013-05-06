@@ -1,7 +1,7 @@
 package org.springsource.examples.spring31.web;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.*;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -18,20 +18,18 @@ import java.io.InputStream;
  * @author Josh Long
  */
 @Controller
-public class UserApiController  {
+public class UserApiController {
 
     /**
      * Root URL template for all modifications to a {@link User}
      */
+    public static final String USER_URL = "/api/self";
     public static final String USER_COLLECTION_URL = "/api/users";
     public static final String USER_COLLECTION_USERNAMES_URL = USER_COLLECTION_URL + "/usernames";
     public static final String USER_COLLECTION_ENTRY_URL = USER_COLLECTION_URL + "/{userId}";
     public static final String USER_COLLECTION_ENTRY_PHOTO_URL = USER_COLLECTION_ENTRY_URL + "/photo";
-
-  //  static public final String PRINCIPAL_IS_REQUESTED_USER = "#userId == principal.id";
-
-    private Logger log = Logger.getLogger(getClass());
     private UserService userService;
+    private Log log = LogFactory.getLog(getClass());
 
     @Inject
     public void setUserService(UserService userService) {
@@ -40,21 +38,26 @@ public class UserApiController  {
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.GET)
     @ResponseBody
-    public User getUserById(  @PathVariable("userId") Long userId) {
+    public User getUserById(@PathVariable("userId") Long userId) {
         return this.userService.getUserById(userId);
     }
 
-
+    @RequestMapping(value = USER_URL, method = RequestMethod.GET)
+    @ResponseBody
+    public User self() {
+        return userService.self();
+//        return crmUserDetails.getUser();
+    }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
     @ResponseBody
     public User updateUserById(
-                               @PathVariable("userId") Long userId,
-                               @RequestParam("username") String username,
-                               @RequestParam("password") String password,
-                               @RequestParam("firstname") String fn,
-                               @RequestParam("lastname") String ln) {
-        User existingUser = this.getUserById( userId);
+            @PathVariable("userId") Long userId,
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("firstname") String fn,
+            @RequestParam("lastname") String ln) {
+        User existingUser = this.getUserById(userId);
         return this.userService.updateUser(userId, username, password, fn, ln, existingUser.isImportedFromServiceProvider());
     }
 
@@ -79,7 +82,7 @@ public class UserApiController  {
         return new ResponseEntity<User>(user, httpHeaders, HttpStatus.CREATED);
     }
 
-     @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST)
+    @RequestMapping(value = USER_COLLECTION_ENTRY_PHOTO_URL, method = RequestMethod.POST)
     @ResponseBody
     public Long uploadBasedOnPathVariable(
             @PathVariable("userId") Long userId,

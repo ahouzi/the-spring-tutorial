@@ -23,8 +23,6 @@ public class RoleAwareOAuthTokenServicesUserApprovalHandler extends TokenService
         this.useTokenServices = useTokenServices;
     }
 
-
-
     /**
      * Allows automatic approval for a white list of clients in the implicit grant case.
      *
@@ -34,29 +32,26 @@ public class RoleAwareOAuthTokenServicesUserApprovalHandler extends TokenService
      */
     @Override
     public boolean isApproved(AuthorizationRequest authorizationRequest, Authentication userAuthentication) {
-
-        assert userAuthentication != null : "the userAuthentication can't be null";
-        assert authorizationRequest != null : "the authorizationRequest can't be null";
-
-        UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) userAuthentication.getPrincipal();
-
-        if (useTokenServices && super.isApproved(authorizationRequest, userAuthentication)) {
-            return true;
+        String clientId = authorizationRequest.getClientId();
+        if (clientId.equals("android-crm")) {
+            return super.isApproved(authorizationRequest, userAuthentication);
+        } else if (clientId.equals("html5-crm")) {
+            UserService.CrmUserDetails crmUserDetails = (UserService.CrmUserDetails) userAuthentication.getPrincipal();
+            if (useTokenServices && super.isApproved(authorizationRequest, userAuthentication)) {
+                return true;
+            }
+            if (!userAuthentication.isAuthenticated()) {
+                return false;
+            }
+            String flag = authorizationRequest.getApprovalParameters().get(AuthorizationRequest.USER_OAUTH_APPROVAL);
+            boolean approved = flag != null && flag.trim().toLowerCase().equals("true");
+            boolean tokenApproved =
+                    (authorizationRequest.getResponseTypes().contains("token") && null != crmUserDetails &&
+                            crmUserDetails.getUser() != null &&
+                            crmUserDetails.getUser().getId() > 0);
+            return approved || tokenApproved;
         }
-
-        if (!userAuthentication.isAuthenticated()) {
-            return false;
-        }
-
-        String flag = authorizationRequest.getApprovalParameters().get(AuthorizationRequest.USER_OAUTH_APPROVAL);
-        boolean approved = flag != null && flag.trim().toLowerCase().equals("true");
-
-        boolean tokenApproved =
-                (authorizationRequest.getResponseTypes().contains("token") && null != crmUserDetails &&
-                        crmUserDetails.getUser() != null &&
-                        crmUserDetails.getUser().getId() > 0);
-        return approved || tokenApproved;
-
+        return false;
     }
 
 }

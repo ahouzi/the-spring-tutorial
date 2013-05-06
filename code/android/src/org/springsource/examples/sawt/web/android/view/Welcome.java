@@ -2,22 +2,18 @@ package org.springsource.examples.sawt.web.android.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.*;
 import org.springframework.util.Assert;
-import org.springsource.examples.sawt.web.android.CrmApplication;
-import org.springsource.examples.sawt.web.android.R;
-import org.springsource.examples.sawt.web.android.Utils;
+import org.springsource.examples.sawt.web.android.*;
 import org.springsource.examples.sawt.web.android.model.Customer;
 
 /**
  * this is the main entry point into the application, by default.
  *
  * @author Josh Long
- */
-public class Welcome extends Activity {
+ */    @Deprecated
+       public class Welcome extends Activity {
 
     private Button newBtn;
     private Button editBtn;
@@ -53,7 +49,7 @@ public class Welcome extends Activity {
         }
     };
 
-    @Override
+/*    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome);
@@ -64,5 +60,5 @@ public class Welcome extends Activity {
         customerIdText = (EditText) findViewById(R.id.cid);
         editBtn = (Button) findViewById(R.id.customer_load_button);
         editBtn.setOnClickListener(editCustomerBtn);
-    }
+    }*/
 }
