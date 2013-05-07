@@ -51,8 +51,16 @@ public class UserApiController {
         return userService.self();
     }
 
+    /**
+     * an API endpoint to authenticate a user
+     *
+     * @param username
+     * @param password
+     * @return
+     * @throws Throwable
+     */
     @RequestMapping(value = "/api/signin")
-    public User signin(@RequestParam("username") String username, @RequestParam("password") String password) throws Throwable {
+    public ResponseEntity<User> signin(@RequestParam("username") String username, @RequestParam("password") String password) throws Throwable {
         UserService.CrmUserDetails details = userService.loadUserByUsername(username);
 
         String pw = org.apache.commons.lang.StringUtils.defaultIfBlank(password, "");
@@ -64,7 +72,7 @@ public class UserApiController {
         Authentication toAuthenticate = new UsernamePasswordAuthenticationToken(details, pw, details.getAuthorities());
         toAuthenticate.setAuthenticated(true);
         SecurityContextHolder.getContext().setAuthentication(toAuthenticate);
-        return details.getUser();
+        return new ResponseEntity<User>(details.getUser(), HttpStatus.OK);
 
     }
 
