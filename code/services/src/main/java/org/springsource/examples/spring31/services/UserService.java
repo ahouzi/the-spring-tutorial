@@ -14,7 +14,6 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.*;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -27,7 +26,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * there are several components that need to know and understand this system's notion of users, * generally we need an object that knows how to administer users (this class' primary responsibility) * and we need an object that can tell Spring Security OAuth how to communicate with the user database * (an implementation of {@link UserDetailsService UserDetailsService}, which this class implements, * and we need a class that can tell Spring Security OAuth about which rights users have to which * resources (an implementation of {@link ClientDetailsService ClientDetailsService}, which this also class * implements). * * @author Josh Long
+ * @author Josh Long
+ *
  */
 @SuppressWarnings("unused")
 @Service

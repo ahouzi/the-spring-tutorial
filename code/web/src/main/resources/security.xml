@@ -11,46 +11,10 @@
         <authentication-provider user-service-ref="userService" />
     </authentication-manager>
 
-    <!-- For S2OAuth endpoints -->
-    <!--<http pattern="/oauth/token" create-session="stateless" authentication-manager-ref="clientAuthenticationManager"
-        entry-point-ref="oauthAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
-        <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
-        <anonymous enabled="false" />
-        <http-basic entry-point-ref="oauthAuthenticationEntryPoint" />
-        &lt;!&ndash; include this only if you need to authenticate clients via request parameters &ndash;&gt;
-        <custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER" />
-    </http>-->
 
-    <sec:http pattern="/oauth/token" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint" access-decision-manager-ref="accessDecisionManager">
-        <sec:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
-        <sec:anonymous enabled="false" />
-        <sec:http-basic entry-point-ref="oauthAuthenticationEntryPoint" />
-
-
-    </sec:http>
 
     <sec:http pattern="/api/crm/search**" create-session="never" security="none" />
 
-    <sec:http pattern="/api/**" create-session="never" entry-point-ref="oauthAuthenticationEntryPoint"
-        access-decision-manager-ref="accessDecisionManager">
-
-        <sec:anonymous enabled="true" />
-
-        <sec:intercept-url pattern="/api/self" method="GET" access="ROLE_USER,SCOPE_READ" />
-
-        <sec:intercept-url pattern="/api/users/**/photo" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-        <sec:intercept-url pattern="/api/users/usernames/**" method="GET" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-        <sec:intercept-url pattern="/api/users/**/photo" method="POST" access="ROLE_USER,SCOPE_READ" />
-        <!-- you should be allowed to create a new user without being logged in, obviously -->
-        <sec:intercept-url pattern="/api/users" method="POST" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-
-        <sec:intercept-url pattern="/api/crm/**" access="ROLE_USER,SCOPE_READ" />
-
-        <sec:intercept-url pattern="/api/**" access="ROLE_USER,SCOPE_READ" />
-
-        <sec:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
-        <sec:access-denied-handler ref="oauthAccessDeniedHandler" />
-    </sec:http>
 
     <sec:http auto-config="true">
         <sec:intercept-url pattern="/crm/profile.html" access="ROLE_USER" />
@@ -64,31 +28,5 @@
 
     </sec:http>
 
-    <oauth:client-details-service id="clientDetailsService">
-        <oauth:client client-id="html5-crm" scope="read,write" authorities="ROLE_USER" authorized-grant-types="authorization_code,implicit" resource-ids="crm" />
-<!--
-        super(app.getApiKey(), "greenhouseApi", "read,write", "authorization_code,token,password", "ROLE_CLIENT", app.getCallbackUrl());
--->
-        <oauth:client client-id="android-crm" scope="read,write" authorities="ROLE_USER" authorized-grant-types="authorization_code,implicit" resource-ids="crm" />
-     </oauth:client-details-service>
-
-    <oauth:authorization-server client-details-service-ref="clientDetailsService" token-services-ref="tokenServices"
-        user-approval-handler-ref="oauthTokenServicesUserApprovalHandler">
-        <oauth:authorization-code />
-        <oauth:implicit />
-        <oauth:refresh-token />
-        <oauth:client-credentials />
-        <oauth:password />
-    </oauth:authorization-server>
-
-    <oauth:resource-server id="resourceServerFilter" resource-id="crm" token-services-ref="tokenServices" />
-
-    <sec:global-method-security pre-post-annotations="enabled" proxy-target-class="true">
-        <sec:expression-handler ref="oauthExpressionHandler" />
-    </sec:global-method-security>
-
-    <oauth:expression-handler id="oauthExpressionHandler" />
-
-    <oauth:web-expression-handler id="oauthWebExpressionHandler" />
 
 </beans>

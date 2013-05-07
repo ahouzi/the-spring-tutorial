@@ -1,11 +1,10 @@
 package org.springsource.examples.spring31.web.oauth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.*;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 /**
@@ -13,7 +12,7 @@ import java.util.Map;
  *
  * @author Josh Long
  */
-@Controller
+@Deprecated //@Controller
 @SessionAttributes("authorizationRequest")
 public class AccessConfirmationController {
 
@@ -30,13 +29,11 @@ public class AccessConfirmationController {
 
     @RequestMapping("/oauth/error")
     public String handleError(Map<String, Object> model) throws Exception {
-        // We can add more stuff to the model here for JSP rendering.  If the client was a machine then
-        // the JSON will already have been rendered.
         model.put("message", "There was a problem with the OAuth2 protocol");
         return "oauthError";
     }
 
-    @Autowired
+    @Inject
     public void setClientDetailsService(ClientDetailsService clientDetailsService) {
         this.clientDetailsService = clientDetailsService;
     }

@@ -3,6 +3,9 @@ package org.springsource.examples.spring31.web;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.*;
 import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +49,23 @@ public class UserApiController {
     @ResponseBody
     public User self() {
         return userService.self();
-//        return crmUserDetails.getUser();
+    }
+
+    @RequestMapping(value = "/api/signin")
+    public User signin(@RequestParam("username") String username, @RequestParam("password") String password) throws Throwable {
+        UserService.CrmUserDetails details = userService.loadUserByUsername(username);
+
+        String pw = org.apache.commons.lang.StringUtils.defaultIfBlank(password, "");
+
+        if (!pw.equals(details.getPassword())) {
+            log.debug("attempting to sign the user '" + username + "'.");
+            return null;
+        }
+        Authentication toAuthenticate = new UsernamePasswordAuthenticationToken(details, pw, details.getAuthorities());
+        toAuthenticate.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(toAuthenticate);
+        return details.getUser();
+
     }
 
     @RequestMapping(value = USER_COLLECTION_ENTRY_URL, method = RequestMethod.PUT)
